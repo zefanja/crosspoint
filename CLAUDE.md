@@ -117,7 +117,9 @@ Abnahmen (Portainer, Import in Anki Desktop/AnkiDroid, eine Woche Lernen am Hand
 - Vor jedem Push `git pull --rebase` – CI legt nach jedem Deploy einen Bot-Commit an.
 - CI-Fehler stehen als Annotation in der öffentlichen API (Logs brauchen Login):
   `curl -s https://api.github.com/repos/zefanja/crosspoint/check-runs/<job-id>/annotations`.
-  CI ist sporadisch rot geworden (Spike/pytest), lokal nicht reproduzierbar – Annotation prüfen.
+  Sporadisch rote CI kam (mind. teilweise) von Tests, die sich auf eine undefinierte Reihenfolge
+  verließen: Nutzer-IDs sind ULIDs, im selben Millisekunden-Takt angelegt → zufällige Reihenfolge.
+  In Tests Nutzer nie per `[0]` aus einer Query ohne `order_by` wählen, sondern per Name.
 - Handy-Breite prüfen: Playwright-Screenshots bei 360 px (Chromium liegt unter
   `~/.cache/ms-playwright/`), Overflow über `document.documentElement.scrollWidth` messen.
 - `pkill -f <muster>` trifft die eigene Shell, wenn das Muster im Befehl steht → lieber
