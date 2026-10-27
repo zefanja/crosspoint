@@ -149,7 +149,8 @@ def test_acceptance_two_groups_distribute_fix_redistribute(client, admin, db):
                                            follow_redirects=False))
         assert job.finished and job.errors == [] and job.done == 3
 
-    learner = members[group_ids[0]][0]
+    # by name: member order is undefined, and the progress check below expects A1
+    learner = db.query(User).filter_by(display_name="A1").one().id
     udeck = next(d.id for d in client.portal.call(anki_service.deck_list, learner) if d.name == "Psalm 23")
     _review_all(client, learner, udeck, 4)
     before = client.portal.call(anki_service.collection_stats, learner)
