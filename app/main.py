@@ -182,8 +182,8 @@ def manifest():
         "start_url": "/",
         "scope": "/",
         "display": "standalone",
-        "background_color": "#f6f6f4",
-        "theme_color": "#2f6fdd",
+        "background_color": "#f1f7fa",
+        "theme_color": "#001a3f",
         "icons": [
             {"src": f"{icons}/icon-192.png", "sizes": "192x192", "type": "image/png"},
             {"src": f"{icons}/icon-512.png", "sizes": "512x512", "type": "image/png"},

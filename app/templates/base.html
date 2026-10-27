@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#2f6fdd">
+  <meta name="theme-color" content="#001a3f">
   <title>{% block title %}{{ app_name }}{% endblock %}</title>
   <link rel="stylesheet" href="/static/app.css">
   <link rel="manifest" href="/manifest.webmanifest">
@@ -16,7 +16,7 @@
 </head>
 <body class="{% block body_class %}{% endblock %}{% if user and user.is_staff %} user-admin{% endif %}{% if request.url.path.startswith("/admin") %} admin-page{% endif %}"{% if csrf_token %} hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'{% endif %}>
   <header class="topbar">
-    <a href="/" class="brand">{{ app_name }}</a>
+    <a href="/" class="brand" aria-label="{{ app_name }}"><img src="/static/icons/icon.svg" alt="" width="28" height="28"><span aria-hidden="true">Cross<span class="brand-point">Point</span></span></a>
     {% if user %}
     <nav class="topnav">
       {% if user.is_staff %}<a href="/admin" class="navlink">{{ _("Admin") }}</a>{% endif %}

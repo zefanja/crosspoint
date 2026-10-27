@@ -1,18 +1,22 @@
 :root {
-  --bg: #f6f6f4;
+  /* brand colors from the CrossPoint print material */
+  --brand-navy: #001a3f;
+  --brand-cyan: #2aecfe;
+  --brand-yellow: #f5e13a;
+  --bg: #f1f7fa;
   --surface: #ffffff;
-  --surface-2: #f0f0ee;
-  --text: #1d1d1f;
-  --muted: #6b6b70;
-  --accent: #2f6fdd;
+  --surface-2: #e7f0f6;
+  --text: #0b1a33;
+  --muted: #5a6a80;
+  --accent: #0a3d91;
   --accent-text: #ffffff;
-  --border: #e2e2e0;
+  --border: #d9e5ee;
   --danger: #c62828;
   --success-bg: #e6f4ea;
   --success-text: #1e6b34;
   --error-bg: #fdecea;
   --error-text: #a12622;
-  --info-bg: #eef3fc;
+  --info-bg: #e3f6fc;
   --c-new: #1f6feb;
   --c-learn: #d1242f;
   --c-rev: #1a7f37;
@@ -26,20 +30,20 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #141416;
-    --surface: #1f1f23;
-    --surface-2: #2a2a2f;
-    --text: #ececef;
-    --muted: #9a9aa2;
-    --accent: #6a9bff;
-    --accent-text: #0b1530;
-    --border: #2e2e33;
+    --bg: #00112a;
+    --surface: #0a2143;
+    --surface-2: #123059;
+    --text: #eaf4fb;
+    --muted: #9cb0c8;
+    --accent: #2aecfe;
+    --accent-text: #001a3f;
+    --border: #1c3b64;
     --danger: #ff6b6b;
     --success-bg: #173a24;
     --success-text: #9be5b0;
     --error-bg: #3d1a1a;
     --error-text: #ffb4ab;
-    --info-bg: #1c2740;
+    --info-bg: #0d2c52;
     --c-new: #6aa7ff;
     --c-learn: #ff7b72;
     --c-rev: #56d364;
@@ -80,16 +84,24 @@ code { font-size: 0.9em; background: var(--surface-2); padding: 1px 4px; border-
   min-height: var(--touch);
   padding: 0 8px 0 16px;
   padding-top: env(safe-area-inset-top);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: var(--brand-navy);
+  border-bottom: 3px solid var(--brand-yellow);
 }
 
 .brand {
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   text-decoration: none;
-  color: var(--text);
-  line-height: var(--touch);
+  color: #ffffff;
 }
+.brand img { display: block; }
+.brand-point { color: var(--brand-cyan); }
 
 .topnav { display: flex; align-items: center; }
 .topnav form { margin: 0; }
@@ -99,7 +111,7 @@ code { font-size: 0.9em; background: var(--surface-2); padding: 1px 4px; border-
   align-items: center;
   min-height: var(--touch);
   padding: 0 12px;
-  color: var(--muted);
+  color: #cfe0f2;
   text-decoration: none;
   font-size: 0.95rem;
 }
@@ -454,7 +466,7 @@ textarea.input { resize: vertical; line-height: 1.4; }
 @media (min-width: 560px) { .sheet { grid-template-columns: 1fr 1fr; } }
 .login-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; background: #fff; color: #000; border: 1px dashed #999; border-radius: 6px; }
 .login-card p { margin: 0; }
-.lc-app { font-size: 0.8rem; font-weight: 700; color: #2f6fdd; }
+.lc-app { font-size: 0.8rem; font-weight: 700; color: #001a3f; }
 .lc-name { font-size: 1.15rem; font-weight: 700; margin: 2px 0 6px; }
 .lc-code { font-family: ui-monospace, monospace; font-size: 1.35rem; letter-spacing: 0.08em; font-weight: 700; }
 .lc-steps { margin: 8px 0 0; padding-left: 18px; font-size: 0.75rem; line-height: 1.35; color: #333; }
@@ -472,7 +484,9 @@ textarea.input { resize: vertical; line-height: 1.4; }
 }
 
 @media (max-width: 420px) {
-  .topbar { padding-right: 4px; }
+  .topbar { padding-right: 4px; padding-left: 10px; }
+  .brand { gap: 5px; letter-spacing: 0; }
+  .brand img { width: 22px; height: 22px; }
   .navlink { padding: 0 8px; font-size: 0.9rem; }
   .linkbutton.navlink { font-size: 0.9rem; }
   .user-admin .nav-search { display: none; }
