@@ -57,11 +57,6 @@ def test_add_note_empty_first_field(client, learner):
     assert r.status_code == 400 and "nicht leer" in r.text
 
 
-def test_basic_notetype_form(client, learner):
-    r = client.get("/notes/new?notetype=Basic")
-    assert "Vorderseite" in r.text and "Rückseite" in r.text
-
-
 def test_review_flow_with_undo(client, learner):
     _, csrf = learner
     deck = default_deck(client)
@@ -207,3 +202,36 @@ def test_security_headers_and_pwa(client):
     assert sw.status_code == 200 and sw.headers["service-worker-allowed"] == "/"
     assert "Keine Verbindung" in client.get("/offline").text
     assert "Datenschutz" in client.get("/datenschutz").text
+
+
+def test_bible_text_import(client, learner):
+    _, csrf = learner
+    deck = default_deck(client)
+    page = client.get("/notes/bible")
+    assert page.status_code == 200 and "Bibeltext" in page.text
+
+    raw = "¹ Der HERR ist mein Hirte. ² Er weidet mich <script>x</script>auf grüner Aue."
+    preview = client.post("/notes/bible/preview", headers=HX, data={"csrf_token": csrf, "text": raw})
+    assert "2 Abschnitte" in preview.text and "<script" not in preview.text
+
+    r = client.post("/notes/bible", data={"csrf_token": csrf, "deck_id": deck, "title": "Psalm 23",
+                                          "recite": 2, "text": raw})
+    assert r.status_code == 200 and "2 Abschnitte mit 6 Karten" in r.text
+    rows = client.get('/browse?q="note:Bible Memorizer"').text
+    assert "6 Karten" in rows
+    note_id = int(re.search(r'href="/notes/(\d+)"', rows).group(1))
+    edit = client.get(f"/notes/{note_id}")
+    assert "aus dem Text erzeugt" in edit.text and "Speichern" not in edit.text
+    assert "<script>x" not in edit.text
+
+
+def test_bible_text_requires_title(client, learner):
+    _, csrf = learner
+    r = client.post("/notes/bible", data={"csrf_token": csrf, "deck_id": default_deck(client),
+                                          "title": " ", "text": "1 Jesus weinte."})
+    assert r.status_code == 400 and "Titel" in r.text
+
+
+def test_basic_is_question_answer(client, learner):
+    r = client.get("/notes/new?notetype=Basic")
+    assert "Frage" in r.text and "Antwort" in r.text and 'aria-current="page">Frage &amp; Antwort' in r.text

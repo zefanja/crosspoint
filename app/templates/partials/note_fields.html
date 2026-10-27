@@ -1,5 +1,5 @@
-{% set labels = {"Front": "Vorderseite", "Back": "Rückseite", "Referenz": "Referenz", "Text": "Text", "Übersetzung": "Übersetzung (optional)"} %}
-{% set hints = {"Referenz": "z. B. Joh 3,16", "Übersetzung": "z. B. LUT17"} %}
+{% set labels = {"Front": "Frage", "Back": "Antwort", "Referenz": "Referenz", "Text": "Text", "Übersetzung": "Übersetzung (optional)"} %}
+{% set hints = {"Referenz": "z. B. Joh 3,16", "Übersetzung": "z. B. LUT17", "Front": "z. B. Wer führte Israel durch das Rote Meer?", "Back": "z. B. Mose (2. Mose 14)"} %}
 {% for name in field_names %}
 <label for="field_{{ loop.index0 }}">{{ labels.get(name, name) }}</label>
 {% if name in ("Referenz", "Übersetzung") %}
@@ -7,7 +7,7 @@
        value="{{ values.get(loop.index0, '') }}" placeholder="{{ hints.get(name, '') }}"
        {% if loop.first %}autofocus required{% endif %}{% if readonly %} readonly{% endif %}>
 {% else %}
-<textarea id="field_{{ loop.index0 }}" name="field_{{ loop.index0 }}" class="input" rows="{{ 5 if name == 'Text' else 3 }}"
+<textarea id="field_{{ loop.index0 }}" name="field_{{ loop.index0 }}" class="input" rows="{{ 5 if name == 'Text' else 3 }}" placeholder="{{ hints.get(name, '') }}"
           {% if loop.first %}autofocus required{% endif %}{% if readonly %} readonly{% endif %}>{{ values.get(loop.index0, '') }}</textarea>
 {% endif %}
 {% endfor %}

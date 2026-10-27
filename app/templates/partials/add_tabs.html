@@ -1,0 +1,7 @@
+<nav class="tabs" aria-label="Kartenart">
+  {% set tabs = [("Bibelvers", "/notes/new?notetype=Bibelvers"), ("Frage & Antwort", "/notes/new?notetype=Basic"), ("Bibeltext", "/notes/bible")] %}
+  {% for label, href in tabs %}
+  <a href="{{ href }}{{ '&' if '?' in href else '?' }}deck_id={{ deck_id }}" class="tab{% if label == active_tab %} active{% endif %}"
+     {% if label == active_tab %}aria-current="page"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</nav>

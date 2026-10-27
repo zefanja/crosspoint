@@ -96,13 +96,27 @@ damit das Dashboard nicht 100+ Collections öffnen muss. Wahrheit bleibt die Col
 ### 5.3 Notiztypen
 
 1. **Basic** (Ankis Standard „Basic“, unverändert übernehmen) – Felder `Front`, `Back`.
+   In der Oberfläche „Frage & Antwort“ (Felder „Frage“/„Antwort“): für allgemeine Fragen
+   zu Themen der Bibel, nicht nur für Verse.
 2. **Bibelvers** – Name exakt `Bibelvers`
    - Felder: `Referenz` (z. B. „Joh 3,16“), `Text`, `Übersetzung` (optional, z. B. „LUT17“)
    - Karte 1 „Referenz → Text“: Vorderseite `{{Referenz}}` (+ kleine Übersetzung),
      Rückseite Vorderseite + `<hr id=answer>` + `{{Text}}`
    - Schlichtes, gut lesbares CSS (große Schrift, Zeilenhöhe 1.5, zentriert, Dark-Mode-fähig).
 
-Beide Notiztypen werden bei Anlage einer Collection automatisch erzeugt, falls nicht vorhanden.
+3. **Bible Memorizer** – 1:1 aus dem Anki-Add-on
+   [zefanja/bible-memorizer](https://github.com/zefanja/bible-memorizer) (`src/model.py`,
+   Version 1.5): 10 Felder (`answer, verse_number, verse_part, table, front, back,
+   first_letters, last_letters, title, id`), 4 Karten (letzte Buchstaben, Anfangsbuchstaben,
+   Übersichtstabelle, Zusammenhang), Sortierfeld `id`, Original-CSS.
+   Notizen werden aus einem Bibeltext erzeugt (siehe 7.1 „Bibeltext importieren“).
+
+Alle drei Notiztypen haben in **jeder** Collection dieselbe ID, sonst legt der Import eines
+Gruppendecks Duplikate an („Basic+“). IDs lassen sich per API nicht setzen, ein Import
+übernimmt sie aber: Die kanonischen Notiztypen liegen im Seed-Paket
+`app/seed/notetypes.apkg` (erzeugt mit `python -m app.cli build-seed`, IDs in
+`anki_service.SEED_IDS`) und werden bei Anlage einer Collection importiert. Ungenutzte
+Notiztypen mit fremder ID werden ersetzt. **Seed nie neu bauen**, sobald Nutzer existieren.
 
 ## 6. Collection-Zugriff (`anki_service.py`)
 
@@ -184,6 +198,17 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - Felder: einfaches Textfeld, Zeilenumbrüche → `<br>`. Erlaubtes HTML nach Sanitizing:
   `b, i, u, br, div, span, sup, sub, ul, ol, li` (Bibliothek `nh3`).
 - Karten in Gruppendecks sind für Lerner **schreibgeschützt** (Tag `gruppendeck` erkennen).
+
+**Bibeltext importieren** (Bible Memorizer)
+- Felder: Deck, Titel, Bibeltext, Zeilen Zusammenhang (1–10, Standard 2),
+  „Übersichtstabelle erstellen“ (nur bei mehr als 4 Versen).
+- Der Text wird von Markup befreit und automatisch formatiert (Port von `formatter.js` aus
+  dem Web-Tool des Add-ons: Zeilenumbruch vor jeder Versnummer, auch Hochzahlen,
+  n+1-Heuristik). Live-Vorschau der erkannten Abschnitte per htmx.
+- Erzeugung mit den Funktionen aus `gen_notes.py` (unverändert vendored unter
+  `app/bible_memorizer/`). Einzige Abweichung: „[Beginning]“ → „[Anfang]“.
+- Bibeltext-Notizen sind nicht einzeln bearbeitbar (löschen und neu importieren);
+  aussetzen und löschen geht.
 
 **Kartenliste / Suche**
 - Suchfeld (Anki-Suchsyntax wird durchgereicht), Liste: Vorderseite (gekürzt), Deck, fällig am.

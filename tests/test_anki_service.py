@@ -276,3 +276,111 @@ def test_backup_collection(run, deck, tmp_path):
     assert not run(svc.backup_collection("NOBODY", tmp_path / "bk2"))
     # collection reopens transparently after the backup closed it
     assert run(svc.get_note(U, run(svc.search_cards(U, ""))[0][0].note_id))
+
+
+def test_notetypes_have_shared_seed_ids(run):
+    run(svc.ensure_collection(U))
+    run(svc.ensure_collection("OTHER"))
+    ids = lambda col: {m["name"]: m["id"] for m in col.models.all()}  # noqa: E731
+    for uid in (U, "OTHER"):
+        got = run(svc._run(uid, ids))
+        assert got["Basic"] == svc.SEED_IDS["Basic"]
+        assert got["Bibelvers"] == svc.SEED_IDS["Bibelvers"]
+    names = run(svc.deck_names(U))
+    assert svc.SEED_DECK not in dict(names).values()
+    assert run(svc.search_cards(U, ""))[1] == 0
+
+
+def test_group_deck_import_does_not_duplicate_notetypes(run, tmp_path):
+    adeck = run(svc.create_deck(svc.ADMIN_COLLECTION, "Gruppe"))
+    run(svc.add_note(svc.ADMIN_COLLECTION, svc.BIBELVERS, adeck, {"Referenz": "Ps 1", "Text": "x"}))
+    run(svc.add_note(svc.ADMIN_COLLECTION, svc.BASIC, adeck, {"Front": "F", "Back": "B"}))
+    pkg = tmp_path / "g.apkg"
+    run(svc.export_deck(svc.ADMIN_COLLECTION, adeck, pkg, with_scheduling=False))
+    run(svc.import_package(U, pkg))
+    names = run(svc._run(U, lambda col: [m["name"] for m in col.models.all()]))
+    assert not [n for n in names if n.endswith("+")], names
+
+
+def test_seed_package_matches_constants(tmp_path):
+    ids = svc.build_seed_package(tmp_path / "seed.apkg")
+    assert set(ids) == set(svc.SEED_IDS)  # ids differ per build; the committed file is canonical
+    (tmp_path / "c").mkdir()
+    col = Collection(str(tmp_path / "c" / "collection.anki2"))
+    try:
+        col.import_anki_package(ImportAnkiPackageRequest(
+            package_path=str(svc.SEED_PATH), options=ImportAnkiPackageOptions()))
+        got = {m["name"]: m["id"] for m in col.models.all()}
+        assert got["Bibelvers"] == svc.SEED_IDS["Bibelvers"]
+        assert svc.SEED_IDS["Basic"] in got.values()
+    finally:
+        col.close()
+
+
+def test_existing_unused_notetype_is_replaced(run, data_dir):
+    path = svc.collection_path("OLD")
+    path.parent.mkdir(parents=True)
+    col = Collection(str(path))  # Phase-1 style collection: random notetype ids
+    svc._add_bibelvers_notetype(col)
+    col.close()
+    run(svc.ensure_collection("OLD"))
+    got = run(svc._run("OLD", lambda c: {m["name"]: m["id"] for m in c.models.all()}))
+    assert got["Basic"] == svc.SEED_IDS["Basic"] and got["Bibelvers"] == svc.SEED_IDS["Bibelvers"]
+
+
+PSALM = """1 Der HERR ist mein Hirte, mir wird nichts mangeln.
+2 Er weidet mich auf einer grünen Aue
+und führet mich zum frischen Wasser.
+3 Er erquicket meine Seele.
+4 Und ob ich schon wanderte im finstern Tal,
+5 Du bereitest vor mir einen Tisch"""
+
+
+def test_add_bible_text(run, deck):
+    notes, cards = run(svc.add_bible_text(U, deck, "Psalm 23", 2, PSALM, table=True))
+    assert notes == 6
+    assert cards == 6 * 4  # last letters, first letters, table (5 verses > 4), context
+    rows, total = run(svc.search_cards(U, '"note:Bible Memorizer"'))
+    assert total == 24
+    note = run(svc.get_note(U, rows[0].note_id))
+    f = dict(note.fields)
+    assert note.generated and note.notetype == "Bible Memorizer"
+    assert f["title"] == "Psalm 23" and f["first_letters"] and "<table" in f["table"]
+    fronts = [dict(run(svc.get_note(U, r.note_id)).fields)["front"] for r in rows]
+    assert "[Anfang]" in fronts and "[Beginning]" not in fronts
+    with pytest.raises(svc.ReadOnlyNote):
+        run(svc.update_note(U, note.id, {"title": "x"}, deck))
+
+
+def test_add_bible_text_without_table_and_short(run, deck):
+    notes, cards = run(svc.add_bible_text(U, deck, "Kurz", 1, "1 Jesus weinte.", table=True))
+    assert (notes, cards) == (1, 3)  # no table for <= 4 verses
+    with pytest.raises(svc.EmptyNote):
+        run(svc.add_bible_text(U, deck, "Leer", 2, "  \n ", table=False))
+
+
+def test_bible_memorizer_notetype_matches_addon(run):
+    from app.bible_memorizer import model as bm
+    m = run(svc._run(U, lambda col: col.models.by_name("Bible Memorizer")))
+    assert m["id"] == svc.SEED_IDS["Bible Memorizer"]
+    assert [f["name"] for f in m["flds"]] == bm.FIELD_NAMES
+    assert [(t["name"], t["qfmt"], t["afmt"]) for t in m["tmpls"]] == [tuple(t) for t in bm.TEMPLATES]
+    assert m["css"] == bm.CSS and m["sortf"] == bm.FIELD_NAMES.index("id")
+
+
+def test_tag_deck_notes(run, deck):
+    sub = run(svc.create_deck(U, f"{svc.DEFAULT_DECK}::Unter"))
+    other = run(svc.create_deck(U, "Andere"))
+    add_verse(run, deck)
+    add_verse(run, sub, ref="Sub")
+    add_verse(run, other, ref="Nicht")
+    assert run(svc.tag_deck_notes(U, deck)) == 2  # incl. subdeck
+    assert run(svc.tag_deck_notes(U, deck)) == 0  # idempotent
+    assert run(svc.search_cards(U, f"tag:{svc.GROUP_TAG}"))[1] == 2
+
+
+def test_delete_collection(run, deck):
+    add_verse(run, deck)
+    run(svc.delete_collection(U))
+    assert not svc.collection_path(U).parent.exists() and svc.open_count() == 0
+    assert run(svc.search_cards(U, ""))[1] == 0  # a fresh one is created on next access

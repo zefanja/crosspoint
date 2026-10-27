@@ -3,7 +3,7 @@
 {% if all_done %}
 <p class="alert alert-success">Fertig für heute 🎉 – nächste Karten morgen</p>
 {% elif total_cards == 0 %}
-<p class="alert">Noch keine Karten. Füge deine erste Karte hinzu – zum Beispiel einen Bibelvers.</p>
+<p class="alert">Noch keine Karten. Füge deine erste Karte hinzu – einen Bibelvers, eine Frage zur Bibel oder einen ganzen Bibelabschnitt.</p>
 {% endif %}
 
 <section class="card flush">
@@ -28,6 +28,7 @@
 
 <div class="actions-grid">
   <a class="btn btn-primary" href="/notes/new">Karte hinzufügen</a>
+  <a class="btn" href="/notes/bible">Bibeltext importieren</a>
   <a class="btn" href="/browse">Karten durchsuchen</a>
   <a class="btn" href="/export">Export</a>
 </div>

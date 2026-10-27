@@ -17,7 +17,7 @@ from app import anki_service, auth, backup
 from app.config import get_settings
 from app.db import get_engine, get_sessionmaker
 from app.routes import auth as auth_routes
-from app.routes import browse, decks, export, notes, pages, review
+from app.routes import bible, browse, decks, export, notes, pages, review
 from app.templating import BASE_DIR, is_htmx, render, templates
 
 log = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
-for module in (auth_routes, decks, review, notes, browse, export, pages):
+for module in (auth_routes, decks, review, bible, notes, browse, export, pages):
     app.include_router(module.router)
 
 

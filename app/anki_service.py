@@ -11,6 +11,7 @@ import asyncio
 import logging
 import re
 import shutil
+import tempfile
 import threading
 import time
 from collections import OrderedDict
@@ -33,6 +34,8 @@ from anki.notes import NoteFieldsCheckResult
 from anki.scheduler.v3 import CardAnswer
 from starlette.concurrency import run_in_threadpool
 
+from app.bible_memorizer import gen_notes as bm_gen
+from app.bible_memorizer import model as bm_model
 from app.config import get_settings
 from app.sanitize import plain_text
 
@@ -45,6 +48,7 @@ GROUP_TAG = "gruppendeck"
 DEFAULT_DECK = "Meine Karten"
 BASIC = "Basic"
 BIBELVERS = "Bibelvers"
+BIBLE_MEMORIZER = bm_model.MODEL_NAME  # "Bible Memorizer"
 DEFAULT_NEW_PER_DAY = 10
 DEFAULT_REVIEWS_PER_DAY = 200
 DEFAULT_RETENTION = 0.9
@@ -53,6 +57,9 @@ DEFAULT_RETENTION = 0.9
 # interval labels and error messages are localized.
 CREATE_LANG = "en"
 UI_LANG = "de"
+SEED_PATH = Path(__file__).resolve().parent / "seed" / "notetypes.apkg"
+SEED_DECK = "_versfest_seed"
+SEED_IDS = {BASIC: 1793118616169, BIBELVERS: 1793118616181, BIBLE_MEMORIZER: 1793118616188}  # from `python -m app.cli build-seed`
 
 RATINGS = {1: CardAnswer.AGAIN, 2: CardAnswer.HARD, 3: CardAnswer.GOOD, 4: CardAnswer.EASY}
 QUEUE_SUSPENDED = -1
@@ -156,6 +163,7 @@ class NoteData:
     tags: list[str]
     readonly: bool
     suspended: bool
+    generated: bool = False  # Bible Memorizer notes are generated from a text, not edited
 
 
 @dataclass
@@ -328,8 +336,66 @@ def _setup_new_collection(col: Collection) -> None:
 
 
 def _ensure_notetypes(col: Collection) -> None:
-    if col.models.by_name(BIBELVERS) is not None:
-        return
+    """Make sure Basic and Bibelvers exist with the shared seed ids.
+
+    Notetype ids must be identical in all collections, otherwise importing a group deck
+    creates duplicates ("Basic+"). Ids cannot be set via the API, but an import keeps
+    them – so the canonical notetypes come from the seed package (app/seed/).
+    Unused notetypes with a foreign id (fresh collections) are replaced.
+    """
+    missing = False
+    for name, nt_id in SEED_IDS.items():
+        m = col.models.by_name(name)
+        if m is not None and m["id"] == nt_id:
+            continue
+        if m is not None and col.models.use_count(m) == 0:
+            col.models.remove(m["id"])
+            m = None
+        if m is None and col.models.get(nt_id) is None:
+            missing = True
+    if missing:
+        _import_seed(col)
+
+
+def _import_seed(col: Collection) -> None:
+    col.import_anki_package(
+        ImportAnkiPackageRequest(package_path=str(SEED_PATH), options=ImportAnkiPackageOptions())
+    )
+    seed_deck = col.decks.id(SEED_DECK, create=False)
+    if seed_deck:
+        col.remove_notes(col.find_notes(f"did:{seed_deck}"))
+        col.decks.remove([seed_deck])
+
+
+def build_seed_package(out_path: Path) -> dict[str, int]:
+    """Create the seed .apkg with one dummy note per notetype. Returns the notetype ids.
+
+    Only run when the notetypes are introduced (python -m app.cli build-seed); the ids
+    then go into SEED_IDS. Rebuilding changes the ids and breaks group-deck matching.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        col = Collection(str(Path(tmp) / "collection.anki2"), backend=RustBackend(langs=[CREATE_LANG]))
+        try:
+            _add_bibelvers_notetype(col)
+            _add_bible_memorizer_notetype(col)
+            did = col.decks.id(SEED_DECK)
+            for name in SEED_IDS:
+                note = col.new_note(col.models.by_name(name))
+                note.fields[0] = "seed"
+                col.add_note(note, did)
+            col.export_anki_package(
+                out_path=str(out_path),
+                options=ExportAnkiPackageOptions(
+                    with_scheduling=False, with_deck_configs=False, with_media=False, legacy=False
+                ),
+                limit=DeckIdLimit(deck_id=did),
+            )
+            return {name: int(col.models.by_name(name)["id"]) for name in SEED_IDS}
+        finally:
+            col.close()
+
+
+def _add_bibelvers_notetype(col: Collection) -> None:
     mm = col.models
     m = mm.new(BIBELVERS)
     for name in ("Referenz", "Text", "Übersetzung"):
@@ -339,6 +405,22 @@ def _ensure_notetypes(col: Collection) -> None:
     t["afmt"] = BIBELVERS_AFMT
     mm.add_template(m, t)
     m["css"] = BIBELVERS_CSS
+    mm.add(m)
+
+
+def _add_bible_memorizer_notetype(col: Collection) -> None:
+    """Identical to the Anki add-on's note type (fields, templates, CSS, sort field)."""
+    mm = col.models
+    m = mm.new(bm_model.MODEL_NAME)
+    for name in bm_model.FIELD_NAMES:
+        mm.add_field(m, mm.new_field(name))
+    for name, front, back in bm_model.TEMPLATES:
+        t = mm.new_template(name)
+        t["qfmt"] = front
+        t["afmt"] = back
+        mm.add_template(m, t)
+    m["css"] = bm_model.CSS
+    m["sortf"] = bm_model.FIELD_NAMES.index(bm_model.SORT_FIELD)
     mm.add(m)
 
 
@@ -541,6 +623,50 @@ async def add_note(
     return await _run(user_id, _add_note, notetype, deck_id, fields, tags)
 
 
+def _add_bible_text(col: Collection, deck_id: int, title: str, recite: int, text: str,
+                    table: bool, tags) -> tuple[int, int]:
+    """Mirror of add_notes() from bible-memorizer's gen_notes.py, using its helpers."""
+    _require_deck(col, deck_id)
+    model = col.models.get(SEED_IDS[BIBLE_MEMORIZER]) or col.models.by_name(BIBLE_MEMORIZER)
+    data = bm_gen.process_lines(text)
+    if not data:
+        raise EmptyNote("Bitte einen Bibeltext eingeben.")
+    sorted_data = bm_gen.sort_by_verse_number(data)
+    ms = int(time.time() * 1000)
+    cards = 0
+    for idx, d in enumerate(data):
+        html = ""
+        if len(sorted_data) > 4 and table:
+            html = bm_gen.create_html_table(sorted_data, d["verse_number"], d["verse_part"])
+        front, back = bm_gen.get_verses(data, d["verse_number"], d["verse_part"], recite)
+        if front == "[Beginning]":  # the only change to the add-on's output: German UI
+            front = "[Anfang]"
+        note = col.new_note(model)
+        note["answer"] = d["answer"]
+        note["verse_number"] = str(d["verse_number"])
+        note["verse_part"] = d["verse_part"]
+        note["table"] = html
+        note["title"] = title
+        note["front"] = front
+        note["back"] = back
+        note["first_letters"] = d["first_letters"]
+        note["last_letters"] = d["last_letters"]
+        note["id"] = f"{ms}-{idx}"
+        note.tags = list(tags)
+        col.add_note(note, deck_id)
+        cards += len(note.card_ids())
+    return len(data), cards
+
+
+async def add_bible_text(
+    user_id: str, deck_id: int, title: str, recite: int, text: str, table: bool,
+    tags: tuple[str, ...] = (),
+) -> tuple[int, int]:
+    """Create Bible Memorizer notes from a formatted, sanitized text (one line per note).
+    Returns (notes, cards)."""
+    return await _run(user_id, _add_bible_text, deck_id, title, recite, text, table, tags)
+
+
 def _note_data(col: Collection, note_id: int) -> NoteData:
     note = _get_note_obj(col, note_id)
     cards = note.cards()
@@ -552,6 +678,7 @@ def _note_data(col: Collection, note_id: int) -> NoteData:
         tags=list(note.tags),
         readonly=note.has_tag(GROUP_TAG),
         suspended=bool(cards) and all(c.queue == QUEUE_SUSPENDED for c in cards),
+        generated=note.note_type()["name"] == BIBLE_MEMORIZER,
     )
 
 
@@ -563,6 +690,9 @@ def _update_note(col: Collection, note_id, fields, deck_id, allow_group: bool) -
     note = _get_note_obj(col, note_id)
     if note.has_tag(GROUP_TAG) and not allow_group:
         raise ReadOnlyNote("Karten aus Gruppendecks können nicht bearbeitet werden.")
+    if note.note_type()["name"] == BIBLE_MEMORIZER:
+        raise ReadOnlyNote("Bibeltext-Karten werden aus dem Text erzeugt. "
+                           "Zum Ändern bitte löschen und neu importieren.")
     _require_deck(col, deck_id)
     _set_fields(note, fields)
     col.update_note(note)
@@ -735,6 +865,38 @@ def _import_package(col: Collection, path: str, with_scheduling: bool) -> int:
 async def import_package(user_id: str, path: Path, with_scheduling: bool = False) -> int:
     """Import an .apkg; existing notes are updated by GUID. Returns new+updated count."""
     return await _run(user_id, _import_package, str(path), with_scheduling)
+
+
+def _tag_deck_notes(col: Collection, deck_id: int, tag: str) -> int:
+    deck = _require_deck(col, deck_id)
+    note_ids = col.find_notes(f'"deck:{_escape_search(deck["name"])}" -tag:{tag}')
+    if note_ids:
+        col.tags.bulk_add(note_ids, tag)
+    return len(note_ids)
+
+
+def _escape_search(text: str) -> str:
+    return text.replace("\\", "\\\\").replace('"', '\\"').replace("*", "\\*").replace("_", "\\_")
+
+
+async def tag_deck_notes(user_id: str, deck_id: int, tag: str = GROUP_TAG) -> int:
+    """Add `tag` to all notes of the deck (incl. subdecks) that lack it. Returns count."""
+    return await _run(user_id, _tag_deck_notes, deck_id, tag)
+
+
+async def delete_collection(user_id: str) -> None:
+    """Close and delete the user's collection folder (irreversible)."""
+    path = collection_path(user_id)
+    async with _lock(user_id):
+        with _cache_lock:
+            entry = _open.pop(user_id, None)
+
+        def remove() -> None:
+            if entry is not None:
+                entry.col.close()
+            shutil.rmtree(path.parent, ignore_errors=True)
+
+        await run_in_threadpool(remove)
 
 
 # --------------------------------------------------------------------------- stats

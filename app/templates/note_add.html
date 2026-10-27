@@ -4,13 +4,8 @@
 <p><a href="/" class="back">‹ Decks</a></p>
 <section class="card">
   <h1>Karte hinzufügen</h1>
-  <nav class="tabs" aria-label="Notiztyp">
-    {% for nt in notetypes %}
-    <a href="/notes/new?notetype={{ nt.name | urlencode }}&deck_id={{ deck_id }}"
-       class="tab{% if nt.name == notetype.name %} active{% endif %}"
-       {% if nt.name == notetype.name %}aria-current="page"{% endif %}>{{ "Vorder-/Rückseite" if nt.name == "Basic" else nt.name }}</a>
-    {% endfor %}
-  </nav>
+  {% set active_tab = "Frage & Antwort" if notetype.name == "Basic" else notetype.name %}
+  {% include "partials/add_tabs.html" %}
   {% if message %}<p class="alert alert-success" role="status">{{ message }}</p>{% endif %}
   {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
   <form method="post" action="/notes/new" class="stack">

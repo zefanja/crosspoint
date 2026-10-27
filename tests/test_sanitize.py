@@ -20,3 +20,9 @@ def test_newlines_roundtrip():
 
 def test_plain_text():
     assert plain_text("<b>Joh</b><br>3,16 &amp; mehr") == "Joh 3,16 & mehr"
+
+
+def test_plain_text_lines():
+    from app.sanitize import plain_text_lines
+    out = plain_text_lines("1 A <b>fett</b> &amp; B<br>2 C <script>x()</script>< 3")
+    assert out == "1 A fett ＆ B\n2 C ‹ 3"

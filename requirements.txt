@@ -7,3 +7,4 @@ python-multipart==0.0.32
 nh3==0.3.7
 # Pinned after the Phase 0b spike; only app/anki_service.py may import it.
 anki==26.9.3
+segno==1.6.6

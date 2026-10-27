@@ -22,7 +22,7 @@ _CARD_HEAD = (
 )
 _CARD_TAIL = (
     "<style>@media (prefers-color-scheme: dark){html,body,.card{background-color:#1f1f23;"
-    "color:#ececef}}</style></body></html>"
+    "color:#ececef}.back{color:#f5d742}td:last-child,.highlight{color:#1d1d1f}}</style></body></html>"
 )
 
 

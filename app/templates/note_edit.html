@@ -5,18 +5,20 @@
 <section class="card">
   <h1>Karte bearbeiten</h1>
   <p class="muted small">Notiztyp: {{ note.notetype }}{% if note.suspended %} · <strong>ausgesetzt</strong>{% endif %}</p>
-  {% if note.readonly %}<p class="alert">Diese Karte gehört zu einem Gruppendeck und kann nicht bearbeitet werden.</p>{% endif %}
+  {% if note.readonly %}<p class="alert">Diese Karte gehört zu einem Gruppendeck und kann nicht bearbeitet werden.</p>
+  {% elif note.generated %}<p class="alert">Bibeltext-Karten werden aus dem Text erzeugt und können nicht einzeln bearbeitet werden. Zum Ändern löschen und den Abschnitt neu importieren.</p>{% endif %}
+  {% set locked = note.readonly or note.generated %}
   {% if saved %}<p class="alert alert-success" role="status">Gespeichert.</p>{% endif %}
   {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
   <form method="post" class="stack">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <label for="deck_id">Deck</label>
-    <select id="deck_id" name="deck_id" class="input"{% if note.readonly %} disabled{% endif %}>
+    <select id="deck_id" name="deck_id" class="input"{% if locked %} disabled{% endif %}>
       {% for did, name in decks %}<option value="{{ did }}"{% if did == note.deck_id %} selected{% endif %}>{{ name }}</option>{% endfor %}
     </select>
-    {% set field_names = note.fields | map("first") | list %}{% set readonly = note.readonly %}
+    {% set field_names = note.fields | map("first") | list %}{% set readonly = locked %}
     {% include "partials/note_fields.html" %}
-    {% if not note.readonly %}<button type="submit" class="btn btn-primary btn-block">Speichern</button>{% endif %}
+    {% if not locked %}<button type="submit" class="btn btn-primary btn-block">Speichern</button>{% endif %}
   </form>
 </section>
 
