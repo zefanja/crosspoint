@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}Versfest{% endblock %}</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand">Versfest</a>
+  </header>
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer">
+    <span>Kompatibel mit Anki</span>
+    <span>·</span>
+    <a href="{{ source_url }}">Quellcode</a>
+    <span>·</span>
+    <span class="version" title="Version">{{ app_version }}</span>
+  </footer>
+</body>
+</html>

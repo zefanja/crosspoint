@@ -1,0 +1,29 @@
+# Production stack, used by Portainer directly from this repository.
+# The `image:` line is owned by the CI bump job – never edit it by hand.
+services:
+  app:
+    image: ghcr.io/zefanja/crosspoint:sha-0000000
+    container_name: versfest
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY muss gesetzt sein}
+      BASE_URL: ${BASE_URL:?BASE_URL muss gesetzt sein}
+      TZ: Europe/Berlin
+      DATA_DIR: /data
+      FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-127.0.0.1}
+      INITIAL_ADMIN_NAME: ${INITIAL_ADMIN_NAME:-Admin}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-7}
+    volumes:
+      # Absolute host path (e.g. /srv/versfest) or default: named volume.
+      # Never use a relative bind mount (./data) in a Portainer Git stack.
+      - ${DATA_PATH:-versfest-data}:/data
+    ports:
+      - "${PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  versfest-data:
