@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 18:37+0100\n"
+"POT-Creation-Date: 2026-10-27 19:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,52 +17,52 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/anki_service.py:49 app/templates/browse.html:13
+#: app/anki_service.py:51 app/templates/browse.html:13
 msgid "My cards"
 msgstr ""
 
-#: app/anki_service.py:497 app/routes/admin_groups.py:122
+#: app/anki_service.py:499 app/routes/admin_groups.py:122
 #: app/routes/admin_groups.py:135 app/routes/export.py:58
 msgid "Deck not found."
 msgstr ""
 
-#: app/anki_service.py:504
+#: app/anki_service.py:506
 msgid "Please enter a deck name."
 msgstr ""
 
-#: app/anki_service.py:611
+#: app/anki_service.py:613
 msgid "Note not found."
 msgstr ""
 
-#: app/anki_service.py:619
+#: app/anki_service.py:621
 msgid "The first field must not be empty."
 msgstr ""
 
-#: app/anki_service.py:625 app/routes/notes.py:55
+#: app/anki_service.py:627 app/routes/notes.py:55
 msgid "Note type not found."
 msgstr ""
 
-#: app/anki_service.py:652
+#: app/anki_service.py:654
 msgid "Please enter a Bible text."
 msgstr ""
 
-#: app/anki_service.py:662
+#: app/anki_service.py:664
 msgid "[Beginning]"
 msgstr ""
 
-#: app/anki_service.py:712
+#: app/anki_service.py:714
 msgid "Cards from group decks cannot be edited."
 msgstr ""
 
-#: app/anki_service.py:714
+#: app/anki_service.py:716
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr ""
 
-#: app/anki_service.py:734
+#: app/anki_service.py:736
 msgid "Cards from group decks cannot be deleted."
 msgstr ""
 
-#: app/distribution.py:136
+#: app/distribution.py:138
 #, python-format
 msgid "Distribute “%(deck)s”"
 msgstr ""
@@ -133,24 +133,24 @@ msgstr ""
 msgid "Please enter one name per line (at most %(max)s)."
 msgstr ""
 
-#: app/routes/admin_users.py:127
+#: app/routes/admin_users.py:141
 msgid "You cannot remove your own admin role."
 msgstr ""
 
-#: app/routes/admin_users.py:140
+#: app/routes/admin_users.py:154
 #, python-format
 msgid "Group decks for %(name)s"
 msgstr ""
 
-#: app/routes/admin_users.py:168
+#: app/routes/admin_users.py:182
 msgid "You cannot deactivate yourself."
 msgstr ""
 
-#: app/routes/admin_users.py:182
+#: app/routes/admin_users.py:196
 msgid "You cannot delete yourself."
 msgstr ""
 
-#: app/routes/admin_users.py:185
+#: app/routes/admin_users.py:199
 msgid "The name does not match. The user was not deleted."
 msgstr ""
 
@@ -179,15 +179,15 @@ msgstr ""
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr ""
 
-#: app/routes/decks.py:68
+#: app/routes/decks.py:70
 msgid "New cards per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:70
+#: app/routes/decks.py:72
 msgid "Reviews per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:72
+#: app/routes/decks.py:74
 #, python-format
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr ""
@@ -294,6 +294,34 @@ msgstr ""
 #: app/templates/admin/user_detail.html:31 app/templates/deck_options.html:22
 #: app/templates/note_edit.html:21
 msgid "Save"
+msgstr ""
+
+#: app/templates/deck_options.html:27
+msgid "Optimize FSRS parameters"
+msgstr ""
+
+#: app/templates/deck_options.html:28
+#, python-format
+msgid "FSRS can adapt to your memory based on your review history. This makes sense from about %(n)s reviews."
+msgstr ""
+
+#: app/templates/deck_options.html:29
+#, python-format
+msgid "This deck has %(num)s review so far."
+msgid_plural "This deck has %(num)s reviews so far."
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/deck_options.html:30
+msgid "Parameters optimized. Future intervals use your personal parameters."
+msgstr ""
+
+#: app/templates/deck_options.html:31
+msgid "Not enough reviews yet or no improvement found – the parameters stay unchanged."
+msgstr ""
+
+#: app/templates/deck_options.html:34
+msgid "Optimize now"
 msgstr ""
 
 #: app/templates/decks.html:4

@@ -41,14 +41,16 @@ async def create_deck(
 @router.get("/decks/{deck_id}/options")
 async def options_page(
     request: Request, deck_id: int, user: User = Depends(require_user),
-    col: str = Depends(current_collection), saved: int = 0
+    col: str = Depends(current_collection), saved: int = 0, optimized: str | None = None
 ):
     opts = await anki_service.get_deck_options(col, deck_id)
     names = dict(await anki_service.deck_names(col))
     return render(
         request, "deck_options.html",
         {"deck_id": deck_id, "deck_name": names.get(deck_id, ""), "opts": opts,
-         "saved": bool(saved), "errors": []},
+         "saved": bool(saved), "errors": [], "optimized": optimized,
+         "reviews": await anki_service.review_count(col, deck_id),
+         "min_reviews": anki_service.MIN_OPTIMIZE_REVIEWS},
     )
 
 
@@ -75,8 +77,18 @@ async def options_save(
         return render(
             request, "deck_options.html",
             {"deck_id": deck_id, "deck_name": names.get(deck_id, ""), "opts": opts,
-             "saved": False, "errors": errors},
+             "saved": False, "errors": errors, "optimized": None,
+             "reviews": await anki_service.review_count(col, deck_id),
+             "min_reviews": anki_service.MIN_OPTIMIZE_REVIEWS},
             status_code=400,
         )
     await anki_service.set_deck_options(col, deck_id, opts)
     return RedirectResponse(f"/decks/{deck_id}/options?saved=1", status_code=303)
+
+
+@router.post("/decks/{deck_id}/optimize")
+async def optimize(deck_id: int, user: User = Depends(verify_csrf),
+                   col: str = Depends(current_collection)):
+    result = await anki_service.optimize_fsrs(col, deck_id)
+    state = "changed" if result.changed else "unchanged"
+    return RedirectResponse(f"/decks/{deck_id}/options?optimized={state}", status_code=303)

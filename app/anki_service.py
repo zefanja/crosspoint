@@ -28,6 +28,8 @@ from anki.collection import (
     ImportAnkiPackageOptions,
     ImportAnkiPackageRequest,
 )
+from anki.deck_config_pb2 import UpdateDeckConfigsMode
+from anki.decks import UpdateDeckConfigs
 from anki.errors import NotFoundError, SearchError
 from anki.import_export_pb2 import ImportAnkiPackageUpdateCondition
 from anki.notes import NoteFieldsCheckResult
@@ -812,15 +814,21 @@ async def get_deck_options(user_id: str, deck_id: int) -> DeckOptions:
     return await _run(user_id, _get_deck_options, deck_id)
 
 
-def _set_deck_options(col: Collection, deck_id: int, opts: DeckOptions) -> None:
+def _own_config(col: Collection, deck_id: int) -> dict:
+    """The deck's options preset; split off first if other decks share it (options are
+    per deck in our UI)."""
     deck = _require_deck(col, deck_id)
     conf = col.decks.config_dict_for_deck_id(deck_id)
     sharing = [d for d in col.decks.all() if not d["dyn"] and d.get("conf") == conf["id"]]
     if len(sharing) > 1:
-        # Options are per deck in our UI, so give this deck its own preset.
         new_id = col.decks.add_config_returning_id(deck["name"], clone_from=conf)
         col.decks.set_config_id_for_deck_dict(deck, new_id)
         conf = col.decks.get_config(new_id)
+    return conf
+
+
+def _set_deck_options(col: Collection, deck_id: int, opts: DeckOptions) -> None:
+    conf = _own_config(col, deck_id)
     conf["new"]["perDay"] = opts.new_per_day
     conf["rev"]["perDay"] = opts.reviews_per_day
     conf["desiredRetention"] = opts.desired_retention
@@ -830,6 +838,77 @@ def _set_deck_options(col: Collection, deck_id: int, opts: DeckOptions) -> None:
 async def set_deck_options(user_id: str, deck_id: int, opts: DeckOptions) -> None:
     """Save options for this deck only (splits off a preset if it was shared)."""
     await _run(user_id, _set_deck_options, deck_id, opts)
+
+
+@dataclass
+class OptimizeResult:
+    reviews: int  # review items FSRS could learn from
+    changed: bool
+
+
+MIN_OPTIMIZE_REVIEWS = 400  # below this the UI only offers the button with a hint
+
+
+def _apply_fsrs_params(col: Collection, deck_id: int, params: list[float]) -> None:
+    """Store FSRS parameters for the deck's preset the way Anki's deck options do
+    (update_deck_configs recomputes the memory states of affected cards)."""
+    conf_id = _own_config(col, deck_id)["id"]
+    data = col.decks.get_deck_configs_for_update(deck_id)
+    entry = next(c for c in data.all_config if c.config.id == conf_id)
+    cfg = entry.config
+    del cfg.config.fsrs_params_6[:]
+    cfg.config.fsrs_params_6.extend(params)
+    col.decks.update_deck_configs(UpdateDeckConfigs(
+        target_deck_id=deck_id,
+        configs=[cfg],
+        removed_config_ids=[],
+        mode=UpdateDeckConfigsMode.UPDATE_DECK_CONFIGS_MODE_NORMAL,
+        card_state_customizer=data.card_state_customizer,
+        limits=data.current_deck.limits,
+        new_cards_ignore_review_limit=data.new_cards_ignore_review_limit,
+        fsrs=True,
+        apply_all_parent_limits=data.apply_all_parent_limits,
+        fsrs_reschedule=False,
+        fsrs_health_check=False,
+    ))
+
+
+def _optimize_fsrs(col: Collection, deck_id: int) -> OptimizeResult:
+    deck = _require_deck(col, deck_id)
+    conf = _own_config(col, deck_id)
+    current = list(conf.get("fsrsParams6") or [])
+    resp = col._backend.compute_fsrs_params(
+        search=f'"deck:{_escape_search(deck["name"])}"',
+        current_params=current,
+        ignore_revlogs_before_ms=0,
+        num_of_relearning_steps=len(conf["lapse"]["delays"]),
+        health_check=False,
+    )
+    params = [round(p, 4) for p in resp.params]
+    if not params or params == [round(p, 4) for p in current]:
+        return OptimizeResult(reviews=resp.fsrs_items, changed=False)
+    _apply_fsrs_params(col, deck_id, list(resp.params))
+    return OptimizeResult(reviews=resp.fsrs_items, changed=True)
+
+
+async def optimize_fsrs(user_id: str, deck_id: int) -> OptimizeResult:
+    """Fit FSRS parameters to this deck's review history (Anki's "Optimize")."""
+    return await _run(user_id, _optimize_fsrs, deck_id)
+
+
+def _review_count(col: Collection, deck_id: int) -> int:
+    deck = _require_deck(col, deck_id)
+    cids = col.find_cards(f'"deck:{_escape_search(deck["name"])}"')
+    if not cids:
+        return 0
+    return col.db.scalar(
+        f"select count() from revlog where ease > 0 and cid in ({','.join(map(str, cids))})"
+    )
+
+
+async def review_count(user_id: str, deck_id: int) -> int:
+    """Number of reviews in the deck (incl. subdecks)."""
+    return await _run(user_id, _review_count, deck_id)
 
 
 # --------------------------------------------------------------------------- export / import

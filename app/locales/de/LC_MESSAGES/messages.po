@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 18:37+0100\n"
+"POT-Creation-Date: 2026-10-27 19:19+0100\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -18,52 +18,52 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/anki_service.py:49 app/templates/browse.html:13
+#: app/anki_service.py:51 app/templates/browse.html:13
 msgid "My cards"
 msgstr "Meine Karten"
 
-#: app/anki_service.py:497 app/routes/admin_groups.py:122
+#: app/anki_service.py:499 app/routes/admin_groups.py:122
 #: app/routes/admin_groups.py:135 app/routes/export.py:58
 msgid "Deck not found."
 msgstr "Deck nicht gefunden."
 
-#: app/anki_service.py:504
+#: app/anki_service.py:506
 msgid "Please enter a deck name."
 msgstr "Bitte einen Decknamen eingeben."
 
-#: app/anki_service.py:611
+#: app/anki_service.py:613
 msgid "Note not found."
 msgstr "Notiz nicht gefunden."
 
-#: app/anki_service.py:619
+#: app/anki_service.py:621
 msgid "The first field must not be empty."
 msgstr "Das erste Feld darf nicht leer sein."
 
-#: app/anki_service.py:625 app/routes/notes.py:55
+#: app/anki_service.py:627 app/routes/notes.py:55
 msgid "Note type not found."
 msgstr "Notiztyp nicht gefunden."
 
-#: app/anki_service.py:652
+#: app/anki_service.py:654
 msgid "Please enter a Bible text."
 msgstr "Bitte einen Bibeltext eingeben."
 
-#: app/anki_service.py:662
+#: app/anki_service.py:664
 msgid "[Beginning]"
 msgstr "[Anfang]"
 
-#: app/anki_service.py:712
+#: app/anki_service.py:714
 msgid "Cards from group decks cannot be edited."
 msgstr "Karten aus Gruppendecks können nicht bearbeitet werden."
 
-#: app/anki_service.py:714
+#: app/anki_service.py:716
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr "Bibeltext-Karten werden aus dem Text erzeugt. Zum Ändern bitte löschen und den Abschnitt neu importieren."
 
-#: app/anki_service.py:734
+#: app/anki_service.py:736
 msgid "Cards from group decks cannot be deleted."
 msgstr "Karten aus Gruppendecks können nicht gelöscht werden."
 
-#: app/distribution.py:136
+#: app/distribution.py:138
 #, python-format
 msgid "Distribute “%(deck)s”"
 msgstr "„%(deck)s“ verteilen"
@@ -134,24 +134,24 @@ msgstr "Nutzer nicht gefunden."
 msgid "Please enter one name per line (at most %(max)s)."
 msgstr "Bitte einen Namen pro Zeile eingeben (höchstens %(max)s)."
 
-#: app/routes/admin_users.py:127
+#: app/routes/admin_users.py:141
 msgid "You cannot remove your own admin role."
 msgstr "Du kannst dir die Admin-Rolle nicht selbst entziehen."
 
-#: app/routes/admin_users.py:140
+#: app/routes/admin_users.py:154
 #, python-format
 msgid "Group decks for %(name)s"
 msgstr "Gruppendecks für %(name)s"
 
-#: app/routes/admin_users.py:168
+#: app/routes/admin_users.py:182
 msgid "You cannot deactivate yourself."
 msgstr "Du kannst dich nicht selbst deaktivieren."
 
-#: app/routes/admin_users.py:182
+#: app/routes/admin_users.py:196
 msgid "You cannot delete yourself."
 msgstr "Du kannst dich nicht selbst löschen."
 
-#: app/routes/admin_users.py:185
+#: app/routes/admin_users.py:199
 msgid "The name does not match. The user was not deleted."
 msgstr "Der Name stimmt nicht überein. Der Nutzer wurde nicht gelöscht."
 
@@ -180,15 +180,15 @@ msgstr "„%(title)s“: %(notes)s Abschnitte mit %(cards)s Karten hinzugefügt.
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr "Die Suche ist ungültig. Beispiele: Joh, is:due, is:new"
 
-#: app/routes/decks.py:68
+#: app/routes/decks.py:70
 msgid "New cards per day: 0 to 9999."
 msgstr "Neue Karten pro Tag: 0 bis 9999."
 
-#: app/routes/decks.py:70
+#: app/routes/decks.py:72
 msgid "Reviews per day: 0 to 9999."
 msgstr "Wiederholungen pro Tag: 0 bis 9999."
 
-#: app/routes/decks.py:72
+#: app/routes/decks.py:74
 #, python-format
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr "Gewünschte Behaltensquote: %(min)s bis %(max)s."
@@ -296,6 +296,34 @@ msgstr "Höher = du behältst mehr, musst aber öfter wiederholen. 0,90 ist ein 
 #: app/templates/note_edit.html:21
 msgid "Save"
 msgstr "Speichern"
+
+#: app/templates/deck_options.html:27
+msgid "Optimize FSRS parameters"
+msgstr "FSRS-Parameter optimieren"
+
+#: app/templates/deck_options.html:28
+#, python-format
+msgid "FSRS can adapt to your memory based on your review history. This makes sense from about %(n)s reviews."
+msgstr "FSRS kann sich anhand deines Lernverlaufs an dein Gedächtnis anpassen. Das lohnt sich ab etwa %(n)s Wiederholungen."
+
+#: app/templates/deck_options.html:29
+#, python-format
+msgid "This deck has %(num)s review so far."
+msgid_plural "This deck has %(num)s reviews so far."
+msgstr[0] "Dieses Deck hat bisher %(num)s Wiederholung."
+msgstr[1] "Dieses Deck hat bisher %(num)s Wiederholungen."
+
+#: app/templates/deck_options.html:30
+msgid "Parameters optimized. Future intervals use your personal parameters."
+msgstr "Parameter optimiert. Künftige Intervalle nutzen deine persönlichen Parameter."
+
+#: app/templates/deck_options.html:31
+msgid "Not enough reviews yet or no improvement found – the parameters stay unchanged."
+msgstr "Noch zu wenige Wiederholungen oder keine Verbesserung gefunden – die Parameter bleiben unverändert."
+
+#: app/templates/deck_options.html:34
+msgid "Optimize now"
+msgstr "Jetzt optimieren"
 
 #: app/templates/decks.html:4
 msgid "Done for today 🎉 – more cards tomorrow"

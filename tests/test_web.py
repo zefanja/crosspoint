@@ -271,3 +271,12 @@ def test_english_collection_and_labels(client, login, monkeypatch):
     # switching to German reopens the collection with a German backend
     client.get("/lang/de")
     assert "Min." in client.get(f"/review/{deck}").text
+
+
+def test_optimize_button(client, learner):
+    _, csrf = learner
+    deck = default_deck(client)
+    page = client.get(f"/decks/{deck}/options")
+    assert "FSRS" in page.text and "disabled" in page.text  # no reviews yet
+    r = client.post(f"/decks/{deck}/optimize", data={"csrf_token": csrf})
+    assert r.status_code == 200 and "unverändert" in r.text

@@ -385,3 +385,37 @@ def test_delete_collection(run, deck):
     run(svc.delete_collection(U))
     assert not svc.collection_path(U).parent.exists() and svc.open_count() == 0
     assert run(svc.search_cards(U, ""))[1] == 0  # a fresh one is created on next access
+
+
+FSRS6_DEFAULTS = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722, 0.1666,
+                  0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912, 0.0658,
+                  0.1542]
+
+
+def test_optimize_fsrs_without_enough_data(run, deck):
+    add_verse(run, deck)
+    _review_all(run, deck, 1)
+    assert run(svc.review_count(U, deck)) == 1
+    result = run(svc.optimize_fsrs(U, deck))
+    assert result.changed is False
+
+
+def test_apply_fsrs_params_recomputes_memory_state_for_this_deck_only(run, deck):
+    other = run(svc.create_deck(U, "Andere"))
+    add_verse(run, deck)
+    _review_all(run, deck, 1)
+
+    def memory(col):
+        cid = col.find_cards("-is:new")[0]
+        return col.get_card(cid).memory_state.stability
+
+    before = run(svc._run(U, memory))
+    params = list(FSRS6_DEFAULTS)
+    params[2] = 9.0  # initial stability for "Good"
+    run(svc._run(U, svc._apply_fsrs_params, deck, params))
+    after = run(svc._run(U, memory))
+    assert after != before and abs(after - 9.0) < 0.5
+    confs = run(svc._run(U, lambda col: (col.decks.config_dict_for_deck_id(deck),
+                                          col.decks.config_dict_for_deck_id(other))))
+    assert confs[0]["fsrsParams6"][2] == pytest.approx(9.0)
+    assert confs[0]["id"] != confs[1]["id"] and not confs[1].get("fsrsParams6")
