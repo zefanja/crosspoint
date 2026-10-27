@@ -1,8 +1,10 @@
 """Jinja2 setup and render helpers shared by all routes."""
 
+import re
 from pathlib import Path
 
 from fastapi import Request
+from markupsafe import escape
 from fastapi.templating import Jinja2Templates
 
 from app import i18n
@@ -28,8 +30,17 @@ _CARD_TAIL = (
 )
 
 
-def card_document(html: str) -> str:
-    """Full HTML document for a card; passed (escaped) into srcdoc."""
+# src="file.png" / src='file.png' / src=file.png – relative names only (Anki media).
+_IMG_SRC = re.compile(r"""(<img\b[^>]*?\bsrc=)(["']?)([^"'\s>/:]+)\2""", re.IGNORECASE)
+
+
+def card_document(html: str, media_base: str | None = None) -> str:
+    """Full HTML document for a card; passed (escaped) into srcdoc. Relative image
+    sources are pointed at the collection's media URL (a <base> tag would be blocked
+    by the inherited CSP base-uri 'none')."""
+    if media_base:
+        prefix = escape(media_base)
+        html = _IMG_SRC.sub(lambda m: f'{m.group(1)}"{prefix}{escape(m.group(3))}"', html)
     return _CARD_HEAD + html + _CARD_TAIL
 
 

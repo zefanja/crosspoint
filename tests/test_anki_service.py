@@ -476,3 +476,29 @@ def test_compare_typed(run, deck):
     assert "typeBad" not in diff and "typeMissed" not in diff  # markup of the field is ignored
     _, diff = run(svc.compare_typed(U, deck, 12345, "x"))
     assert diff is None  # not the current card
+
+
+PNG = (b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00"
+       b"\x1f\x15\xc4\x89\x00\x00\x00\rIDATx\x9cc\xf8\x0f\x00\x00\x01\x01\x00\x05\x18\xd8N\x00\x00"
+       b"\x00\x00IEND\xaeB`\x82")
+
+
+def test_media_add_export_backup(run, deck, tmp_path):
+    name = run(svc.add_media(U, PNG))
+    assert name.endswith(".png") and svc.media_file(U, name).read_bytes() == PNG
+    assert run(svc.add_media(U, PNG)) == name  # same content, same file
+    assert svc.media_file(U, "../collection.anki2") is None
+    with pytest.raises(svc.AnkiServiceError):
+        run(svc.add_media(U, b"<svg></svg>"))
+    run(svc.add_note(U, svc.BASIC, deck, {"Front": "Wer?", "Back": f'Mose<br><img src="{name}">'}))
+
+    import zipfile
+    pkg = tmp_path / "x.apkg"
+    run(svc.export_deck(U, deck, pkg))
+    with zipfile.ZipFile(pkg) as z:
+        assert len(z.namelist()) > 2  # collection, media map, media file
+    run(svc.import_package("OTHER", pkg))
+    assert svc.media_file("OTHER", name) is not None
+
+    assert run(svc.backup_collection(U, tmp_path / "bk"))
+    assert (tmp_path / "bk" / "collection.media" / name).exists()

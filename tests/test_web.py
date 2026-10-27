@@ -1,5 +1,6 @@
 """Learner flow through the HTTP layer."""
 
+import html
 import re
 
 import pytest
@@ -312,3 +313,33 @@ def test_typing_mode(client, learner):
     assert f'name="card_id" value="{card_id}"' in r.text  # same card, ready to rate
     client.get(f"/review/{deck}/typing?on=0")
     assert 'name="typed"' not in client.get(f"/review/{deck}").text
+
+
+def test_image_upload_and_media_route(client, learner):
+    from tests.test_anki_service import PNG
+    from app.auth import media_token
+    user, csrf = learner
+    deck = default_deck(client)
+    r = client.post("/notes/new", data={"csrf_token": csrf, "notetype": "Basic", "deck_id": deck,
+                                        "field_0": "Wer ist das?", "field_1": "Mose",
+                                        "image_side": "front"},
+                    files={"image": ("bild.png", PNG, "image/png")})
+    assert r.status_code == 200 and "Hinzugefügt: Wer ist das?" in r.text
+    review = html.unescape(client.get(f"/review/{deck}").text)
+    token = media_token(user.id)
+    name = re.search(rf'<img src="/media/{user.id}/{token}/([0-9a-f]+\.png)">', review)
+    assert name, "image not in card"
+    url = f"/media/{user.id}/{token}/{name.group(1)}"
+    client.cookies.clear()  # sandboxed iframe: no cookies
+    img = client.get(url)
+    assert img.status_code == 200 and img.content == PNG and img.headers["content-type"] == "image/png"
+    assert client.get(f"/media/{user.id}/{'0' * 32}/{name.group(1)}").status_code == 404
+    assert client.get(f"/media/{user.id}/{token}/collection.anki2").status_code == 404
+
+
+def test_image_upload_rejects_non_images(client, learner):
+    _, csrf = learner
+    r = client.post("/notes/new", data={"csrf_token": csrf, "notetype": "Basic",
+                                        "deck_id": default_deck(client), "field_0": "Q", "field_1": "A"},
+                    files={"image": ("x.svg", b"<svg onload=alert(1)></svg>", "image/svg+xml")})
+    assert r.status_code == 400 and "PNG" in r.text

@@ -520,3 +520,11 @@ a.btn-small { min-width: var(--touch); min-height: var(--touch); }
 .typeBad { background: color-mix(in srgb, var(--c-learn) 30%, transparent); text-decoration: line-through; }
 .typeMissed { background: color-mix(in srgb, var(--c-learn) 15%, transparent); color: var(--c-learn); }
 #typearrow { color: var(--muted); }
+
+/* ---------- image upload ---------- */
+
+.image-upload { border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; margin: 8px 0 0; }
+.image-upload legend { font-weight: 600; padding: 0 4px; }
+.row-radio { display: flex; gap: 16px; flex-wrap: wrap; }
+.row-radio .check { display: flex; align-items: center; gap: 8px; min-height: var(--touch); font-weight: 400; margin: 0; }
+.row-radio input { width: 20px; height: 20px; accent-color: var(--accent); }

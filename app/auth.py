@@ -246,7 +246,8 @@ def current_collection(request: Request, user: User = Depends(require_user)) -> 
     who switched to it (cookie)."""
     admin_ws = user.is_admin and request.cookies.get(WORKSPACE_COOKIE) == "admin"
     request.state.admin_workspace = admin_ws
-    return ADMIN_COLLECTION if admin_ws else user.id
+    request.state.collection_id = ADMIN_COLLECTION if admin_ws else user.id
+    return request.state.collection_id
 
 
 async def verify_csrf(request: Request, user: User = Depends(require_user)) -> User:
@@ -259,6 +260,17 @@ async def verify_csrf(request: Request, user: User = Depends(require_user)) -> U
     if not token or not expected or not hmac.compare_digest(str(token), expected):
         raise CsrfError()
     return user
+
+
+def media_token(collection_id: str) -> str:
+    """Per-collection token for media URLs: card iframes are sandboxed (opaque origin),
+    so images are loaded without cookies via /media/<collection>/<token>/<file>."""
+    key = get_settings().secret_key.encode()
+    return hmac.new(key, b"media:" + collection_id.encode(), hashlib.sha256).hexdigest()[:32]
+
+
+def media_base(collection_id: str) -> str:
+    return f"/media/{collection_id}/{media_token(collection_id)}/"
 
 
 def count_admins(db: DbSession) -> int:

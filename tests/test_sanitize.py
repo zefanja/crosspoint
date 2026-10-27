@@ -26,3 +26,9 @@ def test_plain_text_lines():
     from app.sanitize import plain_text_lines
     out = plain_text_lines("1 A <b>fett</b> &amp; B<br>2 C <script>x()</script>< 3")
     assert out == "1 A fett ＆ B\n2 C ‹ 3"
+
+
+def test_images_only_local_media_files():
+    out = field_from_input('a<img src="abc_1.png" onerror="x()">b<img src="https://evil/x.png">'
+                           '<img src="../etc/passwd.png"><img src="x.svg">')
+    assert out == 'a<img src="abc_1.png">b'

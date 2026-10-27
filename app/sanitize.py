@@ -7,13 +7,31 @@ import nh3
 
 ALLOWED_TAGS = {"b", "i", "u", "br", "div", "span", "sup", "sub", "ul", "ol", "li"}
 _BR = re.compile(r"<br\s*/?>", re.IGNORECASE)
+# Images only as files from the collection's media folder (no URLs, no paths).
+_EMPTY_IMG = re.compile(r"<img\s*/?>", re.IGNORECASE)
+MEDIA_NAME = re.compile(r"^[\w-]+\.(png|jpe?g|gif|webp)$", re.IGNORECASE)
+
+
+def _attribute_filter(tag: str, attr: str, value: str) -> str | None:
+    if tag == "img" and attr == "src":
+        return value if MEDIA_NAME.match(value) else None
+    return value
 
 
 def field_from_input(text: str) -> str:
     """Textarea input -> safe field HTML. Line breaks become <br>."""
     text = text.replace("\r\n", "\n").replace("\r", "\n").strip()
     html = text.replace("\n", "<br>")
-    return nh3.clean(html, tags=ALLOWED_TAGS, attributes={}, link_rel=None)
+    html = nh3.clean(html, tags=ALLOWED_TAGS | {"img"}, attributes={"img": {"src"}},
+                     attribute_filter=_attribute_filter, url_schemes=set(), link_rel=None)
+    return _EMPTY_IMG.sub("", html)  # images whose src was rejected
+
+
+def image_tag(filename: str) -> str:
+    """<img> for a media file name produced by anki_service.add_media."""
+    if not MEDIA_NAME.match(filename):
+        raise ValueError("invalid media file name")
+    return f'<img src="{filename}">'
 
 
 def field_to_input(html: str) -> str:

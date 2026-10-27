@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 21:15+0100\n"
+"POT-Creation-Date: 2026-10-27 21:20+0100\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -18,50 +18,58 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/anki_service.py:51 app/templates/browse.html:13
+#: app/anki_service.py:52 app/templates/browse.html:13
 msgid "My cards"
 msgstr "Meine Karten"
 
-#: app/anki_service.py:547 app/routes/admin_groups.py:143
+#: app/anki_service.py:548 app/routes/admin_groups.py:143
 #: app/routes/admin_groups.py:156 app/routes/export.py:58
 msgid "Deck not found."
 msgstr "Deck nicht gefunden."
 
-#: app/anki_service.py:554
+#: app/anki_service.py:555
 msgid "Please enter a deck name."
 msgstr "Bitte einen Decknamen eingeben."
 
-#: app/anki_service.py:684
+#: app/anki_service.py:685
 msgid "Note not found."
 msgstr "Notiz nicht gefunden."
 
-#: app/anki_service.py:692
+#: app/anki_service.py:693
 msgid "The first field must not be empty."
 msgstr "Das erste Feld darf nicht leer sein."
 
-#: app/anki_service.py:698 app/routes/notes.py:55
+#: app/anki_service.py:699 app/routes/notes.py:68
 msgid "Note type not found."
 msgstr "Notiztyp nicht gefunden."
 
-#: app/anki_service.py:725
+#: app/anki_service.py:726
 msgid "Please enter a Bible text."
 msgstr "Bitte einen Bibeltext eingeben."
 
-#: app/anki_service.py:735
+#: app/anki_service.py:736
 msgid "[Beginning]"
 msgstr "[Anfang]"
 
-#: app/anki_service.py:785
+#: app/anki_service.py:786
 msgid "Cards from group decks cannot be edited."
 msgstr "Karten aus Gruppendecks können nicht bearbeitet werden."
 
-#: app/anki_service.py:787
+#: app/anki_service.py:788
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr "Bibeltext-Karten werden aus dem Text erzeugt. Zum Ändern bitte löschen und den Abschnitt neu importieren."
 
-#: app/anki_service.py:807
+#: app/anki_service.py:808
 msgid "Cards from group decks cannot be deleted."
 msgstr "Karten aus Gruppendecks können nicht gelöscht werden."
+
+#: app/anki_service.py:1215
+msgid "The image is too large (max. 5 MB)."
+msgstr "Das Bild ist zu groß (max. 5 MB)."
+
+#: app/anki_service.py:1218
+msgid "Only PNG, JPEG, GIF or WebP images are supported."
+msgstr "Nur PNG-, JPEG-, GIF- oder WebP-Bilder werden unterstützt."
 
 #: app/distribution.py:138
 #, python-format
@@ -193,7 +201,7 @@ msgstr "Wiederholungen pro Tag: 0 bis 9999."
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr "Gewünschte Behaltensquote: %(min)s bis %(max)s."
 
-#: app/routes/notes.py:69
+#: app/routes/notes.py:83
 #, python-format
 msgid "Added: %(front)s"
 msgstr "Hinzugefügt: %(front)s"
@@ -293,7 +301,7 @@ msgid "Higher = you remember more, but review more often. 0.90 is a good default
 msgstr "Höher = du behältst mehr, musst aber öfter wiederholen. 0,90 ist ein guter Standard. Der Lernalgorithmus FSRS ist immer aktiv."
 
 #: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:22
-#: app/templates/note_edit.html:21
+#: app/templates/note_edit.html:22
 msgid "Save"
 msgstr "Speichern"
 
@@ -495,7 +503,7 @@ msgstr "Gib deinen persönlichen Code ein – oder scanne den QR-Code auf deinem
 msgid "Code"
 msgstr "Code"
 
-#: app/templates/note_add.html:20
+#: app/templates/note_add.html:21
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -565,19 +573,19 @@ msgstr "Diese Karte gehört zu einem Gruppendeck und kann nicht bearbeitet werde
 msgid "Bible text cards are generated from the text and cannot be edited individually. To change them, delete and import the passage again."
 msgstr "Bibeltext-Karten werden aus dem Text erzeugt und können nicht einzeln bearbeitet werden. Zum Ändern löschen und den Abschnitt neu importieren."
 
-#: app/templates/note_edit.html:29
+#: app/templates/note_edit.html:30
 msgid "Unsuspend"
 msgstr "Wieder aktivieren"
 
-#: app/templates/note_edit.html:29
+#: app/templates/note_edit.html:30
 msgid "Suspend"
 msgstr "Aussetzen"
 
-#: app/templates/note_edit.html:32
+#: app/templates/note_edit.html:33
 msgid "Really delete this card? Its learning progress will be lost."
 msgstr "Diese Karte wirklich löschen? Der Lernstand geht verloren."
 
-#: app/templates/note_edit.html:34
+#: app/templates/note_edit.html:35
 msgid "Delete"
 msgstr "Löschen"
 
@@ -1160,6 +1168,23 @@ msgstr "(leer)"
 #: app/templates/partials/browse_results.html:12
 msgid "new"
 msgstr "neu"
+
+#: app/templates/partials/image_upload.html:2
+#: app/templates/partials/image_upload.html:3
+msgid "Image (optional)"
+msgstr "Bild (optional)"
+
+#: app/templates/partials/image_upload.html:5
+msgid "on the front"
+msgstr "auf der Vorderseite"
+
+#: app/templates/partials/image_upload.html:6
+msgid "on the back"
+msgstr "auf der Rückseite"
+
+#: app/templates/partials/image_upload.html:8
+msgid "PNG, JPEG, GIF or WebP, max. 5 MB. Exported to Anki together with the cards."
+msgstr "PNG, JPEG, GIF oder WebP, max. 5 MB. Wird mit den Karten nach Anki exportiert."
 
 #: app/templates/partials/note_fields.html:2
 msgid "Question"

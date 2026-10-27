@@ -207,6 +207,12 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - Felder: einfaches Textfeld, Zeilenumbrüche → `<br>`. Erlaubtes HTML nach Sanitizing:
   `b, i, u, br, div, span, sup, sub, ul, ol, li` (Bibliothek `nh3`).
 - Karten in Gruppendecks sind für Lerner **schreibgeschützt** (Tag `gruppendeck` erkennen).
+- *Bilder* (Phase 3): optionaler Upload pro Karte (Vorder- oder Rückseite), PNG/JPEG/GIF/WebP
+  bis 5 MB (Magic Bytes geprüft). Ablage über Ankis Medienordner (`col.media.write_data`,
+  Name = SHA-1 des Inhalts), im Feld als `<img src="name">`. Sanitizing erlaubt `img` nur mit
+  lokalem Dateinamen. Anzeige: die Kartenvorschau läuft sandboxed ohne Cookies, daher werden
+  relative `src` serverseitig auf `/media/<collection>/<token>/<datei>` umgeschrieben (Token =
+  HMAC je Collection). Exporte, Gruppendeck-Verteilung und Backups enthalten die Medien.
 
 **Bibeltext importieren** (Bible Memorizer)
 - Felder: Deck, Titel, Bibeltext, Zeilen Zusammenhang (1–10, Standard 2),

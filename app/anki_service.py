@@ -8,6 +8,7 @@ Verified against anki==26.9.3 (see SPEC §6, spike results).
 """
 
 import asyncio
+import hashlib
 import logging
 import re
 import shutil
@@ -40,7 +41,7 @@ from app.bible_memorizer import gen_notes as bm_gen
 from app.bible_memorizer import model as bm_model
 from app.config import get_settings
 from app.i18n import N_, get_language, translate
-from app.sanitize import plain_text
+from app.sanitize import MEDIA_NAME, plain_text
 
 log = logging.getLogger(__name__)
 
@@ -987,7 +988,7 @@ async def review_count(user_id: str, deck_id: int) -> int:
 
 def _export_collection(col: Collection, out_path: str) -> None:
     try:
-        col.export_collection_package(out_path, include_media=False, legacy=False)
+        col.export_collection_package(out_path, include_media=True, legacy=False)
     finally:
         col.reopen()  # export_collection_package closes the collection
 
@@ -1004,7 +1005,7 @@ def _export_deck(col: Collection, deck_id: int, out_path: str, with_scheduling: 
         options=ExportAnkiPackageOptions(
             with_scheduling=with_scheduling,
             with_deck_configs=with_scheduling,
-            with_media=False,
+            with_media=True,
             legacy=False,
         ),
         limit=DeckIdLimit(deck_id=deck_id),
@@ -1186,6 +1187,46 @@ async def learner_stats(user_id: str, deck_id: int | None = None, history_days: 
     return await _run(user_id, _learner_stats, deck_id, history_days, forecast_days)
 
 
+# --------------------------------------------------------------------------- media
+
+MEDIA_TYPES = {"png": b"\x89PNG", "jpg": b"\xff\xd8\xff", "gif": b"GIF8"}
+MAX_MEDIA_BYTES = 5 * 1024 * 1024
+
+
+def media_type(data: bytes) -> str | None:
+    """File extension for supported image data (by magic bytes), else None."""
+    for ext, magic in MEDIA_TYPES.items():
+        if data.startswith(magic):
+            return ext
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return "webp"
+    return None
+
+
+def _add_media(col: Collection, data: bytes, ext: str) -> str:
+    name = f"{hashlib.sha1(data).hexdigest()}.{ext}"
+    return col.media.write_data(name, data)
+
+
+async def add_media(user_id: str, data: bytes) -> str:
+    """Store an image in the collection's media folder. Returns the file name to use
+    in <img src>. Raises AnkiServiceError for unsupported or too large files."""
+    if len(data) > MAX_MEDIA_BYTES:
+        raise AnkiServiceError(N_("The image is too large (max. 5 MB)."))
+    ext = media_type(data)
+    if ext is None:
+        raise AnkiServiceError(N_("Only PNG, JPEG, GIF or WebP images are supported."))
+    return await _run(user_id, _add_media, data, ext)
+
+
+def media_file(user_id: str, filename: str) -> Path | None:
+    """Path of a media file for serving (read-only, outside the collection DB)."""
+    if not MEDIA_NAME.match(filename):
+        return None
+    path = collection_path(user_id).parent / "collection.media" / filename
+    return path if path.is_file() else None
+
+
 # --------------------------------------------------------------------------- backup
 
 
@@ -1204,6 +1245,9 @@ async def backup_collection(user_id: str, dest_dir: Path) -> bool:
                 return False
             dest_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, dest_dir / path.name)
+            media = path.parent / "collection.media"
+            if media.is_dir():
+                shutil.copytree(media, dest_dir / media.name, dirs_exist_ok=True)
             return True
 
         return await run_in_threadpool(copy)

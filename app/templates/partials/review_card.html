@@ -22,9 +22,9 @@
   <input type="checkbox" id="show-answer" class="show-toggle" aria-hidden="true" tabindex="-1"{% if typed_diff %} checked{% endif %}>
   <div class="card-stage">
     <iframe class="card-frame card-q" sandbox title="{{ _('Front') }}"
-            srcdoc="{{ state.card.question | card_document }}"></iframe>
+            srcdoc="{{ state.card.question | card_document(media_base) }}"></iframe>
     <iframe class="card-frame card-a" sandbox title="{{ _('Back') }}"
-            srcdoc="{{ state.card.answer | card_document }}"></iframe>
+            srcdoc="{{ state.card.answer | card_document(media_base) }}"></iframe>
   </div>
   {% if typed_diff %}<div class="typed-diff" aria-label="{{ _('Your answer compared') }}">{{ typed_diff }}</div>
   {% elif typing and state.card.can_type %}
