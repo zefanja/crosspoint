@@ -10,7 +10,7 @@ from app import anki_service, distribution
 from app.auth import require_admin, verify_csrf
 from app.db import get_db
 from app.i18n import _
-from app.models import Group, GroupDeck, GroupMember, User
+from app.models import Group, GroupDeck, GroupLeader, GroupMember, User
 from app.templating import render
 
 router = APIRouter(prefix="/admin/groups")
@@ -71,10 +71,31 @@ async def group_detail(request: Request, group_id: int, admin: User = Depends(re
     admin_decks = [(did, name) for did, name in
                    await anki_service.deck_names(anki_service.ADMIN_COLLECTION)
                    if did not in assigned]
+    leaders = set(db.scalars(select(GroupLeader.user_id).where(GroupLeader.group_id == group_id)))
     return render(request, "admin/group_detail.html", {
         "group": group, "users": users, "members": members, "decks": decks,
-        "admin_decks": admin_decks, "error": error,
+        "admin_decks": admin_decks, "error": error, "leaders": leaders,
     })
+
+
+@router.post("/{group_id}/leaders")
+async def group_leaders(request: Request, group_id: int, admin: User = Depends(require_admin),
+                        _csrf: User = Depends(verify_csrf), db: DbSession = Depends(get_db)):
+    """Assign group leaders; learners become role "leader" (admins keep their role)."""
+    _get_group(db, group_id)
+    form = await request.form()
+    wanted = {str(u) for u in form.getlist("user_ids")}
+    users = {u.id: u for u in db.scalars(select(User).where(User.id.in_(wanted)))}
+    current = set(db.scalars(select(GroupLeader.user_id).where(GroupLeader.group_id == group_id)))
+    for uid in current - set(users):
+        db.query(GroupLeader).filter_by(group_id=group_id, user_id=uid).delete()
+    for uid in set(users) - current:
+        db.add(GroupLeader(group_id=group_id, user_id=uid))
+    for u in users.values():
+        if u.role == "learner":
+            u.role = "leader"
+    db.commit()
+    return RedirectResponse(f"/admin/groups/{group_id}", status_code=303)
 
 
 @router.post("/{group_id}")

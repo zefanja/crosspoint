@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 20:51+0100\n"
+"POT-Creation-Date: 2026-10-27 21:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,8 +21,8 @@ msgstr ""
 msgid "My cards"
 msgstr ""
 
-#: app/anki_service.py:536 app/routes/admin_groups.py:122
-#: app/routes/admin_groups.py:135 app/routes/export.py:58
+#: app/anki_service.py:536 app/routes/admin_groups.py:143
+#: app/routes/admin_groups.py:156 app/routes/export.py:58
 msgid "Deck not found."
 msgstr ""
 
@@ -116,41 +116,41 @@ msgstr ""
 msgid "A group with this name already exists."
 msgstr ""
 
-#: app/routes/admin_groups.py:111 app/routes/admin_users.py:100
+#: app/routes/admin_groups.py:132 app/routes/admin_users.py:114
 msgid "Group decks for new members"
 msgstr ""
 
-#: app/routes/admin_progress.py:98 app/templates/admin/progress.html:48
+#: app/routes/admin_progress.py:113 app/templates/admin/progress.html:48
 msgid "Refresh figures"
 msgstr ""
 
-#: app/routes/admin_users.py:57
+#: app/routes/admin_users.py:65
 msgid "User not found."
 msgstr ""
 
-#: app/routes/admin_users.py:89
+#: app/routes/admin_users.py:103
 #, python-format
 msgid "Please enter one name per line (at most %(max)s)."
 msgstr ""
 
-#: app/routes/admin_users.py:141
+#: app/routes/admin_users.py:159
 msgid "You cannot remove your own admin role."
 msgstr ""
 
-#: app/routes/admin_users.py:154
+#: app/routes/admin_users.py:172
 #, python-format
 msgid "Group decks for %(name)s"
 msgstr ""
 
-#: app/routes/admin_users.py:182
+#: app/routes/admin_users.py:200
 msgid "You cannot deactivate yourself."
 msgstr ""
 
-#: app/routes/admin_users.py:196
+#: app/routes/admin_users.py:214
 msgid "You cannot delete yourself."
 msgstr ""
 
-#: app/routes/admin_users.py:199
+#: app/routes/admin_users.py:217
 msgid "The name does not match. The user was not deleted."
 msgstr ""
 
@@ -199,9 +199,9 @@ msgstr ""
 
 #: app/templates/admin/groups.html:4 app/templates/admin/home.html:2
 #: app/templates/admin/home.html:5 app/templates/admin/import.html:4
-#: app/templates/admin/progress.html:4 app/templates/admin/user_detail.html:22
-#: app/templates/admin/users.html:4 app/templates/admin/users.html:25
-#: app/templates/admin/users.html:53 app/templates/base.html:22
+#: app/templates/admin/progress.html:4 app/templates/admin/user_detail.html:23
+#: app/templates/admin/users.html:4 app/templates/admin/users.html:26
+#: app/templates/admin/users.html:55 app/templates/base.html:22
 msgid "Admin"
 msgstr ""
 
@@ -218,7 +218,7 @@ msgstr ""
 msgid "You are editing the admin collection (group decks)."
 msgstr ""
 
-#: app/templates/admin/home.html:21 app/templates/base.html:37
+#: app/templates/admin/home.html:30 app/templates/base.html:37
 msgid "Back to my cards"
 msgstr ""
 
@@ -291,7 +291,7 @@ msgstr ""
 msgid "Higher = you remember more, but review more often. 0.90 is a good default. The FSRS algorithm is always on."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:31 app/templates/deck_options.html:22
+#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:22
 #: app/templates/note_edit.html:21
 msgid "Save"
 msgstr ""
@@ -705,17 +705,18 @@ msgid "Young: interval under 21 days. Mature: 21 days or more."
 msgstr ""
 
 #: app/templates/admin/group_detail.html:4 app/templates/admin/groups.html:2
-#: app/templates/admin/groups.html:6 app/templates/admin/home.html:8
-#: app/templates/admin/user_detail.html:25
+#: app/templates/admin/groups.html:6 app/templates/admin/home.html:9
+#: app/templates/admin/user_detail.html:26
 msgid "Groups"
 msgstr ""
 
-#: app/templates/admin/group_detail.html:8 app/templates/admin/home.html:9
-#: app/templates/admin/progress.html:2 app/templates/admin/progress.html:6
+#: app/templates/admin/group_detail.html:8 app/templates/admin/home.html:10
+#: app/templates/admin/home.html:15 app/templates/admin/progress.html:2
+#: app/templates/admin/progress.html:6
 msgid "Progress"
 msgstr ""
 
-#: app/templates/admin/group_detail.html:9
+#: app/templates/admin/group_detail.html:9 app/templates/admin/home.html:16
 msgid "Codes / print sheet"
 msgstr ""
 
@@ -723,7 +724,7 @@ msgstr ""
 msgid "The name does not match. The group was not deleted."
 msgstr ""
 
-#: app/templates/admin/group_detail.html:15 app/templates/admin/home.html:14
+#: app/templates/admin/group_detail.html:15 app/templates/admin/home.html:23
 msgid "Group decks"
 msgstr ""
 
@@ -774,11 +775,12 @@ msgid "Members"
 msgstr ""
 
 #: app/templates/admin/group_detail.html:57
-#: app/templates/admin/user_detail.html:10 app/templates/admin/users.html:25
+#: app/templates/admin/user_detail.html:10 app/templates/admin/users.html:26
 msgid "deactivated"
 msgstr ""
 
-#: app/templates/admin/group_detail.html:58 app/templates/admin/users.html:31
+#: app/templates/admin/group_detail.html:58
+#: app/templates/admin/group_detail.html:73 app/templates/admin/users.html:32
 msgid "No users yet."
 msgstr ""
 
@@ -787,26 +789,39 @@ msgid "Save members"
 msgstr ""
 
 #: app/templates/admin/group_detail.html:65
-msgid "Rename or delete group"
+#: app/templates/admin/group_detail.html:70
+msgid "Group leaders"
 msgstr ""
 
-#: app/templates/admin/group_detail.html:68 app/templates/admin/groups.html:10
-msgid "Group name"
-msgstr ""
-
-#: app/templates/admin/group_detail.html:69
-msgid "Rename"
-msgstr ""
-
-#: app/templates/admin/group_detail.html:73
-msgid "Delete group – type the name to confirm:"
+#: app/templates/admin/group_detail.html:66
+msgid "Group leaders see the progress of this group and can print new codes for its members."
 msgstr ""
 
 #: app/templates/admin/group_detail.html:75
+msgid "Save group leaders"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:80
+msgid "Rename or delete group"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:83 app/templates/admin/groups.html:10
+msgid "Group name"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:84
+msgid "Rename"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:88
+msgid "Delete group – type the name to confirm:"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:90
 msgid "Users and their cards are kept."
 msgstr ""
 
-#: app/templates/admin/group_detail.html:76
+#: app/templates/admin/group_detail.html:91
 msgid "Delete group"
 msgstr ""
 
@@ -828,24 +843,28 @@ msgid_plural "%(num)s group decks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/admin/groups.html:22 app/templates/admin/user_detail.html:28
+#: app/templates/admin/groups.html:22 app/templates/admin/user_detail.html:29
 msgid "No groups yet."
 msgstr ""
 
-#: app/templates/admin/home.html:7 app/templates/admin/user_detail.html:4
-#: app/templates/admin/users.html:2 app/templates/admin/users.html:6
+#: app/templates/admin/home.html:8 app/templates/admin/user_detail.html:4
+#: app/templates/admin/users.html:2 app/templates/admin/users.html:7
 msgid "Users"
 msgstr ""
 
-#: app/templates/admin/home.html:15
-msgid "Group decks are maintained in the admin collection – with the same screens as your own cards. Then assign them to a group and distribute them."
+#: app/templates/admin/home.html:13
+msgid "As a group leader you see the progress of your groups and can print new codes for their members."
 msgstr ""
 
 #: app/templates/admin/home.html:24
+msgid "Group decks are maintained in the admin collection – with the same screens as your own cards. Then assign them to a group and distribute them."
+msgstr ""
+
+#: app/templates/admin/home.html:33
 msgid "Edit admin collection"
 msgstr ""
 
-#: app/templates/admin/home.html:27 app/templates/admin/import.html:2
+#: app/templates/admin/home.html:36 app/templates/admin/import.html:2
 msgid "Import .apkg"
 msgstr ""
 
@@ -909,7 +928,7 @@ msgstr ""
 msgid "or open %(url)s and enter the code"
 msgstr ""
 
-#: app/templates/admin/progress.html:8 app/templates/admin/users.html:8
+#: app/templates/admin/progress.html:8 app/templates/admin/users.html:9
 msgid "Group"
 msgstr ""
 
@@ -963,7 +982,7 @@ msgstr ""
 msgid "Last login: %(date)s"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:8 app/templates/admin/users.html:27
+#: app/templates/admin/user_detail.html:8 app/templates/admin/users.html:28
 msgid "never logged in"
 msgstr ""
 
@@ -972,104 +991,108 @@ msgstr ""
 msgid "Streak: %(n)s"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:19 app/templates/admin/users.html:50
+#: app/templates/admin/user_detail.html:19 app/templates/admin/users.html:52
 msgid "Role"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:21 app/templates/admin/users.html:52
+#: app/templates/admin/user_detail.html:21 app/templates/admin/users.html:54
 msgid "Learner"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:28
+#: app/templates/admin/user_detail.html:22 app/templates/admin/users.html:26
+msgid "Group leader"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:29
 msgid "Create a group"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:30
+#: app/templates/admin/user_detail.html:31
 msgid "New group members receive all decks of the group automatically."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:36
+#: app/templates/admin/user_detail.html:37
 msgid "Login code"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:37
+#: app/templates/admin/user_detail.html:38
 msgid "Codes are not stored in readable form and cannot be shown again. If a code is lost, create a new one – the old one stops working."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:39
+#: app/templates/admin/user_detail.html:40
 msgid "Create a new code? The old code stops working."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:41
+#: app/templates/admin/user_detail.html:42
 msgid "New code + print sheet"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:47
+#: app/templates/admin/user_detail.html:48
 msgid "Deactivate or delete"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:50
+#: app/templates/admin/user_detail.html:51
 msgid "Activate"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:50
+#: app/templates/admin/user_detail.html:51
 msgid "Deactivate (cannot log in, data is kept)"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:54
+#: app/templates/admin/user_detail.html:55
 msgid "Delete permanently – type the name to confirm:"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:56
+#: app/templates/admin/user_detail.html:57
 msgid "Delete user and all cards"
 msgstr ""
 
-#: app/templates/admin/users.html:9
+#: app/templates/admin/users.html:10
 msgid "All users"
 msgstr ""
 
-#: app/templates/admin/users.html:12
+#: app/templates/admin/users.html:13
 msgid "Filter"
 msgstr ""
 
-#: app/templates/admin/users.html:17
+#: app/templates/admin/users.html:18
 msgid "Create new codes for the selected users? Their old codes stop working."
 msgstr ""
 
-#: app/templates/admin/users.html:23
+#: app/templates/admin/users.html:24
 #, python-format
 msgid "Select %(name)s"
 msgstr ""
 
-#: app/templates/admin/users.html:34
+#: app/templates/admin/users.html:35
 msgid "New codes + print sheet for selected users"
 msgstr ""
 
-#: app/templates/admin/users.html:38
+#: app/templates/admin/users.html:40
 msgid "Add users"
 msgstr ""
 
-#: app/templates/admin/users.html:42
+#: app/templates/admin/users.html:44
 msgid "Names (one per line)"
 msgstr ""
 
-#: app/templates/admin/users.html:43
+#: app/templates/admin/users.html:45
 msgid "Anna"
 msgstr ""
 
-#: app/templates/admin/users.html:43
+#: app/templates/admin/users.html:45
 msgid "Ben"
 msgstr ""
 
-#: app/templates/admin/users.html:44
+#: app/templates/admin/users.html:46
 msgid "A first name or initials is enough – no email address needed."
 msgstr ""
 
-#: app/templates/admin/users.html:45
+#: app/templates/admin/users.html:47
 msgid "Group (optional)"
 msgstr ""
 
-#: app/templates/admin/users.html:55
+#: app/templates/admin/users.html:57
 msgid "Create users and print codes"
 msgstr ""
 

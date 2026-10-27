@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session as DbSession
 
 from app import anki_service, distribution
-from app.auth import WORKSPACE_COOKIE, cookie_secure, require_admin, verify_csrf
+from app.auth import WORKSPACE_COOKIE, cookie_secure, require_admin, require_staff, verify_csrf
 from app.config import get_settings
 from app.db import get_db
 from app.i18n import _
@@ -21,7 +21,7 @@ MAX_UPLOAD = 100 * 1024 * 1024
 
 
 @router.get("")
-def home(request: Request, admin: User = Depends(require_admin), db: DbSession = Depends(get_db)):
+def home(request: Request, admin: User = Depends(require_staff), db: DbSession = Depends(get_db)):
     users = db.scalar(select(func.count()).select_from(User)) or 0
     groups = db.scalar(select(func.count()).select_from(Group)) or 0
     return render(request, "admin/home.html", {"users": users, "groups": groups,
@@ -78,7 +78,7 @@ async def import_submit(request: Request, file: UploadFile,
 
 @router.get("/jobs/{job_id}")
 def job_page(request: Request, job_id: str, back: str = "/admin",
-             admin: User = Depends(require_admin)):
+             admin: User = Depends(require_staff)):
     job = distribution.get_job(job_id)
     if job is None:
         return render(request, "error.html", {"message": _("This task is no longer known.")}, 404)

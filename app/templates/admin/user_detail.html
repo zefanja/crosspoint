@@ -18,7 +18,8 @@
     <input id="display_name" name="display_name" class="input" value="{{ u.display_name }}" required maxlength="100">
     <label for="role">{{ _("Role") }}</label>
     <select id="role" name="role" class="input">
-      <option value="learner"{% if u.role != "admin" %} selected{% endif %}>{{ _("Learner") }}</option>
+      <option value="learner"{% if u.role == "learner" %} selected{% endif %}>{{ _("Learner") }}</option>
+      <option value="leader"{% if u.role == "leader" %} selected{% endif %}>{{ _("Group leader") }}</option>
       <option value="admin"{% if u.role == "admin" %} selected{% endif %}>{{ _("Admin") }}</option>
     </select>
     <fieldset class="checklist">

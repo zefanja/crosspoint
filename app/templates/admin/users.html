@@ -2,6 +2,7 @@
 {% block title %}{{ _("Users") }} – {{ app_name }}{% endblock %}
 {% block content %}
 <p><a href="/admin" class="back">‹ {{ _("Admin") }}</a></p>
+{% set can_manage = user.is_admin %}
 <section class="card">
   <h1>{{ _("Users") }}</h1>
   <form method="get" class="row">
@@ -20,9 +21,9 @@
   <ul class="cardlist card flush">
     {% for u in users %}
     <li class="userrow">
-      {% if u.id != user.id %}<label class="pick"><input type="checkbox" name="user_ids" value="{{ u.id }}" aria-label="{{ _('Select %(name)s', name=u.display_name) }}"></label>{% else %}<span class="pick"></span>{% endif %}
-      <a href="/admin/users/{{ u.id }}" class="cardrow{% if u.disabled %} suspended{% endif %}">
-        <span class="cardfront">{{ u.display_name }}{% if u.is_admin %} <span class="badge">{{ _("Admin") }}</span>{% endif %}{% if u.disabled %} <span class="badge">{{ _("deactivated") }}</span>{% endif %}</span>
+      {% if u.id != user.id and (can_manage or not u.is_staff) %}<label class="pick"><input type="checkbox" name="user_ids" value="{{ u.id }}" aria-label="{{ _('Select %(name)s', name=u.display_name) }}"></label>{% else %}<span class="pick"></span>{% endif %}
+      <a {% if can_manage %}href="/admin/users/{{ u.id }}" {% endif %}class="cardrow{% if u.disabled %} suspended{% endif %}">
+        <span class="cardfront">{{ u.display_name }}{% if u.is_admin %} <span class="badge">{{ _("Admin") }}</span>{% elif u.role == "leader" %} <span class="badge">{{ _("Group leader") }}</span>{% endif %}{% if u.disabled %} <span class="badge">{{ _("deactivated") }}</span>{% endif %}</span>
         <span class="cardmeta"><span>{{ memberships.get(u.id, []) | join(", ") or "–" }}</span>
           <span>{% if u.last_login_at %}{{ u.last_login_at.date() | date }}{% else %}{{ _("never logged in") }}{% endif %}</span></span>
       </a>
@@ -34,6 +35,7 @@
   {% if users %}<button class="btn btn-block">{{ _("New codes + print sheet for selected users") }}</button>{% endif %}
 </form>
 
+{% if can_manage %}
 <section class="card" style="margin-top:16px">
   <h2>{{ _("Add users") }}</h2>
   {% if error %}<p class="alert alert-error">{{ error }}</p>{% endif %}
@@ -55,4 +57,5 @@
     <button class="btn btn-primary btn-block">{{ _("Create users and print codes") }}</button>
   </form>
 </section>
+{% endif %}
 {% endblock %}

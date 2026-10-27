@@ -8,7 +8,10 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session as DbSession
 
 from app import anki_service, distribution
-from app.auth import create_user, format_code, require_admin, reset_code, verify_csrf
+from app.auth import (
+    create_user, format_code, require_admin, require_staff, reset_code, verify_csrf,
+    visible_group_ids, visible_user_ids,
+)
 from app.config import get_settings
 from app.db import get_db
 from app.i18n import _
@@ -17,7 +20,7 @@ from app.templating import render
 
 router = APIRouter(prefix="/admin/users")
 
-ROLES = ("learner", "admin")
+ROLES = ("learner", "leader", "admin")
 MAX_BATCH = 300
 
 
@@ -46,6 +49,11 @@ def _groups(db: DbSession) -> list[Group]:
     return list(db.scalars(select(Group).order_by(Group.name)))
 
 
+def _visible_groups(db: DbSession, viewer: User) -> list[Group]:
+    visible = visible_group_ids(db, viewer)
+    return [g for g in _groups(db) if visible is None or g.id in visible]
+
+
 def _active_admins(db: DbSession) -> int:
     return db.scalar(select(func.count()).select_from(User)
                      .where(User.role == "admin", User.disabled.is_(False))) or 0
@@ -60,8 +68,14 @@ def _get_user(db: DbSession, user_id: str) -> User:
 
 @router.get("")
 def user_list(request: Request, group: int | None = None,
-              admin: User = Depends(require_admin), db: DbSession = Depends(get_db)):
+              admin: User = Depends(require_staff), db: DbSession = Depends(get_db)):
     query = select(User).order_by(User.display_name)
+    visible = visible_user_ids(db, admin)
+    if visible is not None:  # group leader: members of the own groups only
+        query = query.where(User.id.in_(visible))
+    groups = _visible_groups(db, admin)
+    if group and group not in {g.id for g in groups}:
+        group = None
     if group:
         query = query.join(GroupMember, GroupMember.user_id == User.id).where(
             GroupMember.group_id == group)
@@ -71,7 +85,7 @@ def user_list(request: Request, group: int | None = None,
                                     .join(Group, Group.id == GroupMember.group_id)):
         memberships.setdefault(user_id, []).append(name)
     return render(request, "admin/users.html", {
-        "users": users, "memberships": memberships, "groups": _groups(db), "group": group,
+        "users": users, "memberships": memberships, "groups": groups, "group": group,
         "error": None,
     })
 
@@ -102,12 +116,16 @@ async def users_create(request: Request, names: str = Form(""), role: str = Form
 
 
 @router.post("/print")
-async def users_print(request: Request, admin: User = Depends(require_admin),
+async def users_print(request: Request, admin: User = Depends(require_staff),
                       _csrf: User = Depends(verify_csrf), db: DbSession = Depends(get_db)):
-    """New codes for the selected users + print sheet (old codes stop working)."""
+    """New codes for the selected users + print sheet (old codes stop working).
+    Group leaders: only members of their groups, never admins."""
     form = await request.form()
     ids = [str(i) for i in form.getlist("user_ids")]
-    users = [u for u in (db.get(User, i) for i in ids) if u is not None and u.id != admin.id]
+    visible = visible_user_ids(db, admin)
+    users = [u for u in (db.get(User, i) for i in ids)
+             if u is not None and u.id != admin.id
+             and (visible is None or (u.id in visible and not u.is_staff))]
     if not users:
         return RedirectResponse(str(form.get("back") or "/admin/users"), status_code=303)
     entries = [(u.display_name, reset_code(db, u)) for u in sorted(users, key=lambda u: u.display_name)]

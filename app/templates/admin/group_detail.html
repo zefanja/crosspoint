@@ -62,6 +62,21 @@
 </section>
 
 <section class="card">
+  <h2>{{ _("Group leaders") }}</h2>
+  <p class="muted small">{{ _("Group leaders see the progress of this group and can print new codes for its members.") }}</p>
+  <form method="post" action="/admin/groups/{{ group.id }}/leaders" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <fieldset class="checklist">
+      <legend class="sr-only">{{ _("Group leaders") }}</legend>
+      {% for u in users if not u.is_admin %}
+      <label class="check"><input type="checkbox" name="user_ids" value="{{ u.id }}"{% if u.id in leaders %} checked{% endif %}><span>{{ u.display_name }}</span></label>
+      {% else %}<p class="muted small">{{ _("No users yet.") }}</p>{% endfor %}
+    </fieldset>
+    <button class="btn btn-block">{{ _("Save group leaders") }}</button>
+  </form>
+</section>
+
+<section class="card">
   <h2>{{ _("Rename or delete group") }}</h2>
   <form method="post" action="/admin/groups/{{ group.id }}" class="row">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

@@ -215,6 +215,32 @@ def require_admin(user: User = Depends(require_user)) -> User:
     return user
 
 
+def require_staff(user: User = Depends(require_user)) -> User:
+    """Admins and group leaders (leaders see only their own groups)."""
+    if not user.is_staff:
+        raise Forbidden()
+    return user
+
+
+def visible_group_ids(db: DbSession, user: User) -> set[int] | None:
+    """None = all groups (admin); otherwise the groups the leader leads."""
+    if user.is_admin:
+        return None
+    from app.models import GroupLeader
+
+    return set(db.scalars(select(GroupLeader.group_id).where(GroupLeader.user_id == user.id)))
+
+
+def visible_user_ids(db: DbSession, user: User) -> set[str] | None:
+    """None = all users (admin); otherwise the members of the leader's groups."""
+    groups = visible_group_ids(db, user)
+    if groups is None:
+        return None
+    from app.models import GroupMember
+
+    return set(db.scalars(select(GroupMember.user_id).where(GroupMember.group_id.in_(groups))))
+
+
 def current_collection(request: Request, user: User = Depends(require_user)) -> str:
     """Collection the learner UI works on: own, or the admin collection for admins
     who switched to it (cookie)."""

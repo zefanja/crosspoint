@@ -33,6 +33,11 @@ class User(Base):
     def is_admin(self) -> bool:
         return self.role == "admin"
 
+    @property
+    def is_staff(self) -> bool:
+        """Admins and group leaders (dashboard access)."""
+        return self.role in ("admin", "leader")
+
 
 class Session(Base):
     __tablename__ = "sessions"
@@ -113,3 +118,16 @@ class GroupDeck(Base):
     admin_deck_id: Mapped[int] = mapped_column(Integer)
     deck_name: Mapped[str] = mapped_column(String(200))
     last_distributed_at: Mapped[datetime | None] = mapped_column(DateTime)
+
+
+class GroupLeader(Base):
+    """Group leaders see progress and can print codes for their groups only."""
+
+    __tablename__ = "group_leaders"
+
+    group_id: Mapped[int] = mapped_column(
+        ForeignKey("groups.id", ondelete="CASCADE"), primary_key=True
+    )
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True, index=True
+    )

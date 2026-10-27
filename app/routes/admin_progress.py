@@ -10,7 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session as DbSession
 
 from app import distribution
-from app.auth import require_admin, verify_csrf
+from app.auth import require_staff, verify_csrf, visible_group_ids, visible_user_ids
 from app.db import get_db
 from app.i18n import _
 from app.models import DailyReviews, Group, GroupMember, User, UserStats
@@ -36,8 +36,11 @@ class Row:
     alert: bool
 
 
-def _rows(db: DbSession, group_id: int | None) -> list[Row]:
+def _rows(db: DbSession, group_id: int | None, viewer: User) -> list[Row]:
     query = select(User).where(User.role != "admin").order_by(User.display_name)
+    visible = visible_user_ids(db, viewer)
+    if visible is not None:
+        query = query.where(User.id.in_(visible))
     if group_id:
         query = query.join(GroupMember, GroupMember.user_id == User.id).where(
             GroupMember.group_id == group_id)
@@ -79,12 +82,22 @@ def _sort(rows: list[Row], key: str, desc: bool) -> list[Row]:
     return sorted(rows, key=getters.get(key, getters["name"]), reverse=desc)
 
 
+def _groups(db: DbSession, viewer: User) -> list[Group]:
+    query = select(Group).order_by(Group.name)
+    visible = visible_group_ids(db, viewer)
+    if visible is not None:
+        query = query.where(Group.id.in_(visible))
+    return list(db.scalars(query))
+
+
 @router.get("")
 def progress(request: Request, group: int | None = None, sort: str = "name", desc: int = 0,
-             admin: User = Depends(require_admin), db: DbSession = Depends(get_db)):
-    groups = list(db.scalars(select(Group).order_by(Group.name)))
+             admin: User = Depends(require_staff), db: DbSession = Depends(get_db)):
+    groups = _groups(db, admin)
+    if group is not None and group not in {g.id for g in groups}:
+        group = None
     sort = sort if sort in SORT_KEYS else "name"
-    rows = _sort(_rows(db, group), sort, bool(desc))
+    rows = _sort(_rows(db, group, admin), sort, bool(desc))
     return render(request, "admin/progress.html", {
         "groups": groups, "group": group, "rows": rows, "sort": sort, "desc": bool(desc),
         "inactive_days": INACTIVE_DAYS, "max_due": MAX_DUE,
@@ -92,9 +105,11 @@ def progress(request: Request, group: int | None = None, sort: str = "name", des
 
 
 @router.post("/refresh")
-async def refresh(group: int | None = Form(None), admin: User = Depends(require_admin),
+async def refresh(group: int | None = Form(None), admin: User = Depends(require_staff),
                   _csrf: User = Depends(verify_csrf), db: DbSession = Depends(get_db)):
-    rows = _rows(db, group)
+    if group is not None and group not in {g.id for g in _groups(db, admin)}:
+        group = None
+    rows = _rows(db, group, admin)
     job = distribution.refresh_stats([(r.user_id, r.name) for r in rows], _("Refresh figures"))
     back = f"/admin/progress?group={group}" if group else "/admin/progress"
     return RedirectResponse(f"/admin/jobs/{job.id}?back={quote(back)}", status_code=303)

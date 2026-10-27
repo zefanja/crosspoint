@@ -214,3 +214,46 @@ def test_group_delete_requires_name(client, admin):
     dup = client.post("/admin/groups", data={"csrf_token": csrf, "name": "Neu"})
     dup = client.post("/admin/groups", data={"csrf_token": csrf, "name": "Neu"})
     assert "gibt es schon" in dup.text
+
+
+def test_group_leader_sees_only_own_group(client, login, make_user, db):
+    from app.auth import SESSION_COOKIE
+    from app.models import Group, GroupMember, User
+
+    _, admin_csrf = login("Admin", role="admin")
+    for name in ("Jugend", "Senioren"):
+        client.post("/admin/groups", data={"csrf_token": admin_csrf, "name": name})
+    g1, g2 = (db.query(Group).filter_by(name=n).one().id for n in ("Jugend", "Senioren"))
+    anna, _ = make_user("Anna")
+    otto, _ = make_user("Otto")
+    leader, leader_code = make_user("Lea")
+    db.add_all([GroupMember(group_id=g1, user_id=anna.id), GroupMember(group_id=g2, user_id=otto.id)])
+    db.commit()
+    client.post(f"/admin/groups/{g1}/leaders", data={"csrf_token": admin_csrf, "user_ids": [leader.id]})
+    db.expire_all()
+    assert db.get(User, leader.id).role == "leader"
+    assert "Gruppenleitung" in client.get(f"/admin/groups/{g1}").text
+
+    client.cookies.clear()
+    client.get(f"/login?c={leader_code}")
+    csrf = csrf_token_for(client.cookies[SESSION_COOKIE])
+    assert "Verwaltung" in client.get("/").text
+    home = client.get("/admin")
+    assert home.status_code == 200 and "Admin-Sammlung" not in home.text
+    prog = client.get("/admin/progress")
+    assert "Anna" in prog.text and "Otto" not in prog.text
+    assert "Otto" not in client.get(f"/admin/progress?group={g2}").text  # foreign group ignored
+    users = client.get("/admin/users")
+    assert "Anna" in users.text and "Otto" not in users.text and "Nutzer anlegen" not in users.text
+
+    # codes only for own members
+    r = client.post("/admin/users/print", data={"csrf_token": csrf, "user_ids": [anna.id, otto.id]})
+    assert len(codes_from_sheet(r.text)) == 1 and "Anna" in r.text and "Otto" not in r.text
+
+    for path in ("/admin/groups", f"/admin/groups/{g1}", f"/admin/users/{anna.id}", "/admin/import"):
+        assert client.get(path).status_code == 403, path
+    assert client.post("/admin/users", data={"csrf_token": csrf, "names": "X"}).status_code == 403
+    assert client.post("/admin/workspace", data={"csrf_token": csrf, "ws": "admin"}).status_code == 403
+    job = wait_job(client, client.post("/admin/progress/refresh", data={"csrf_token": csrf},
+                                       follow_redirects=False))
+    assert job.done == 1  # only Anna

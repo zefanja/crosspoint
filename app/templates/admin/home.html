@@ -3,12 +3,21 @@
 {% block content %}
 <section class="card">
   <h1>{{ _("Admin") }}</h1>
+  {% if user.is_admin %}
   <div class="actions-grid">
     <a class="btn" href="/admin/users">{{ _("Users") }} <span class="muted">({{ users }})</span></a>
     <a class="btn" href="/admin/groups">{{ _("Groups") }} <span class="muted">({{ groups }})</span></a>
     <a class="btn" href="/admin/progress">{{ _("Progress") }}</a>
   </div>
+  {% else %}
+  <p class="muted">{{ _("As a group leader you see the progress of your groups and can print new codes for their members.") }}</p>
+  <div class="actions-grid">
+    <a class="btn" href="/admin/progress">{{ _("Progress") }}</a>
+    <a class="btn" href="/admin/users">{{ _("Codes / print sheet") }}</a>
+  </div>
+  {% endif %}
 </section>
+{% if user.is_admin %}
 
 <section class="card">
   <h2>{{ _("Group decks") }}</h2>
@@ -27,4 +36,5 @@
     <a class="btn" href="/admin/import">{{ _("Import .apkg") }}</a>
   </div>
 </section>
+{% endif %}
 {% endblock %}
