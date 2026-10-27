@@ -1057,6 +1057,64 @@ async def collection_stats(user_id: str, days: int = 30) -> CollectionStats:
     return await _run(user_id, _stats, days)
 
 
+@dataclass
+class LearnerStats:
+    heatmap: list[tuple[date, int]]  # reviews per day, oldest first, ending today
+    forecast: list[tuple[date, int]]  # due cards per day, starting today (incl. overdue)
+    new: int
+    learning: int
+    young: int
+    mature: int
+    suspended: int
+    today_answered: int
+    today_correct: int
+    retention_month: float | None
+    streak_days: int
+    total_reviews: int
+
+
+def _learner_stats(col: Collection, deck_id: int | None, history_days: int,
+                   forecast_days: int) -> LearnerStats:
+    search = "deck:*"
+    if deck_id is not None:
+        search = f'"deck:{_escape_search(_require_deck(col, deck_id)["name"])}"'
+    g = col._backend.graphs(search=search, days=history_days)
+    today = (datetime.fromtimestamp(col.sched.day_cutoff) - timedelta(days=1)).date()
+
+    def total(r) -> int:
+        return r.learn + r.relearn + r.young + r.mature + r.filtered
+
+    per_day = {int(k): total(v) for k, v in g.reviews.count.items()}
+    heatmap = [(today - timedelta(days=i), per_day.get(-i, 0)) for i in reversed(range(history_days))]
+    due = {int(k): v for k, v in g.future_due.future_due.items()}
+    overdue = sum(v for k, v in due.items() if k < 0)
+    forecast = [(today + timedelta(days=i), due.get(i, 0) + (overdue if i == 0 else 0))
+                for i in range(forecast_days)]
+    counts = g.card_counts.excluding_inactive
+    month = g.true_retention.month
+    passed = month.young_passed + month.mature_passed
+    failed = month.young_failed + month.mature_failed
+    streak = 0
+    day = 0 if per_day.get(0) else -1
+    while per_day.get(day):
+        streak += 1
+        day -= 1
+    return LearnerStats(
+        heatmap=heatmap, forecast=forecast,
+        new=counts.newCards, learning=counts.learn + counts.relearn, young=counts.young,
+        mature=counts.mature, suspended=g.card_counts.including_inactive.suspended,
+        today_answered=g.today.answer_count, today_correct=g.today.correct_count,
+        retention_month=passed / (passed + failed) if passed + failed else None,
+        streak_days=streak, total_reviews=sum(per_day.values()),
+    )
+
+
+async def learner_stats(user_id: str, deck_id: int | None = None, history_days: int = 365,
+                        forecast_days: int = 30) -> LearnerStats:
+    """Heatmap, forecast and card counts from Anki's own statistics (graphs)."""
+    return await _run(user_id, _learner_stats, deck_id, history_days, forecast_days)
+
+
 # --------------------------------------------------------------------------- backup
 
 

@@ -419,3 +419,17 @@ def test_apply_fsrs_params_recomputes_memory_state_for_this_deck_only(run, deck)
                                           col.decks.config_dict_for_deck_id(other))))
     assert confs[0]["fsrsParams6"][2] == pytest.approx(9.0)
     assert confs[0]["id"] != confs[1]["id"] and not confs[1].get("fsrsParams6")
+
+
+def test_learner_stats(run, deck):
+    empty = run(svc.learner_stats(U))
+    assert len(empty.heatmap) == 365 and len(empty.forecast) == 30
+    assert empty.total_reviews == 0 and empty.retention_month is None
+    for i in range(4):
+        add_verse(run, deck, ref=f"Vers {i}")
+    _review_all(run, deck, 3)
+    stats = run(svc.learner_stats(U, deck))
+    assert stats.heatmap[-1][1] == 3 and stats.total_reviews == 3 and stats.streak_days == 1
+    assert stats.today_answered == 3 and stats.new == 1
+    assert sum(n for _, n in stats.forecast) >= 3  # all reviewed cards come back
+    assert stats.heatmap[-1][0] == stats.forecast[0][0]  # both anchored at "today"

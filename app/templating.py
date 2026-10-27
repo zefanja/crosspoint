@@ -39,6 +39,7 @@ templates.env.add_extension("jinja2.ext.i18n")
 templates.env.install_gettext_callables(i18n.gettext, i18n.ngettext, newstyle=True)
 templates.env.filters["card_document"] = card_document
 templates.env.filters["date"] = i18n.format_date
+templates.env.filters["short_date"] = i18n.format_short_date
 templates.env.filters["decimal"] = i18n.format_decimal
 templates.env.globals.update(
     source_url=SOURCE_URL,

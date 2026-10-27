@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 19:19+0100\n"
+"POT-Creation-Date: 2026-10-27 19:26+0100\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -250,7 +250,7 @@ msgstr "Karten durchsuchen"
 
 #: app/templates/browse.html:4 app/templates/deck_options.html:4
 #: app/templates/export.html:4 app/templates/note_add.html:4
-#: app/templates/note_bible.html:4
+#: app/templates/note_bible.html:4 app/templates/stats.html:4
 msgid "Decks"
 msgstr "Decks"
 
@@ -335,11 +335,11 @@ msgstr "Noch keine Karten. Füge deine erste Karte hinzu – einen Bibelvers, ei
 
 #: app/templates/decks.html:11 app/templates/export.html:24
 #: app/templates/note_add.html:14 app/templates/note_bible.html:14
-#: app/templates/note_edit.html:15
+#: app/templates/note_edit.html:15 app/templates/stats.html:8
 msgid "Deck"
 msgstr "Deck"
 
-#: app/templates/decks.html:12
+#: app/templates/decks.html:12 app/templates/stats.html:50
 msgid "New"
 msgstr "Neu"
 
@@ -365,27 +365,32 @@ msgstr "Karte hinzufügen"
 msgid "Import Bible text"
 msgstr "Bibeltext importieren"
 
-#: app/templates/decks.html:33 app/templates/export.html:2
+#: app/templates/decks.html:33 app/templates/stats.html:2
+#: app/templates/stats.html:6
+msgid "Statistics"
+msgstr "Statistik"
+
+#: app/templates/decks.html:34 app/templates/export.html:2
 msgid "Export"
 msgstr "Export"
 
-#: app/templates/decks.html:37
+#: app/templates/decks.html:38
 msgid "Create new deck"
 msgstr "Neues Deck anlegen"
 
-#: app/templates/decks.html:41
+#: app/templates/decks.html:42
 msgid "e.g. Psalms"
 msgstr "z. B. Psalmen"
 
-#: app/templates/decks.html:41
+#: app/templates/decks.html:42
 msgid "Deck name"
 msgstr "Deckname"
 
-#: app/templates/admin/groups.html:11 app/templates/decks.html:42
+#: app/templates/admin/groups.html:11 app/templates/decks.html:43
 msgid "Create"
 msgstr "Anlegen"
 
-#: app/templates/decks.html:44
+#: app/templates/decks.html:45
 msgid "Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>."
 msgstr "Unterdecks mit <code>::</code>, z. B. <code>Bibel::Psalmen</code>."
 
@@ -539,7 +544,7 @@ msgstr "Karten erstellen"
 msgid "Edit card"
 msgstr "Karte bearbeiten"
 
-#: app/templates/note_edit.html:4
+#: app/templates/note_edit.html:4 app/templates/stats.html:48
 msgid "Cards"
 msgstr "Karten"
 
@@ -627,6 +632,78 @@ msgstr "[Name und Kontakt des Betreibers]"
 #: app/templates/review.html:2
 msgid "Study"
 msgstr "Lernen"
+
+#: app/templates/stats.html:9
+msgid "All decks"
+msgstr "Alle Decks"
+
+#: app/templates/admin/progress.html:12 app/templates/stats.html:12
+msgid "Show"
+msgstr "Anzeigen"
+
+#: app/templates/stats.html:17
+msgid "Reviews today"
+msgstr "Wiederholungen heute"
+
+#: app/templates/stats.html:18
+msgid "Day streak"
+msgstr "Tage in Folge"
+
+#: app/templates/stats.html:19
+msgid "Retention (30 days)"
+msgstr "Behaltensquote (30 Tage)"
+
+#: app/templates/stats.html:20
+msgid "Due tomorrow"
+msgstr "Morgen fällig"
+
+#: app/templates/stats.html:24
+msgid "Activity"
+msgstr "Aktivität"
+
+#: app/templates/stats.html:25 app/templates/stats.html:27
+#, python-format
+msgid "%(num)s review in the last 12 months"
+msgid_plural "%(num)s reviews in the last 12 months"
+msgstr[0] "%(num)s Wiederholung in den letzten 12 Monaten"
+msgstr[1] "%(num)s Wiederholungen in den letzten 12 Monaten"
+
+#: app/templates/stats.html:31
+msgid "Less"
+msgstr "Weniger"
+
+#: app/templates/stats.html:31
+msgid "More"
+msgstr "Mehr"
+
+#: app/templates/stats.html:35
+msgid "Forecast"
+msgstr "Prognose"
+
+#: app/templates/stats.html:36 app/templates/stats.html:37
+#, python-format
+msgid "Cards due in the next 7 days: %(n)s"
+msgstr "Fällige Karten in den nächsten 7 Tagen: %(n)s"
+
+#: app/templates/stats.html:51
+msgid "Learning"
+msgstr "Lernen"
+
+#: app/templates/stats.html:52
+msgid "Young"
+msgstr "Jung"
+
+#: app/templates/stats.html:53
+msgid "Mature"
+msgstr "Ausgereift"
+
+#: app/templates/stats.html:54
+msgid "Suspended"
+msgstr "Ausgesetzt"
+
+#: app/templates/stats.html:56
+msgid "Young: interval under 21 days. Mature: 21 days or more."
+msgstr "Jung: Intervall unter 21 Tagen. Ausgereift: ab 21 Tagen."
 
 #: app/templates/admin/group_detail.html:4 app/templates/admin/groups.html:2
 #: app/templates/admin/groups.html:6 app/templates/admin/home.html:8
@@ -840,10 +917,6 @@ msgstr "Gruppe"
 #: app/templates/admin/progress.html:9
 msgid "All learners"
 msgstr "Alle Lernenden"
-
-#: app/templates/admin/progress.html:12
-msgid "Show"
-msgstr "Anzeigen"
 
 #: app/templates/admin/progress.html:14
 #, python-format

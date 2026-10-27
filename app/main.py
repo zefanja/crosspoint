@@ -18,7 +18,7 @@ from app.config import get_settings
 from app.db import get_engine, get_sessionmaker
 from app.routes import auth as auth_routes
 from app.routes import admin, admin_groups, admin_progress, admin_users
-from app.routes import bible, browse, decks, export, notes, pages, review
+from app.routes import bible, browse, decks, export, notes, pages, review, statistics
 from app.templating import BASE_DIR, is_htmx, render, templates
 from app.i18n import _
 
@@ -95,7 +95,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
-for module in (auth_routes, decks, review, bible, notes, browse, export, pages,
+for module in (auth_routes, decks, review, bible, notes, browse, export, pages, statistics,
                admin, admin_users, admin_groups, admin_progress):
     app.include_router(module.router)
 

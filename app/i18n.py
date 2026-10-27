@@ -18,6 +18,7 @@ from pathlib import Path
 
 from babel import Locale, UnknownLocaleError
 from babel.dates import format_date as _babel_format_date
+from babel.dates import format_skeleton as _babel_format_skeleton
 from babel.messages.mofile import write_mo
 from babel.messages.pofile import read_po
 from babel.numbers import format_decimal as _babel_format_decimal
@@ -110,6 +111,11 @@ def N_(message: str) -> str:
 
 def format_date(value: date) -> str:
     return _babel_format_date(value, format="medium", locale=get_language())
+
+
+def format_short_date(value: date) -> str:
+    """Day and month only, e.g. "28.10." / "10/28"."""
+    return _babel_format_skeleton("Md", value, locale=get_language())
 
 
 def format_decimal(value: float, digits: int = 2) -> str:

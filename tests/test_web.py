@@ -280,3 +280,17 @@ def test_optimize_button(client, learner):
     assert "FSRS" in page.text and "disabled" in page.text  # no reviews yet
     r = client.post(f"/decks/{deck}/optimize", data={"csrf_token": csrf})
     assert r.status_code == 200 and "unverändert" in r.text
+
+
+def test_stats_page(client, learner):
+    _, csrf = learner
+    deck = default_deck(client)
+    add_verse(client, csrf, deck)
+    page = client.get(f"/review/{deck}")
+    card_id = re.search(r'name="card_id" value="(\d+)"', page.text).group(1)
+    client.post(f"/review/{deck}/answer", headers=HX, data={"csrf_token": csrf, "card_id": card_id, "rating": 3})
+    r = client.get("/stats")
+    assert r.status_code == 200 and "Statistik" in r.text
+    assert r.text.count('class="hm ') >= 365 and 'class="fc-col"' in r.text
+    assert client.get(f"/stats?deck={deck}").status_code == 200
+    assert client.get("/stats?deck=999").status_code == 200  # unknown deck → all decks

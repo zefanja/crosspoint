@@ -483,3 +483,28 @@ textarea.input { resize: vertical; line-height: 1.4; }
 @media (min-width: 900px) {
   .admin-page .sheet { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ---------- statistics ---------- */
+
+.stat-tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+@media (min-width: 560px) { .stat-tiles { grid-template-columns: repeat(4, 1fr); } }
+.stat-tile { display: flex; flex-direction: column; padding: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.stat-value { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 0.82rem; color: var(--muted); }
+.heatmap-scroll { overflow-x: auto; direction: rtl; padding-bottom: 4px; }
+.heatmap { direction: ltr; display: inline-grid; grid-template-rows: repeat(7, 11px); grid-auto-flow: column; grid-auto-columns: 11px; gap: 2px; }
+.hm { display: inline-block; width: 11px; height: 11px; border-radius: 2px; background: var(--surface-2); }
+.hm.empty { background: transparent; }
+.hm.l1 { background: color-mix(in srgb, var(--c-rev) 30%, var(--surface-2)); }
+.hm.l2 { background: color-mix(in srgb, var(--c-rev) 55%, var(--surface-2)); }
+.hm.l3 { background: color-mix(in srgb, var(--c-rev) 80%, var(--surface-2)); }
+.hm.l4 { background: var(--c-rev); }
+.hm-legend { display: flex; align-items: center; justify-content: flex-end; gap: 3px; margin-top: 6px; }
+.forecast { display: flex; align-items: flex-end; gap: 2px; height: 140px; padding-bottom: 18px; position: relative; }
+.fc-col { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
+.fc-bar { display: block; background: var(--c-new); border-radius: 2px 2px 0 0; min-height: 1px; }
+.fc-label { position: absolute; bottom: -18px; left: 0; font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+.card-counts { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; margin: 0 0 8px; }
+.card-counts div { display: flex; flex-direction: column; }
+.card-counts dt { font-size: 0.85rem; font-weight: 600; }
+.card-counts dd { margin: 0; font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 19:19+0100\n"
+"POT-Creation-Date: 2026-10-27 19:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -249,7 +249,7 @@ msgstr ""
 
 #: app/templates/browse.html:4 app/templates/deck_options.html:4
 #: app/templates/export.html:4 app/templates/note_add.html:4
-#: app/templates/note_bible.html:4
+#: app/templates/note_bible.html:4 app/templates/stats.html:4
 msgid "Decks"
 msgstr ""
 
@@ -334,11 +334,11 @@ msgstr ""
 
 #: app/templates/decks.html:11 app/templates/export.html:24
 #: app/templates/note_add.html:14 app/templates/note_bible.html:14
-#: app/templates/note_edit.html:15
+#: app/templates/note_edit.html:15 app/templates/stats.html:8
 msgid "Deck"
 msgstr ""
 
-#: app/templates/decks.html:12
+#: app/templates/decks.html:12 app/templates/stats.html:50
 msgid "New"
 msgstr ""
 
@@ -364,27 +364,32 @@ msgstr ""
 msgid "Import Bible text"
 msgstr ""
 
-#: app/templates/decks.html:33 app/templates/export.html:2
+#: app/templates/decks.html:33 app/templates/stats.html:2
+#: app/templates/stats.html:6
+msgid "Statistics"
+msgstr ""
+
+#: app/templates/decks.html:34 app/templates/export.html:2
 msgid "Export"
 msgstr ""
 
-#: app/templates/decks.html:37
+#: app/templates/decks.html:38
 msgid "Create new deck"
 msgstr ""
 
-#: app/templates/decks.html:41
+#: app/templates/decks.html:42
 msgid "e.g. Psalms"
 msgstr ""
 
-#: app/templates/decks.html:41
+#: app/templates/decks.html:42
 msgid "Deck name"
 msgstr ""
 
-#: app/templates/admin/groups.html:11 app/templates/decks.html:42
+#: app/templates/admin/groups.html:11 app/templates/decks.html:43
 msgid "Create"
 msgstr ""
 
-#: app/templates/decks.html:44
+#: app/templates/decks.html:45
 msgid "Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>."
 msgstr ""
 
@@ -538,7 +543,7 @@ msgstr ""
 msgid "Edit card"
 msgstr ""
 
-#: app/templates/note_edit.html:4
+#: app/templates/note_edit.html:4 app/templates/stats.html:48
 msgid "Cards"
 msgstr ""
 
@@ -625,6 +630,78 @@ msgstr ""
 
 #: app/templates/review.html:2
 msgid "Study"
+msgstr ""
+
+#: app/templates/stats.html:9
+msgid "All decks"
+msgstr ""
+
+#: app/templates/admin/progress.html:12 app/templates/stats.html:12
+msgid "Show"
+msgstr ""
+
+#: app/templates/stats.html:17
+msgid "Reviews today"
+msgstr ""
+
+#: app/templates/stats.html:18
+msgid "Day streak"
+msgstr ""
+
+#: app/templates/stats.html:19
+msgid "Retention (30 days)"
+msgstr ""
+
+#: app/templates/stats.html:20
+msgid "Due tomorrow"
+msgstr ""
+
+#: app/templates/stats.html:24
+msgid "Activity"
+msgstr ""
+
+#: app/templates/stats.html:25 app/templates/stats.html:27
+#, python-format
+msgid "%(num)s review in the last 12 months"
+msgid_plural "%(num)s reviews in the last 12 months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/stats.html:31
+msgid "Less"
+msgstr ""
+
+#: app/templates/stats.html:31
+msgid "More"
+msgstr ""
+
+#: app/templates/stats.html:35
+msgid "Forecast"
+msgstr ""
+
+#: app/templates/stats.html:36 app/templates/stats.html:37
+#, python-format
+msgid "Cards due in the next 7 days: %(n)s"
+msgstr ""
+
+#: app/templates/stats.html:51
+msgid "Learning"
+msgstr ""
+
+#: app/templates/stats.html:52
+msgid "Young"
+msgstr ""
+
+#: app/templates/stats.html:53
+msgid "Mature"
+msgstr ""
+
+#: app/templates/stats.html:54
+msgid "Suspended"
+msgstr ""
+
+#: app/templates/stats.html:56
+msgid "Young: interval under 21 days. Mature: 21 days or more."
 msgstr ""
 
 #: app/templates/admin/group_detail.html:4 app/templates/admin/groups.html:2
@@ -838,10 +915,6 @@ msgstr ""
 
 #: app/templates/admin/progress.html:9
 msgid "All learners"
-msgstr ""
-
-#: app/templates/admin/progress.html:12
-msgid "Show"
 msgstr ""
 
 #: app/templates/admin/progress.html:14
