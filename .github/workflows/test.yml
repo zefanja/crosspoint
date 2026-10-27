@@ -17,4 +17,14 @@ jobs:
           cache: pip
           cache-dependency-path: requirements*.txt
       - run: pip install -r requirements.txt -r requirements-dev.txt
-      - run: pytest -q
+      - run: pip freeze
+      - name: pytest
+        run: |
+          if ! pytest -q -rf > pytest.log 2>&1; then
+            cat pytest.log
+            # Annotations are readable via the public API (logs need a login).
+            msg=$(grep -E "^(FAILED|ERROR|E  )" pytest.log | head -n 40 | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')
+            echo "::error title=pytest failed::${msg}"
+            exit 1
+          fi
+          tail -n 1 pytest.log
