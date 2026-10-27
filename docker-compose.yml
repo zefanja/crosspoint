@@ -2,7 +2,7 @@
 # The `image:` line is owned by the CI bump job – never edit it by hand.
 services:
   app:
-    image: ghcr.io/zefanja/crosspoint:sha-87fc80d
+    image: ghcr.io/zefanja/crosspoint:sha-e5ee239
     container_name: versfest
     restart: unless-stopped
     environment:
