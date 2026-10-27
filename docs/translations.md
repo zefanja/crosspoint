@@ -34,5 +34,5 @@ Weblate). The language appears automatically in the footer switcher. Anki's own 
 - Strings defined outside a request (constants, exceptions) are marked with `N_("…")` and
   translated where they are shown (`_(str(exc))`).
 - Translations may contain simple HTML where the English text does (links, `<em>`).
-- Note type and field names (`Bibelvers`, `Referenz`, …) are Anki data and are not translated;
-  only their labels in the UI are.
+- Note type and field names (`Bible Verse`, `Reference`, …) are Anki data and stay English;
+  only their labels in the UI are translated.

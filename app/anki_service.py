@@ -48,7 +48,7 @@ IDLE_SECONDS = 600
 GROUP_TAG = "gruppendeck"
 DEFAULT_DECK = N_("My cards")  # created in the user's language
 BASIC = "Basic"
-BIBELVERS = "Bibelvers"
+BIBLE_VERSE = "Bible Verse"
 BIBLE_MEMORIZER = bm_model.MODEL_NAME  # "Bible Memorizer"
 DEFAULT_NEW_PER_DAY = 10
 DEFAULT_REVIEWS_PER_DAY = 200
@@ -58,8 +58,8 @@ DEFAULT_RETENTION = 0.9
 # the UI language so interval labels are localized.
 CREATE_LANG = "en"
 SEED_PATH = Path(__file__).resolve().parent / "seed" / "notetypes.apkg"
-SEED_DECK = "_versfest_seed"  # baked into app/seed/notetypes.apkg (old working title)
-SEED_IDS = {BASIC: 1793118616169, BIBELVERS: 1793118616181, BIBLE_MEMORIZER: 1793118616188}  # from `python -m app.cli build-seed`
+SEED_DECK = "_crosspoint_seed"  # baked into app/seed/notetypes.apkg
+SEED_IDS = {BASIC: 1793123435605, BIBLE_VERSE: 1793123435615, BIBLE_MEMORIZER: 1793123435620}  # from `python -m app.cli build-seed`
 
 RATINGS = {1: CardAnswer.AGAIN, 2: CardAnswer.HARD, 3: CardAnswer.GOOD, 4: CardAnswer.EASY}
 QUEUE_SUSPENDED = -1
@@ -69,7 +69,7 @@ _USER_ID = re.compile(r"^[0-9A-Za-z_]{1,40}$")
 # describe_next_states() wraps numbers in Unicode isolates (U+2068/U+2069).
 _LABEL_MARKS = str.maketrans("", "", "⁨⁩")
 
-BIBELVERS_CSS = """\
+BIBLE_VERSE_CSS = """\
 .card {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 24px;
@@ -79,18 +79,18 @@ BIBELVERS_CSS = """\
   background-color: #ffffff;
   padding: 0 12px;
 }
-.uebersetzung { font-size: 14px; opacity: 0.6; margin-top: 4px; }
+.translation { font-size: 14px; opacity: 0.6; margin-top: 4px; }
 .text { text-align: left; display: inline-block; max-width: 36em; }
 .card.nightMode, .nightMode .card { color: #ececef; background-color: #1f1f23; }
 @media (prefers-color-scheme: dark) {
   .card { color: #ececef; background-color: #1f1f23; }
 }
 """
-BIBELVERS_QFMT = (
-    "{{Referenz}}"
-    "{{#Übersetzung}}<div class=uebersetzung>{{Übersetzung}}</div>{{/Übersetzung}}"
+BIBLE_VERSE_QFMT = (
+    "{{Reference}}"
+    "{{#Translation}}<div class=translation>{{Translation}}</div>{{/Translation}}"
 )
-BIBELVERS_AFMT = "{{FrontSide}}\n\n<hr id=answer>\n\n<div class=text>{{Text}}</div>"
+BIBLE_VERSE_AFMT = "{{FrontSide}}\n\n<hr id=answer>\n\n<div class=text>{{Text}}</div>"
 
 
 class AnkiServiceError(Exception):
@@ -344,7 +344,7 @@ def _setup_new_collection(col: Collection, deck_name: str) -> None:
 
 
 def _ensure_notetypes(col: Collection) -> None:
-    """Make sure Basic and Bibelvers exist with the shared seed ids.
+    """Make sure Basic, Bible Verse and Bible Memorizer exist with the shared seed ids.
 
     Notetype ids must be identical in all collections, otherwise importing a group deck
     creates duplicates ("Basic+"). Ids cannot be set via the API, but an import keeps
@@ -405,14 +405,14 @@ def build_seed_package(out_path: Path) -> dict[str, int]:
 
 def _add_bibelvers_notetype(col: Collection) -> None:
     mm = col.models
-    m = mm.new(BIBELVERS)
-    for name in ("Referenz", "Text", "Übersetzung"):
+    m = mm.new(BIBLE_VERSE)
+    for name in ("Reference", "Text", "Translation"):
         mm.add_field(m, mm.new_field(name))
-    t = mm.new_template("Referenz → Text")
-    t["qfmt"] = BIBELVERS_QFMT
-    t["afmt"] = BIBELVERS_AFMT
+    t = mm.new_template("Reference → Text")
+    t["qfmt"] = BIBLE_VERSE_QFMT
+    t["afmt"] = BIBLE_VERSE_AFMT
     mm.add_template(m, t)
-    m["css"] = BIBELVERS_CSS
+    m["css"] = BIBLE_VERSE_CSS
     mm.add(m)
 
 
@@ -592,7 +592,7 @@ async def undo_review(user_id: str, deck_id: int) -> tuple[ReviewState, bool]:
 
 def _notetypes_for_adding(col: Collection) -> list[NotetypeInfo]:
     result = []
-    for name in (BIBELVERS, BASIC):
+    for name in (BIBLE_VERSE, BASIC):
         m = col.models.by_name(name)
         if m is not None:
             result.append(NotetypeInfo(m["id"], m["name"], [f["name"] for f in m["flds"]]))
@@ -600,7 +600,7 @@ def _notetypes_for_adding(col: Collection) -> list[NotetypeInfo]:
 
 
 async def notetypes_for_adding(user_id: str) -> list[NotetypeInfo]:
-    """The note types offered in the add form (Bibelvers, Basic)."""
+    """The note types offered in the add form (Bible Verse, Basic)."""
     return await _run(user_id, _notetypes_for_adding)
 
 
@@ -621,7 +621,7 @@ def _set_fields(note, fields: dict[str, str]) -> None:
 
 def _add_note(col: Collection, notetype: str, deck_id: int, fields: dict[str, str], tags):
     m = col.models.by_name(notetype)
-    if m is None or notetype not in (BASIC, BIBELVERS):
+    if m is None or notetype not in (BASIC, BIBLE_VERSE):
         raise NotFound(N_("Note type not found."))
     _require_deck(col, deck_id)
     note = col.new_note(m)

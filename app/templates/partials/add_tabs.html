@@ -1,5 +1,5 @@
 <nav class="tabs" aria-label="{{ _('Card type') }}">
-  {% set tabs = [("verse", _("Bible verse"), "/notes/new?notetype=Bibelvers"), ("qa", _("Question & answer"), "/notes/new?notetype=Basic"), ("text", _("Bible text"), "/notes/bible")] %}
+  {% set tabs = [("verse", _("Bible verse"), "/notes/new?notetype=Bible%20Verse"), ("qa", _("Question & answer"), "/notes/new?notetype=Basic"), ("text", _("Bible text"), "/notes/bible")] %}
   {% for key, label, href in tabs %}
   <a href="{{ href }}{{ '&' if '?' in href else '?' }}deck_id={{ deck_id }}" class="tab{% if key == active_tab %} active{% endif %}"
      {% if key == active_tab %}aria-current="page"{% endif %}>{{ label }}</a>

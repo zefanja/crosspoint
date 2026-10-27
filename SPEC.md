@@ -98,9 +98,10 @@ damit das Dashboard nicht 100+ Collections öffnen muss. Wahrheit bleibt die Col
 1. **Basic** (Ankis Standard „Basic“, unverändert übernehmen) – Felder `Front`, `Back`.
    In der Oberfläche „Frage & Antwort“ (Felder „Frage“/„Antwort“): für allgemeine Fragen
    zu Themen der Bibel, nicht nur für Verse.
-2. **Bibelvers** – Name exakt `Bibelvers`
-   - Felder: `Referenz` (z. B. „Joh 3,16“), `Text`, `Übersetzung` (optional, z. B. „LUT17“)
-   - Karte 1 „Referenz → Text“: Vorderseite `{{Referenz}}` (+ kleine Übersetzung),
+2. **Bible Verse** – Name exakt `Bible Verse` (Notiztyp- und Feldnamen englisch; nur die
+   Beschriftungen in der Oberfläche werden übersetzt)
+   - Felder: `Reference` (z. B. „Joh 3,16“), `Text`, `Translation` (optional, z. B. „LUT17“)
+   - Karte 1 „Reference → Text“: Vorderseite `{{Reference}}` (+ kleine Übersetzung),
      Rückseite Vorderseite + `<hr id=answer>` + `{{Text}}`
    - Schlichtes, gut lesbares CSS (große Schrift, Zeilenhöhe 1.5, zentriert, Dark-Mode-fähig).
 
@@ -112,7 +113,7 @@ damit das Dashboard nicht 100+ Collections öffnen muss. Wahrheit bleibt die Col
    Notizen werden aus einem Bibeltext erzeugt (siehe 7.1 „Bibeltext importieren“).
 
 Alle drei Notiztypen haben in **jeder** Collection dieselbe ID, sonst legt der Import eines
-Gruppendecks Duplikate an („Basic+“). IDs lassen sich per API nicht setzen, ein Import
+Gruppendecks Duplikate an („Basic+“, „Bible Verse+“). IDs lassen sich per API nicht setzen, ein Import
 übernimmt sie aber: Die kanonischen Notiztypen liegen im Seed-Paket
 `app/seed/notetypes.apkg` (erzeugt mit `python -m app.cli build-seed`, IDs in
 `anki_service.SEED_IDS`) und werden bei Anlage einer Collection importiert. Ungenutzte
@@ -376,7 +377,7 @@ services:
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-en}
     volumes:
       # Absoluter Host-Pfad (z. B. /srv/crosspoint) oder Standard: benanntes Volume
-      - ${DATA_PATH:-versfest-data}:/data
+      - ${DATA_PATH:-crosspoint-data}:/data
     ports:
       - "${PORT:-8000}:8000"
     healthcheck:
@@ -386,7 +387,7 @@ services:
       retries: 3
 
 volumes:
-  versfest-data:
+  crosspoint-data:
 ```
 
 Hinweis: In Portainer-Git-Stacks **keine relativen Bind-Mounts** (`./data`) verwenden – die
@@ -498,7 +499,7 @@ am Server; Rollback per Revert funktioniert.
 **0b – anki-Spike:** `spike/check_anki.py` muss **im gebauten Container** durchlaufen
 (`docker run --rm <image> python spike/check_anki.py`):
 1. `pip install anki` im Image funktioniert (Version notieren und in `requirements.txt` pinnen).
-2. Collection anlegen, FSRS an, Notiztyp „Bibelvers“ anlegen, 20 Notizen.
+2. Collection anlegen, FSRS an, Notiztyp „Bible Verse“ anlegen, 20 Notizen.
 3. 50 simulierte Reviews über die v3-Scheduler-API inkl. Intervall-Vorschau und Undo.
 4. Export `.colpkg` und `.apkg` (mit Lernstand).
 5. Export erneut mit `anki` öffnen: Revlog-Einträge vorhanden, FSRS-Speicherzustand gesetzt.
@@ -523,7 +524,7 @@ neu verteilen – Lernstände bleiben erhalten.
 
 ### Phase 3 – Komfort
 Gruppenleiter-Rolle, FSRS-Optimierung, Statistikseite für Lerner (Heatmap, Prognose),
-Medien (Bilder), zweite Kartenrichtung „Text → Referenz“ für Bibelverse,
+Medien (Bilder), zweite Kartenrichtung „Text → Reference“ für Bibelverse,
 Lückentext-/Tipp-Modus für Verse.
 
 ## 13. Tests

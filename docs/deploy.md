@@ -32,7 +32,7 @@ git push main → Tests → Image ghcr.io/<owner>/<repo>:sha-<kurz> → Bot-Comm
    |---|---|---|---|
    | `SECRET_KEY` | ja | `openssl rand -hex 32` | Session-/HMAC-Schlüssel (min. 32 Zeichen). **Nie ändern** – sonst werden alle Login-Codes ungültig. |
    | `BASE_URL` | ja | `https://lernen.example.de` | Öffentliche URL (für QR-Codes) |
-   | `DATA_PATH` | empfohlen | `/srv/crosspoint` | Absoluter Host-Pfad für `/data`. Ohne: benanntes Volume `versfest-data`. |
+   | `DATA_PATH` | empfohlen | `/srv/crosspoint` | Absoluter Host-Pfad für `/data`. Ohne: benanntes Volume `crosspoint-data`. |
    | `FORWARDED_ALLOW_IPS` | empfohlen | `127.0.0.1` | IP des Reverse Proxys (wichtig für das Rate-Limit) |
    | `PORT` | nein | `8000` | Host-Port |
    | `INITIAL_ADMIN_NAME` | nein | `Admin` | Name des beim Erststart angelegten Admins |

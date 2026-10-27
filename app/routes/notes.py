@@ -63,7 +63,7 @@ async def add_submit(request: Request, notetype: str = Form(...), deck_id: int =
     # Keep the form open for adding the next card (same note type and deck).
     first = field_to_input(fields[nt.fields[0]])
     keep = {}
-    if notetype == anki_service.BIBELVERS:  # keep the translation for series entry
+    if notetype == anki_service.BIBLE_VERSE:  # keep the translation for series entry
         keep = {2: str(form.get("field_2", ""))}
     return await _add_form(request, col, notetype, deck_id, values=keep,
                            message=_("Added: %(front)s", front=first))

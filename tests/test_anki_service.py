@@ -13,8 +13,8 @@ DECK = "Meine Karten"  # "My cards" in German (DEFAULT_LANGUAGE=de)
 
 
 def add_verse(run, deck_id, ref="Joh 3,16", text="Denn also hat Gott die Welt geliebt", tags=()):
-    return run(svc.add_note(U, svc.BIBELVERS, deck_id,
-                            {"Referenz": ref, "Text": text, "Übersetzung": "LUT17"}, tags))
+    return run(svc.add_note(U, svc.BIBLE_VERSE, deck_id,
+                            {"Reference": ref, "Text": text, "Translation": "LUT17"}, tags))
 
 
 @pytest.fixture
@@ -32,7 +32,7 @@ def test_new_collection_setup(run, data_dir):
     try:
         assert col.get_config("fsrs") is True
         assert col.get_preferences().scheduling.rollover == 4
-        assert col.models.by_name("Bibelvers") is not None
+        assert col.models.by_name("Bible Verse") is not None
         assert col.models.by_name("Basic") is not None
         assert col.decks.by_name(DECK) is not None
         conf = col.decks.config_dict_for_deck_id(1)
@@ -64,21 +64,21 @@ def test_create_deck_and_names(run, deck):
 
 def test_notetypes_for_adding(run):
     nts = run(svc.notetypes_for_adding(U))
-    assert [n.name for n in nts] == ["Bibelvers", "Basic"]
-    assert nts[0].fields == ["Referenz", "Text", "Übersetzung"]
+    assert [n.name for n in nts] == ["Bible Verse", "Basic"]
+    assert nts[0].fields == ["Reference", "Text", "Translation"]
 
 
 def test_add_get_update_delete_note(run, deck):
     nid = add_verse(run, deck)
     note = run(svc.get_note(U, nid))
-    assert note.notetype == "Bibelvers"
-    assert dict(note.fields)["Referenz"] == "Joh 3,16"
+    assert note.notetype == "Bible Verse"
+    assert dict(note.fields)["Reference"] == "Joh 3,16"
     assert note.deck_id == deck and not note.readonly and not note.suspended
 
     other = run(svc.create_deck(U, "Andere"))
-    run(svc.update_note(U, nid, {"Referenz": "Joh 3,17"}, other))
+    run(svc.update_note(U, nid, {"Reference": "Joh 3,17"}, other))
     note = run(svc.get_note(U, nid))
-    assert dict(note.fields)["Referenz"] == "Joh 3,17" and note.deck_id == other
+    assert dict(note.fields)["Reference"] == "Joh 3,17" and note.deck_id == other
 
     run(svc.delete_note(U, nid))
     with pytest.raises(svc.NotFound):
@@ -220,8 +220,8 @@ def test_export_roundtrip(run, deck, tmp_path):
 def test_import_package_updates_by_guid_and_keeps_progress(run, deck, tmp_path):
     admin = svc.ADMIN_COLLECTION
     adeck = run(svc.create_deck(admin, "Gruppe"))
-    nid = run(svc.add_note(admin, svc.BIBELVERS, adeck,
-                           {"Referenz": "Ps 1,1", "Text": "alt"}, (svc.GROUP_TAG,)))
+    nid = run(svc.add_note(admin, svc.BIBLE_VERSE, adeck,
+                           {"Reference": "Ps 1,1", "Text": "alt"}, (svc.GROUP_TAG,)))
     pkg = tmp_path / "g.apkg"
     run(svc.export_deck(admin, adeck, pkg, with_scheduling=False))
     assert run(svc.import_package(U, pkg)) == 1
@@ -286,7 +286,7 @@ def test_notetypes_have_shared_seed_ids(run):
     for uid in (U, "OTHER"):
         got = run(svc._run(uid, ids))
         assert got["Basic"] == svc.SEED_IDS["Basic"]
-        assert got["Bibelvers"] == svc.SEED_IDS["Bibelvers"]
+        assert got["Bible Verse"] == svc.SEED_IDS["Bible Verse"]
     names = run(svc.deck_names(U))
     assert svc.SEED_DECK not in dict(names).values()
     assert run(svc.search_cards(U, ""))[1] == 0
@@ -294,7 +294,7 @@ def test_notetypes_have_shared_seed_ids(run):
 
 def test_group_deck_import_does_not_duplicate_notetypes(run, tmp_path):
     adeck = run(svc.create_deck(svc.ADMIN_COLLECTION, "Gruppe"))
-    run(svc.add_note(svc.ADMIN_COLLECTION, svc.BIBELVERS, adeck, {"Referenz": "Ps 1", "Text": "x"}))
+    run(svc.add_note(svc.ADMIN_COLLECTION, svc.BIBLE_VERSE, adeck, {"Reference": "Ps 1", "Text": "x"}))
     run(svc.add_note(svc.ADMIN_COLLECTION, svc.BASIC, adeck, {"Front": "F", "Back": "B"}))
     pkg = tmp_path / "g.apkg"
     run(svc.export_deck(svc.ADMIN_COLLECTION, adeck, pkg, with_scheduling=False))
@@ -312,7 +312,7 @@ def test_seed_package_matches_constants(tmp_path):
         col.import_anki_package(ImportAnkiPackageRequest(
             package_path=str(svc.SEED_PATH), options=ImportAnkiPackageOptions()))
         got = {m["name"]: m["id"] for m in col.models.all()}
-        assert got["Bibelvers"] == svc.SEED_IDS["Bibelvers"]
+        assert got["Bible Verse"] == svc.SEED_IDS["Bible Verse"]
         assert svc.SEED_IDS["Basic"] in got.values()
     finally:
         col.close()
@@ -326,7 +326,7 @@ def test_existing_unused_notetype_is_replaced(run, data_dir):
     col.close()
     run(svc.ensure_collection("OLD"))
     got = run(svc._run("OLD", lambda c: {m["name"]: m["id"] for m in c.models.all()}))
-    assert got["Basic"] == svc.SEED_IDS["Basic"] and got["Bibelvers"] == svc.SEED_IDS["Bibelvers"]
+    assert got["Basic"] == svc.SEED_IDS["Basic"] and got["Bible Verse"] == svc.SEED_IDS["Bible Verse"]
 
 
 PSALM = """1 Der HERR ist mein Hirte, mir wird nichts mangeln.

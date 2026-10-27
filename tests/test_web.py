@@ -22,7 +22,7 @@ def default_deck(client):
 
 def add_verse(client, csrf, deck, ref="Joh 3,16", text="Denn also hat Gott die Welt geliebt"):
     return client.post("/notes/new", data={
-        "csrf_token": csrf, "notetype": "Bibelvers", "deck_id": deck,
+        "csrf_token": csrf, "notetype": "Bible Verse", "deck_id": deck,
         "field_0": ref, "field_1": text, "field_2": "LUT17"})
 
 

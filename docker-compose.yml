@@ -16,9 +16,8 @@ services:
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-en}
     volumes:
       # Absolute host path (e.g. /srv/crosspoint) or default: named volume.
-      # (The volume keeps its old name so existing installs keep their data.)
       # Never use a relative bind mount (./data) in a Portainer Git stack.
-      - ${DATA_PATH:-versfest-data}:/data
+      - ${DATA_PATH:-crosspoint-data}:/data
     ports:
       - "${PORT:-8000}:8000"
     healthcheck:
@@ -28,4 +27,4 @@ services:
       retries: 3
 
 volumes:
-  versfest-data:
+  crosspoint-data:

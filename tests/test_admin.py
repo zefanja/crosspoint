@@ -123,10 +123,10 @@ def test_acceptance_two_groups_distribute_fix_redistribute(client, admin, db):
     _, csrf = admin
     A = anki_service.ADMIN_COLLECTION
     adeck = client.portal.call(anki_service.create_deck, A, "Psalm 23")
-    nid = client.portal.call(anki_service.add_note, A, "Bibelvers", adeck,
-                             {"Referenz": "Ps 23,1", "Text": "Der HERR ist mein Hirt"})
-    client.portal.call(anki_service.add_note, A, "Bibelvers", adeck,
-                       {"Referenz": "Ps 23,2", "Text": "Er weidet mich"})
+    nid = client.portal.call(anki_service.add_note, A, "Bible Verse", adeck,
+                             {"Reference": "Ps 23,1", "Text": "Der HERR ist mein Hirt"})
+    client.portal.call(anki_service.add_note, A, "Bible Verse", adeck,
+                       {"Reference": "Ps 23,2", "Text": "Er weidet mich"})
 
     for name in ("Jugend", "Hauskreis"):
         client.post("/admin/groups", data={"csrf_token": csrf, "name": name})
@@ -160,7 +160,7 @@ def test_acceptance_two_groups_distribute_fix_redistribute(client, admin, db):
     time.sleep(1.1)  # anki skips notes with an unchanged mtime (seconds)
     client.portal.call(lambda: anki_service.update_note(
         A, nid, {"Text": "Der HERR ist mein Hirte"}, adeck, allow_group=True))
-    client.portal.call(anki_service.add_note, A, "Bibelvers", adeck, {"Referenz": "Ps 23,3", "Text": "Er erquicket"})
+    client.portal.call(anki_service.add_note, A, "Bible Verse", adeck, {"Reference": "Ps 23,3", "Text": "Er erquicket"})
     gd = int(re.search(rf'/admin/groups/{group_ids[0]}/decks/(\d+)/distribute', client.get(f"/admin/groups/{group_ids[0]}").text).group(1))
     job = wait_job(client, client.post(f"/admin/groups/{group_ids[0]}/decks/{gd}/distribute",
                                        data={"csrf_token": csrf}, follow_redirects=False))
@@ -171,7 +171,7 @@ def test_acceptance_two_groups_distribute_fix_redistribute(client, admin, db):
     texts = {}
     for row in rows:
         note = client.portal.call(anki_service.get_note, learner, row.note_id)
-        texts[dict(note.fields)["Referenz"]] = (dict(note.fields)["Text"], row.status, note.readonly)
+        texts[dict(note.fields)["Reference"]] = (dict(note.fields)["Text"], row.status, note.readonly)
     assert texts["Ps 23,1"][0] == "Der HERR ist mein Hirte"
     assert texts["Ps 23,1"][1] == "scheduled"  # learning progress kept
     assert texts["Ps 23,3"][1] == "new" and all(t[2] for t in texts.values())

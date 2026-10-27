@@ -43,7 +43,7 @@ VERSES = [
     ("Hebr 11,1", "Es ist aber der Glaube eine feste Zuversicht dessen, was man hofft."),
 ]
 
-BIBELVERS_CSS = """\
+BIBLE_VERSE_CSS = """\
 .card {
   font-family: system-ui, sans-serif;
   font-size: 24px;
@@ -53,7 +53,7 @@ BIBELVERS_CSS = """\
   background: #ffffff;
 }
 .card.nightMode, .nightMode .card { color: #ececef; background: #1f1f23; }
-.uebersetzung { font-size: 14px; opacity: 0.6; }
+.translation { font-size: 14px; opacity: 0.6; }
 """
 
 LABEL_MARKS = str.maketrans("", "", "⁨⁩")
@@ -74,19 +74,19 @@ def section(title: str) -> None:
 
 def add_bibelvers_notetype(col: Collection) -> dict:
     mm = col.models
-    m = mm.new("Bibelvers")
-    for name in ("Referenz", "Text", "Übersetzung"):
+    m = mm.new("Bible Verse")
+    for name in ("Reference", "Text", "Translation"):
         mm.add_field(m, mm.new_field(name))
-    t = mm.new_template("Referenz → Text")
+    t = mm.new_template("Reference → Text")
     t["qfmt"] = (
-        "{{Referenz}}"
-        "{{#Übersetzung}}<div class=uebersetzung>{{Übersetzung}}</div>{{/Übersetzung}}"
+        "{{Reference}}"
+        "{{#Translation}}<div class=translation>{{Translation}}</div>{{/Translation}}"
     )
     t["afmt"] = "{{FrontSide}}\n\n<hr id=answer>\n\n{{Text}}"
     mm.add_template(m, t)
-    m["css"] = BIBELVERS_CSS
+    m["css"] = BIBLE_VERSE_CSS
     mm.add(m)
-    return mm.by_name("Bibelvers")
+    return mm.by_name("Bible Verse")
 
 
 def open_col(path: Path) -> Collection:
@@ -146,20 +146,20 @@ def main() -> int:
     print(f"  python: {sys.version.split()[0]}  TZ={os.environ.get('TZ')}  "
           f"local tz={time.tzname}")
 
-    section("2. Collection, FSRS, notetype 'Bibelvers', 20 notes")
+    section("2. Collection, FSRS, notetype 'Bible Verse', 20 notes")
     col, did = setup_collection(work / "user" / "collection.anki2")
     check(col.get_config("fsrs") is True, "FSRS enabled globally")
     check(col.get_preferences().scheduling.rollover == 4, "day starts at 4:00")
     m = add_bibelvers_notetype(col)
-    check(m is not None and [f["name"] for f in m["flds"]] == ["Referenz", "Text", "Übersetzung"],
-          "notetype 'Bibelvers' with fields Referenz/Text/Übersetzung")
+    check(m is not None and [f["name"] for f in m["flds"]] == ["Reference", "Text", "Translation"],
+          "notetype 'Bible Verse' with fields Reference/Text/Translation")
     check(col.models.by_name("Basic") is not None, "stock notetype 'Basic' present")
     for i in range(20):
         ref, text = VERSES[i % len(VERSES)]
         note = col.new_note(m)
-        note["Referenz"] = f"{ref} ({i + 1})"
+        note["Reference"] = f"{ref} ({i + 1})"
         note["Text"] = text
-        note["Übersetzung"] = "LUT17"
+        note["Translation"] = "LUT17"
         col.add_note(note, did)
     check(len(col.find_notes(f"did:{did}")) == 20, "20 notes in deck 'Meine Karten'")
     card = col.get_card(col.find_cards(f"did:{did}")[0])

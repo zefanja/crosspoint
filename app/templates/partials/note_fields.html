@@ -1,9 +1,9 @@
 {# Field names are data (Anki note types); only their labels are translated. #}
-{% set labels = {"Front": _("Question"), "Back": _("Answer"), "Referenz": _("Reference"), "Text": _("Text"), "Übersetzung": _("Translation (optional)")} %}
-{% set hints = {"Referenz": _("e.g. John 3:16"), "Übersetzung": _("e.g. ESV"), "Front": _("e.g. Who led Israel through the Red Sea?"), "Back": _("e.g. Moses (Exodus 14)")} %}
+{% set labels = {"Front": _("Question"), "Back": _("Answer"), "Reference": _("Reference"), "Text": _("Text"), "Translation": _("Translation (optional)")} %}
+{% set hints = {"Reference": _("e.g. John 3:16"), "Translation": _("e.g. ESV"), "Front": _("e.g. Who led Israel through the Red Sea?"), "Back": _("e.g. Moses (Exodus 14)")} %}
 {% for name in field_names %}
 <label for="field_{{ loop.index0 }}">{{ labels.get(name, name) }}</label>
-{% if name in ("Referenz", "Übersetzung") %}
+{% if name in ("Reference", "Translation") %}
 <input id="field_{{ loop.index0 }}" name="field_{{ loop.index0 }}" class="input"
        value="{{ values.get(loop.index0, '') }}" placeholder="{{ hints.get(name, '') }}"
        {% if loop.first %}autofocus required{% endif %}{% if readonly %} readonly{% endif %}>
