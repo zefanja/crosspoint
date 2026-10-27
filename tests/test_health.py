@@ -18,8 +18,8 @@ def test_healthz_fails_without_write_access(client, data_dir):
         data_dir.chmod(0o700)
 
 
-def test_index_shows_short_version_and_source_link(client):
-    r = client.get("/")
+def test_login_page_shows_short_version_and_source_link(client):
+    r = client.get("/login")
     assert r.status_code == 200
     assert "abcdef0" in r.text
     assert "Quellcode" in r.text

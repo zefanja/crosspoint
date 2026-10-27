@@ -1,0 +1,17 @@
+{% if error %}
+<p class="alert alert-error">{{ error }}</p>
+{% elif not rows %}
+<p class="muted">Keine Karten gefunden.</p>
+{% else %}
+<p class="muted small">{{ total }} Karte{{ "" if total == 1 else "n" }}{% if total > limit %} – die ersten {{ limit }} werden angezeigt{% endif %}</p>
+<ul class="cardlist card flush">
+  {% for r in rows %}
+  <li>
+    <a href="/notes/{{ r.note_id }}" class="cardrow{% if r.suspended %} suspended{% endif %}">
+      <span class="cardfront">{{ r.front or "(leer)" }}</span>
+      <span class="cardmeta"><span>{{ r.deck }}</span><span>{{ r.due }}</span></span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

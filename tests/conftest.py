@@ -21,8 +21,62 @@ def data_dir(tmp_path, monkeypatch):
 
 
 @pytest.fixture
-def client(data_dir):
+def migrated(data_dir):
+    from alembic import command
+    from alembic.config import Config
+
+    command.upgrade(Config("alembic.ini"), "head")
+    return data_dir
+
+
+@pytest.fixture
+def client(migrated):
     from app.main import app
 
     with TestClient(app) as c:
         yield c
+
+
+@pytest.fixture
+def db(migrated):
+    from app.db import get_sessionmaker
+
+    with get_sessionmaker()() as session:
+        yield session
+
+
+@pytest.fixture
+def make_user(db):
+    from app.auth import create_user
+
+    def make(name="Anna", role="learner"):
+        return create_user(db, name, role)
+
+    return make
+
+
+@pytest.fixture
+def login(client, make_user):
+    """Create a user, log in via QR link, return (user, csrf token)."""
+    from app.auth import SESSION_COOKIE, csrf_token_for
+
+    def do(name="Anna", role="learner"):
+        user, code = make_user(name, role)
+        r = client.get(f"/login?c={code}", follow_redirects=False)
+        assert r.status_code == 303 and r.headers["location"] == "/"
+        return user, csrf_token_for(client.cookies[SESSION_COOKIE])
+
+    return do
+
+
+@pytest.fixture
+def run(data_dir):
+    """Run coroutines on one event loop per test; closes all collections afterwards."""
+    import asyncio
+
+    from app import anki_service
+
+    loop = asyncio.new_event_loop()
+    yield loop.run_until_complete
+    loop.run_until_complete(anki_service.close_all())
+    loop.close()

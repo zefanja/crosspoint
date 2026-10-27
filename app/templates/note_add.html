@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Karte hinzufügen{% endblock %}
+{% block content %}
+<p><a href="/" class="back">‹ Decks</a></p>
+<section class="card">
+  <h1>Karte hinzufügen</h1>
+  <nav class="tabs" aria-label="Notiztyp">
+    {% for nt in notetypes %}
+    <a href="/notes/new?notetype={{ nt.name | urlencode }}&deck_id={{ deck_id }}"
+       class="tab{% if nt.name == notetype.name %} active{% endif %}"
+       {% if nt.name == notetype.name %}aria-current="page"{% endif %}>{{ "Vorder-/Rückseite" if nt.name == "Basic" else nt.name }}</a>
+    {% endfor %}
+  </nav>
+  {% if message %}<p class="alert alert-success" role="status">{{ message }}</p>{% endif %}
+  {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
+  <form method="post" action="/notes/new" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="notetype" value="{{ notetype.name }}">
+    <label for="deck_id">Deck</label>
+    <select id="deck_id" name="deck_id" class="input">
+      {% for did, name in decks %}<option value="{{ did }}"{% if did == deck_id %} selected{% endif %}>{{ name }}</option>{% endfor %}
+    </select>
+    {% set field_names = notetype.fields %}{% set readonly = false %}
+    {% include "partials/note_fields.html" %}
+    <button type="submit" class="btn btn-primary btn-block">Hinzufügen</button>
+  </form>
+</section>
+{% endblock %}

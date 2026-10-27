@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Karten durchsuchen{% endblock %}
+{% block content %}
+<p><a href="/" class="back">‹ Decks</a></p>
+<form method="get" action="/browse" class="row search-row" role="search"
+      hx-get="/browse" hx-target="#results" hx-trigger="input changed delay:300ms from:#q, submit" hx-push-url="true">
+  <input type="search" id="q" name="q" class="input" value="{{ q }}" placeholder="Suchen (Anki-Suchsyntax)" aria-label="Suche" autocomplete="off">
+  <button class="btn">Suchen</button>
+</form>
+<div id="results">
+  {% include "partials/browse_results.html" %}
+</div>
+<p class="muted small">Beispiele: <code>Joh</code>, <code>deck:"Meine Karten"</code>, <code>is:due</code>, <code>is:new</code>, <code>is:suspended</code></p>
+{% endblock %}

@@ -1,0 +1,57 @@
+"""Exports: whole collection (.colpkg) or one deck (.apkg), both with scheduling."""
+
+import re
+import secrets
+from datetime import date
+
+from fastapi import APIRouter, Depends, Form, Request
+from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
+
+from app import anki_service
+from app.auth import require_user, verify_csrf
+from app.config import get_settings
+from app.models import User
+from app.templating import render
+
+router = APIRouter()
+
+
+def _temp_path(suffix: str):
+    path = get_settings().data_dir / "exports"
+    path.mkdir(parents=True, exist_ok=True)
+    return path / f"{secrets.token_hex(12)}{suffix}"
+
+
+def _download(path, filename: str):
+    return FileResponse(
+        path, filename=filename, media_type="application/octet-stream",
+        background=BackgroundTask(path.unlink, missing_ok=True),
+    )
+
+
+def _safe_name(name: str) -> str:
+    return re.sub(r"[^\w\-]+", "_", name.replace("::", "-")).strip("_") or "Deck"
+
+
+@router.get("/export")
+async def export_page(request: Request, user: User = Depends(require_user)):
+    decks = await anki_service.deck_names(user.id)
+    return render(request, "export.html", {"decks": decks})
+
+
+@router.post("/export/collection")
+async def export_collection(user: User = Depends(verify_csrf)):
+    path = _temp_path(".colpkg")
+    await anki_service.export_collection(user.id, path)
+    return _download(path, f"Versfest-{date.today().isoformat()}.colpkg")
+
+
+@router.post("/export/deck")
+async def export_deck(deck_id: int = Form(...), user: User = Depends(verify_csrf)):
+    names = dict(await anki_service.deck_names(user.id))
+    if deck_id not in names:
+        raise anki_service.NotFound("Deck nicht gefunden")
+    path = _temp_path(".apkg")
+    await anki_service.export_deck(user.id, deck_id, path)
+    return _download(path, f"{_safe_name(names[deck_id])}-{date.today().isoformat()}.apkg")

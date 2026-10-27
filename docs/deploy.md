@@ -48,7 +48,18 @@ git push main → Tests → Image ghcr.io/<owner>/<repo>:sha-<kurz> → Bot-Comm
    Falls angeboten, zusätzlich *Re-pull image* aktivieren.
 
 6. **Deploy the stack.** Danach unter *Containers → versfest → Logs* den einmalig
-   ausgegebenen Admin-Code notieren (ab Phase 1).
+   ausgegebenen Admin-Code notieren.
+
+   Bis das Admin-Dashboard (Phase 2) fertig ist, werden Nutzer über die Konsole angelegt:
+   *Containers → versfest → Console → Connect* (`/bin/sh`), dann
+
+   ```bash
+   python -m app.cli create-user "Anna" "Ben"   # gibt Name, Code und ID aus
+   python -m app.cli list-users
+   python -m app.cli reset-code <user-id>       # neuer Code, alter wird ungültig
+   ```
+
+   Login-Link für einen QR-Code: `<BASE_URL>/login?c=<CODE>`.
 
 7. **Reverse Proxy** (bestehender Caddy/nginx) auf `http://<server>:<PORT>` zeigen lassen
    und TLS dort terminieren. Die App spricht nur HTTP. Beispiel Caddy:
@@ -84,7 +95,7 @@ Zum Wiederfreigeben einfach einen neuen Commit auf `main` pushen (oder den Workf
 
 ## Backups und Restore
 
-Ab Phase 1 erstellt die App nächtlich um 3:00 Uhr ein Backup unter `/data/backups/<datum>/`
+Die App erstellt nächtlich ab 3:00 Uhr ein Backup unter `/data/backups/<datum>/`
 (`app.db` per SQLite-Backup-API, Collections als `.tar.gz`), Rotation nach
 `BACKUP_KEEP_DAYS`. Da `/data` auf einem Host-Pfad liegt, erfasst es zusätzlich die
 bestehende Server-Sicherung.

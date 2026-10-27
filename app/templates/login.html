@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Anmelden – Versfest{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Anmelden</h1>
+  <p class="muted">Gib deinen persönlichen Code ein – oder scanne den QR-Code auf deinem Kärtchen.</p>
+  {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
+  <form method="post" action="/login" class="stack">
+    <input type="hidden" name="login_token" value="{{ login_token }}">
+    <label for="code">Code</label>
+    <input id="code" name="code" class="input code-input" autocomplete="one-time-code"
+           autocapitalize="characters" autocorrect="off" spellcheck="false"
+           placeholder="K7MX-P3QR" required autofocus>
+    <button type="submit" class="btn btn-primary btn-block">Anmelden</button>
+  </form>
+</section>
+{% endblock %}

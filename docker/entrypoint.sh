@@ -18,6 +18,9 @@ fi
 
 alembic upgrade head
 
+# First start: create an admin and print its code once (visible in Portainer → Logs).
+python -m app.bootstrap
+
 # exec: uvicorn becomes PID 1 and receives SIGTERM -> lifespan shutdown runs.
 exec uvicorn app.main:app \
     --host 0.0.0.0 --port 8000 --workers 1 \

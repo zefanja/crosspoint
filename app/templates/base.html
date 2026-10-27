@@ -2,23 +2,41 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#2f6fdd">
   <title>{% block title %}Versfest{% endblock %}</title>
   <link rel="stylesheet" href="/static/app.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+  {% block head %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}"{% if csrf_token %} hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'{% endif %}>
   <header class="topbar">
     <a href="/" class="brand">Versfest</a>
+    {% if user %}
+    <nav class="topnav">
+      <a href="/browse" class="navlink">Suchen</a>
+      <form method="post" action="/logout">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="navlink linkbutton">Abmelden</button>
+      </form>
+    </nav>
+    {% endif %}
   </header>
   <main class="content">
     {% block content %}{% endblock %}
   </main>
   <footer class="footer">
     <span>Kompatibel mit Anki</span>
-    <span>·</span>
+    <span aria-hidden="true">·</span>
+    <a href="/datenschutz">Datenschutz</a>
+    <span aria-hidden="true">·</span>
     <a href="{{ source_url }}">Quellcode</a>
-    <span>·</span>
+    <span aria-hidden="true">·</span>
     <span class="version" title="Version">{{ app_version }}</span>
   </footer>
 </body>

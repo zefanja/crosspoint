@@ -55,7 +55,10 @@ Konsequenzen:
 - Session: zufällige Session-ID in `app.db`, Cookie `HttpOnly; Secure; SameSite=Lax`,
   Laufzeit 180 Tage, gleitend verlängert. „Abmelden“ löscht die Session.
 - Rate-Limit: max. 10 Fehlversuche pro IP in 15 Minuten, danach 15 Minuten Sperre.
-- CSRF: Token im Formular bzw. htmx-Header `X-CSRF-Token` für alle POST-Anfragen.
+  Während der Sperre werden Versuche abgewiesen, aber nicht gezählt.
+- CSRF: Token im Formular bzw. htmx-Header `X-CSRF-Token` für alle POST-Anfragen
+  (HMAC der Session-ID). Das Login-Formular selbst nutzt ein Double-Submit-Cookie.
+- Bis zum Dashboard (Phase 2) legt `python -m app.cli create-user …` Nutzer an.
 
 ## 5. Datenmodell
 
@@ -138,12 +141,20 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
   „Meine Karten“ per `col.decks.id("Meine Karten")` anlegen.
 - Die v3-Queue gilt nur für das **aktuelle Deck** → vor `get_queued_cards` immer
   `col.decks.select(did)`.
+- Sprache: Ein Backend mit `langs=["de"]` legt Standard-Notiztypen lokalisiert an
+  („Einfach“ statt „Basic“). Deshalb neue Collections mit `RustBackend(langs=["en"])`
+  anlegen und danach mit `RustBackend(langs=["de"])` öffnen → deutsche Intervall-Labels
+  („<10 Min.“, „4 Tg.“) und Fehlermeldungen, Namen bleiben „Basic“/„Default“.
 - `describe_next_states` liefert Labels mit Unicode-Isolatoren (U+2068/U+2069) → für die
   Anzeige entfernen.
 - Deck-Optionen: `conf["new"]["perDay"]`, `conf["rev"]["perDay"]`, `conf["desiredRetention"]`.
 - Export Deck: `limit=DeckIdLimit(deck_id=did)`; Import-Optionen
   `ImportAnkiPackageOptions(with_scheduling, with_deck_configs, update_notes, merge_notetypes, …)`.
 - `.colpkg` + `.apkg` wieder geöffnet: Revlog und FSRS-Speicherzustand vollständig erhalten.
+- Import mit `update_notes=…ALWAYS` aktualisiert per GUID, überspringt aber Notizen mit
+  **gleicher mtime (Sekunden)** als „duplicate“ – relevant nur für Tests.
+- `export_collection_package` schließt die Collection → danach `col.reopen()` (Undo-Stack weg).
+- Nach `col.undo()` einer Bewertung liefert die Queue die zurückgenommene Karte wieder zuerst.
 - Tageswechsel mit `TZ=Europe/Berlin`: `col.sched.day_cutoff` = 04:00 Ortszeit. ✔
 
 ## 7. Funktionen
@@ -164,6 +175,9 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - Fortschrittszeile oben: verbleibende Karten (neu/Lernen/fällig).
 - Kein Seiten-Reload: htmx tauscht nur den Kartenbereich aus. Nächste Karte wird nach
   der Bewertung direkt mitgeliefert (eine Anfrage pro Bewertung).
+- Umsetzung: Vorder- und Rückseite kommen in derselben Antwort; „Antwort zeigen“ schaltet
+  rein per CSS um (funktioniert ohne JS). Die Antwortzeit misst der Server
+  (`shown_at` im Formular).
 
 **Karten anlegen / bearbeiten**
 - Formular je Notiztyp; Deck-Auswahl; „Hinzufügen“ hält Formular offen (Serienanlage).

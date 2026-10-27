@@ -1,0 +1,51 @@
+<div id="review" class="review">
+  <div class="review-top">
+    <a href="/" class="back" aria-label="Zurück zu den Decks">‹ {{ state.deck_name }}</a>
+    <span class="counts" aria-label="Verbleibend: {{ state.new }} neu, {{ state.learn }} lernen, {{ state.review }} fällig">
+      <span class="c-new{% if state.card and state.card.queue == 0 %} current{% endif %}">{{ state.new }}</span>
+      <span class="c-learn{% if state.card and state.card.queue in (1, 3) %} current{% endif %}">{{ state.learn }}</span>
+      <span class="c-rev{% if state.card and state.card.queue == 2 %} current{% endif %}">{{ state.review }}</span>
+    </span>
+    {% if state.can_undo %}
+    <form hx-post="/review/{{ state.deck_id }}/undo" hx-target="#review" hx-swap="outerHTML"
+          method="post" action="/review/{{ state.deck_id }}/undo" class="inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button id="undo-btn" class="btn btn-small" title="Rückgängig (Z)"><span aria-hidden="true">↶</span><span class="undo-text">Rückgängig</span></button>
+    </form>
+    {% endif %}
+  </div>
+
+  {% if state.card %}
+  <input type="checkbox" id="show-answer" class="show-toggle" aria-hidden="true" tabindex="-1">
+  <div class="card-stage">
+    <iframe class="card-frame card-q" sandbox title="Vorderseite"
+            srcdoc="{{ state.card.question | card_document }}"></iframe>
+    <iframe class="card-frame card-a" sandbox title="Rückseite"
+            srcdoc="{{ state.card.answer | card_document }}"></iframe>
+  </div>
+  <div class="answer-bar">
+    <label for="show-answer" id="show-btn" class="btn btn-primary btn-block show-btn" role="button">Antwort zeigen</label>
+    <form class="ratings" method="post" action="/review/{{ state.deck_id }}/answer"
+          hx-post="/review/{{ state.deck_id }}/answer" hx-target="#review" hx-swap="outerHTML"
+          hx-disabled-elt="find button">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="card_id" value="{{ state.card.card_id }}">
+      <input type="hidden" name="shown_at" value="{{ shown_at }}">
+      {% set names = ["Nochmal", "Schwer", "Gut", "Einfach"] %}
+      {% set classes = ["r-again", "r-hard", "r-good", "r-easy"] %}
+      {% for i in range(4) %}
+      <button type="submit" name="rating" value="{{ i + 1 }}" class="btn rating {{ classes[i] }}" data-rating="{{ i + 1 }}">
+        <span>{{ names[i] }}</span><small>{{ state.card.labels[i] }}</small>
+      </button>
+      {% endfor %}
+    </form>
+  </div>
+  {% else %}
+  <div class="done">
+    <p class="done-emoji" aria-hidden="true">🎉</p>
+    <h2>Fertig für heute!</h2>
+    <p class="muted">In diesem Deck ist gerade nichts mehr fällig. Nächste Karten morgen.</p>
+    <a href="/" class="btn btn-primary">Zurück zu den Decks</a>
+  </div>
+  {% endif %}
+</div>
