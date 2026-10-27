@@ -294,3 +294,21 @@ def test_stats_page(client, learner):
     assert r.text.count('class="hm ') >= 365 and 'class="fc-col"' in r.text
     assert client.get(f"/stats?deck={deck}").status_code == 200
     assert client.get("/stats?deck=999").status_code == 200  # unknown deck → all decks
+
+
+def test_typing_mode(client, learner):
+    _, csrf = learner
+    deck = default_deck(client)
+    add_verse(client, csrf, deck, ref="Ps 23,1", text="Der HERR ist mein Hirte")
+    assert 'name="typed"' not in client.get(f"/review/{deck}").text  # off by default
+    page = client.get(f"/review/{deck}/typing?on=1")
+    assert 'name="typed"' in page.text and 'aria-pressed="true"' in page.text
+    card_id = re.search(r'name="card_id" value="(\d+)"', page.text).group(1)
+    r = client.post(f"/review/{deck}/check", headers=HX, data={
+        "csrf_token": csrf, "card_id": card_id, "typed": "Der Herr ist mein <script>x</script>"})
+    assert 'class="typed-diff"' in r.text and "typeGood" in r.text and "typeBad" in r.text
+    assert "<script>x" not in r.text
+    assert 'class="show-toggle" aria-hidden="true" tabindex="-1" checked' in r.text
+    assert f'name="card_id" value="{card_id}"' in r.text  # same card, ready to rate
+    client.get(f"/review/{deck}/typing?on=0")
+    assert 'name="typed"' not in client.get(f"/review/{deck}").text

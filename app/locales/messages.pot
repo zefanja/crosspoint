@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 21:03+0100\n"
+"POT-Creation-Date: 2026-10-27 21:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,44 +21,44 @@ msgstr ""
 msgid "My cards"
 msgstr ""
 
-#: app/anki_service.py:536 app/routes/admin_groups.py:143
+#: app/anki_service.py:547 app/routes/admin_groups.py:143
 #: app/routes/admin_groups.py:156 app/routes/export.py:58
 msgid "Deck not found."
 msgstr ""
 
-#: app/anki_service.py:543
+#: app/anki_service.py:554
 msgid "Please enter a deck name."
 msgstr ""
 
-#: app/anki_service.py:650
+#: app/anki_service.py:684
 msgid "Note not found."
 msgstr ""
 
-#: app/anki_service.py:658
+#: app/anki_service.py:692
 msgid "The first field must not be empty."
 msgstr ""
 
-#: app/anki_service.py:664 app/routes/notes.py:55
+#: app/anki_service.py:698 app/routes/notes.py:55
 msgid "Note type not found."
 msgstr ""
 
-#: app/anki_service.py:691
+#: app/anki_service.py:725
 msgid "Please enter a Bible text."
 msgstr ""
 
-#: app/anki_service.py:701
+#: app/anki_service.py:735
 msgid "[Beginning]"
 msgstr ""
 
-#: app/anki_service.py:751
+#: app/anki_service.py:785
 msgid "Cards from group decks cannot be edited."
 msgstr ""
 
-#: app/anki_service.py:753
+#: app/anki_service.py:787
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr ""
 
-#: app/anki_service.py:773
+#: app/anki_service.py:807
 msgid "Cards from group decks cannot be deleted."
 msgstr ""
 
@@ -884,7 +884,7 @@ msgstr ""
 msgid "Import"
 msgstr ""
 
-#: app/templates/admin/job.html:4 app/templates/partials/review_card.html:23
+#: app/templates/admin/job.html:4 app/templates/partials/review_card.html:26
 msgid "Back"
 msgstr ""
 
@@ -1205,7 +1205,7 @@ msgid "Line breaks are kept. Simple formatting like &lt;b&gt;bold&lt;/b&gt; or &
 msgstr ""
 
 #: app/templates/partials/review_card.html:3
-#: app/templates/partials/review_card.html:48
+#: app/templates/partials/review_card.html:63
 msgid "Back to decks"
 msgstr ""
 
@@ -1214,43 +1214,71 @@ msgstr ""
 msgid "Remaining: %(new)s new, %(learn)s learning, %(due)s due"
 msgstr ""
 
-#: app/templates/partials/review_card.html:13
+#: app/templates/partials/review_card.html:10
+msgid "Typing mode: off"
+msgstr ""
+
+#: app/templates/partials/review_card.html:10
+msgid "Typing mode: on"
+msgstr ""
+
+#: app/templates/partials/review_card.html:11
+msgid "Typing mode"
+msgstr ""
+
+#: app/templates/partials/review_card.html:16
 msgid "Undo (Z)"
 msgstr ""
 
-#: app/templates/partials/review_card.html:13
+#: app/templates/partials/review_card.html:16
 msgid "Undo"
 msgstr ""
 
-#: app/templates/partials/review_card.html:21
+#: app/templates/partials/review_card.html:24
 msgid "Front"
 msgstr ""
 
-#: app/templates/partials/review_card.html:27
+#: app/templates/partials/review_card.html:29
+msgid "Your answer compared"
+msgstr ""
+
+#: app/templates/partials/review_card.html:37
+msgid "Type the answer …"
+msgstr ""
+
+#: app/templates/partials/review_card.html:37
+msgid "Your answer"
+msgstr ""
+
+#: app/templates/partials/review_card.html:38
+msgid "Check"
+msgstr ""
+
+#: app/templates/partials/review_card.html:42
 msgid "Show answer"
 msgstr ""
 
-#: app/templates/partials/review_card.html:34
+#: app/templates/partials/review_card.html:49
 msgid "Again"
 msgstr ""
 
-#: app/templates/partials/review_card.html:34
+#: app/templates/partials/review_card.html:49
 msgid "Hard"
 msgstr ""
 
-#: app/templates/partials/review_card.html:34
+#: app/templates/partials/review_card.html:49
 msgid "Good"
 msgstr ""
 
-#: app/templates/partials/review_card.html:34
+#: app/templates/partials/review_card.html:49
 msgid "Easy"
 msgstr ""
 
-#: app/templates/partials/review_card.html:46
+#: app/templates/partials/review_card.html:61
 msgid "Done for today!"
 msgstr ""
 
-#: app/templates/partials/review_card.html:47
+#: app/templates/partials/review_card.html:62
 msgid "Nothing else is due in this deck right now. More cards tomorrow."
 msgstr ""
 

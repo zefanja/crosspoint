@@ -508,3 +508,15 @@ textarea.input { resize: vertical; line-height: 1.4; }
 .card-counts div { display: flex; flex-direction: column; }
 .card-counts dt { font-size: 0.85rem; font-weight: 600; }
 .card-counts dd { margin: 0; font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ---------- typing mode ---------- */
+
+.btn-small.active { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+a.btn-small { min-width: var(--touch); min-height: var(--touch); }
+.type-form { display: flex; flex-direction: column; gap: 6px; padding: 8px 8px 0; }
+.typed-diff { margin: 8px 8px 0; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; overflow-wrap: anywhere; }
+.typed-diff code { font-family: inherit; }
+.typeGood { background: color-mix(in srgb, var(--c-rev) 25%, transparent); }
+.typeBad { background: color-mix(in srgb, var(--c-learn) 30%, transparent); text-decoration: line-through; }
+.typeMissed { background: color-mix(in srgb, var(--c-learn) 15%, transparent); color: var(--c-learn); }
+#typearrow { color: var(--muted); }

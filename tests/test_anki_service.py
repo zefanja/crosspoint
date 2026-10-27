@@ -466,3 +466,13 @@ def test_upgrade_adds_reverse_to_existing_bible_verse(run, data_dir):
     names = run(svc._run(U, lambda col: col.models.field_names(col.models.get(svc.SEED_IDS[svc.BIBLE_VERSE]))))
     assert names[-1] == "Reverse"
     assert dict(run(svc.get_note(U, nid)).fields)["Text"] == "Im Anfang"
+
+
+def test_compare_typed(run, deck):
+    add_verse(run, deck, ref="Joh 3,16", text="Denn also hat <b>Gott</b> die Welt geliebt")
+    state = run(svc.review_state(U, deck))
+    assert state.card.can_type
+    _, diff = run(svc.compare_typed(U, deck, state.card.card_id, "Denn also hat Gott die Welt geliebt"))
+    assert "typeBad" not in diff and "typeMissed" not in diff  # markup of the field is ignored
+    _, diff = run(svc.compare_typed(U, deck, 12345, "x"))
+    assert diff is None  # not the current card

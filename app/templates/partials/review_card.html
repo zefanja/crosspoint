@@ -6,6 +6,9 @@
       <span class="c-learn{% if state.card and state.card.queue in (1, 3) %} current{% endif %}">{{ state.learn }}</span>
       <span class="c-rev{% if state.card and state.card.queue == 2 %} current{% endif %}">{{ state.review }}</span>
     </span>
+    <a href="/review/{{ state.deck_id }}/typing?on={{ 0 if typing else 1 }}" class="btn btn-small{% if typing %} active{% endif %}"
+       title="{{ _('Typing mode: off') if typing else _('Typing mode: on') }}" aria-pressed="{{ 'true' if typing else 'false' }}"
+       aria-label="{{ _('Typing mode') }}">⌨</a>
     {% if state.can_undo %}
     <form hx-post="/review/{{ state.deck_id }}/undo" hx-target="#review" hx-swap="outerHTML"
           method="post" action="/review/{{ state.deck_id }}/undo" class="inline">
@@ -16,13 +19,25 @@
   </div>
 
   {% if state.card %}
-  <input type="checkbox" id="show-answer" class="show-toggle" aria-hidden="true" tabindex="-1">
+  <input type="checkbox" id="show-answer" class="show-toggle" aria-hidden="true" tabindex="-1"{% if typed_diff %} checked{% endif %}>
   <div class="card-stage">
     <iframe class="card-frame card-q" sandbox title="{{ _('Front') }}"
             srcdoc="{{ state.card.question | card_document }}"></iframe>
     <iframe class="card-frame card-a" sandbox title="{{ _('Back') }}"
             srcdoc="{{ state.card.answer | card_document }}"></iframe>
   </div>
+  {% if typed_diff %}<div class="typed-diff" aria-label="{{ _('Your answer compared') }}">{{ typed_diff }}</div>
+  {% elif typing and state.card.can_type %}
+  <form class="type-form" hx-post="/review/{{ state.deck_id }}/check" hx-target="#review" hx-swap="outerHTML"
+        method="post" action="/review/{{ state.deck_id }}/check">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="card_id" value="{{ state.card.card_id }}">
+    <input type="hidden" name="shown_at" value="{{ shown_at }}">
+    <textarea name="typed" id="typed" class="input" rows="3" autocomplete="off" autocapitalize="sentences"
+              placeholder="{{ _('Type the answer …') }}" aria-label="{{ _('Your answer') }}"></textarea>
+    <button class="btn btn-primary btn-block">{{ _("Check") }}</button>
+  </form>
+  {% endif %}
   <div class="answer-bar">
     <label for="show-answer" id="show-btn" class="btn btn-primary btn-block show-btn" role="button">{{ _("Show answer") }}</label>
     <form class="ratings" method="post" action="/review/{{ state.deck_id }}/answer"

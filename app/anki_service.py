@@ -63,6 +63,16 @@ SEED_PATH = Path(__file__).resolve().parent / "seed" / "notetypes.apkg"
 SEED_DECK = "_crosspoint_seed"  # baked into app/seed/notetypes.apkg
 SEED_IDS = {BASIC: 1793123435605, BIBLE_VERSE: 1793123435615, BIBLE_MEMORIZER: 1793123435620}  # from `python -m app.cli build-seed`
 
+# Field holding the expected answer for typing mode, per (notetype, card ordinal).
+TYPE_FIELDS = {
+    ("Bible Verse", 0): "Text",
+    ("Bible Verse", 1): "Reference",
+    ("Basic", 0): "Back",
+    ("Bible Memorizer", 0): "answer",
+    ("Bible Memorizer", 1): "answer",
+    ("Bible Memorizer", 2): "answer",
+}
+
 RATINGS = {1: CardAnswer.AGAIN, 2: CardAnswer.HARD, 3: CardAnswer.GOOD, 4: CardAnswer.EASY}
 QUEUE_SUSPENDED = -1
 CARD_TYPE_NEW = 0
@@ -144,6 +154,7 @@ class ReviewCard:
     answer: str
     labels: list[str]  # interval preview for Again/Hard/Good/Easy
     queue: int
+    can_type: bool = False  # typing mode available (expected answer is known)
 
 
 @dataclass
@@ -570,6 +581,7 @@ def _review_state(col: Collection, deck_id: int) -> ReviewState:
             answer=col.media.strip_av_tags(card.answer()),
             labels=[s.translate(_LABEL_MARKS) for s in col.sched.describe_next_states(qc.states)],
             queue=qc.queue,
+            can_type=_type_field(card) is not None,
         )
     return ReviewState(
         deck_id=deck_id,
@@ -585,6 +597,28 @@ def _review_state(col: Collection, deck_id: int) -> ReviewState:
 async def review_state(user_id: str, deck_id: int) -> ReviewState:
     """Next card of the deck (or None) plus remaining counts."""
     return await _run(user_id, _review_state, deck_id)
+
+
+def _type_field(card) -> str | None:
+    return TYPE_FIELDS.get((card.note_type()["name"], card.ord))
+
+
+def _compare_typed(col: Collection, deck_id: int, card_id: int, typed: str):
+    state = _review_state(col, deck_id)
+    if state.card is None or state.card.card_id != card_id:
+        return state, None
+    card = col.get_card(card_id)
+    field = _type_field(card)
+    if field is None:
+        return state, None
+    expected = plain_text(card.note()[field])
+    return state, col.compare_answer(expected, typed.strip())
+
+
+async def compare_typed(user_id: str, deck_id: int, card_id: int, typed: str):
+    """Typing mode: Anki's diff (HTML, input escaped by Anki) of the typed answer
+    against the expected field. Returns (state, diff or None if not applicable)."""
+    return await _run(user_id, _compare_typed, deck_id, card_id, typed)
 
 
 def _answer(col: Collection, deck_id: int, card_id: int, rating: int, taken_secs: float):

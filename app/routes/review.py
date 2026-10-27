@@ -1,12 +1,15 @@
 """Review screen. htmx swaps only #review; one request per answer (next card included)."""
 
+import re
 import time
 
+import nh3
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, Request
 from fastapi.responses import RedirectResponse
+from markupsafe import Markup
 
 from app import anki_service, stats
-from app.auth import current_collection, require_user, verify_csrf
+from app.auth import cookie_secure, current_collection, require_user, verify_csrf
 from app.models import User
 from app.templating import is_htmx, render
 
@@ -15,8 +18,13 @@ router = APIRouter()
 MAX_TAKEN_SECS = 3600  # anki caps further via the deck's maxTaken
 
 
-def _render_state(request: Request, state, full_page: bool, undone: bool = False):
-    ctx = {"state": state, "shown_at": f"{time.time():.3f}", "undone": undone}
+TYPE_COOKIE = "vf_type"
+
+
+def _render_state(request: Request, state, full_page: bool, undone: bool = False,
+                  typed_diff=None, shown_at: str | None = None):
+    ctx = {"state": state, "shown_at": shown_at or f"{time.time():.3f}", "undone": undone,
+           "typing": request.cookies.get(TYPE_COOKIE) == "1", "typed_diff": typed_diff}
     return render(request, "review.html" if full_page else "partials/review_card.html", ctx)
 
 
@@ -58,3 +66,26 @@ async def undo(
     if not is_htmx(request):
         return RedirectResponse(f"/review/{deck_id}", status_code=303)
     return _render_state(request, state, full_page=False, undone=undone)
+
+
+@router.post("/review/{deck_id}/check")
+async def check(request: Request, deck_id: int, card_id: int = Form(...), typed: str = Form(""),
+                shown_at: str = Form(""), user: User = Depends(verify_csrf),
+                col: str = Depends(current_collection)):
+    state, diff = await anki_service.compare_typed(col, deck_id, card_id, typed[:5000])
+    diff = Markup(nh3.clean(diff, tags={"code", "span", "br"}, attributes={"*": {"class", "id"}})) if diff else None
+    if not is_htmx(request):
+        return RedirectResponse(f"/review/{deck_id}", status_code=303)
+    return _render_state(request, state, full_page=False, typed_diff=diff,
+                         shown_at=shown_at if re.fullmatch(r"\d+(\.\d+)?", shown_at) else None)
+
+
+@router.get("/review/{deck_id}/typing")
+def toggle_typing(deck_id: int, on: int = 0, user: User = Depends(require_user)):
+    response = RedirectResponse(f"/review/{deck_id}", status_code=303)
+    if on:
+        response.set_cookie(TYPE_COOKIE, "1", max_age=365 * 86400, httponly=True,
+                            secure=cookie_secure(), samesite="lax")
+    else:
+        response.delete_cookie(TYPE_COOKIE)
+    return response

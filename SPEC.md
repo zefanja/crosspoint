@@ -192,6 +192,9 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
   („<10 min“, „2 T“, …). Farben wie Anki.
 - Desktop: Leertaste = Antwort zeigen / Gut; Tasten 1–4 = Bewertung; `Z` = Rückgängig.
 - „Rückgängig“-Button für die letzte Bewertung (Fehltipp auf dem Handy).
+- *Tippmodus* (Phase 3, Schalter ⌨ in der Lernansicht, Cookie): Antwort eintippen → „Prüfen“
+  zeigt Ankis Diff (`col.compare_answer`) und die Rückseite, danach bewerten. Für Bible Verse
+  (Text bzw. Referenz), Basic (Rückseite) und Bible Memorizer Karte 1–3 (`answer`).
 - Fortschrittszeile oben: verbleibende Karten (neu/Lernen/fällig).
 - Kein Seiten-Reload: htmx tauscht nur den Kartenbereich aus. Nächste Karte wird nach
   der Bewertung direkt mitgeliefert (eine Anfrage pro Bewertung).

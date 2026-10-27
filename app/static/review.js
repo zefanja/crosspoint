@@ -3,6 +3,12 @@
 "use strict";
 
 document.addEventListener("keydown", (e) => {
+  // Ctrl/Cmd+Enter in the typing field = check
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && e.target.id === "typed") {
+    e.preventDefault();
+    e.target.form.requestSubmit();
+    return;
+  }
   if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
   if (e.target.closest("input:not([type=checkbox]), textarea, select")) return;
 
