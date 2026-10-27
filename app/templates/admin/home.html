@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Admin") }} – {{ app_name }}{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ _("Admin") }}</h1>
+  <div class="actions-grid">
+    <a class="btn" href="/admin/users">{{ _("Users") }} <span class="muted">({{ users }})</span></a>
+    <a class="btn" href="/admin/groups">{{ _("Groups") }} <span class="muted">({{ groups }})</span></a>
+    <a class="btn" href="/admin/progress">{{ _("Progress") }}</a>
+  </div>
+</section>
+
+<section class="card">
+  <h2>{{ _("Group decks") }}</h2>
+  <p class="muted">{{ _("Group decks are maintained in the admin collection – with the same screens as your own cards. Then assign them to a group and distribute them.") }}</p>
+  <div class="actions-grid">
+    <form method="post" action="/admin/workspace">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      {% if admin_ws %}
+      <input type="hidden" name="ws" value="own">
+      <button class="btn btn-block">{{ _("Back to my cards") }}</button>
+      {% else %}
+      <input type="hidden" name="ws" value="admin">
+      <button class="btn btn-primary btn-block">{{ _("Edit admin collection") }}</button>
+      {% endif %}
+    </form>
+    <a class="btn" href="/admin/import">{{ _("Import .apkg") }}</a>
+  </div>
+</section>
+{% endblock %}

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 18:08+0100\n"
+"POT-Creation-Date: 2026-10-27 18:37+0100\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -22,7 +22,8 @@ msgstr ""
 msgid "My cards"
 msgstr "Meine Karten"
 
-#: app/anki_service.py:497 app/routes/export.py:58
+#: app/anki_service.py:497 app/routes/admin_groups.py:122
+#: app/routes/admin_groups.py:135 app/routes/export.py:58
 msgid "Deck not found."
 msgstr "Deck nicht gefunden."
 
@@ -67,19 +68,19 @@ msgstr "Karten aus Gruppendecks können nicht gelöscht werden."
 msgid "Distribute “%(deck)s”"
 msgstr "„%(deck)s“ verteilen"
 
-#: app/main.py:130
+#: app/main.py:132
 msgid "You don't have permission to do that."
 msgstr "Dafür fehlen dir die Rechte."
 
-#: app/main.py:137
+#: app/main.py:139
 msgid "Your session has expired. Please reload the page and try again."
 msgstr "Die Sitzung ist abgelaufen. Bitte lade die Seite neu und versuche es noch einmal."
 
-#: app/main.py:176
+#: app/main.py:178
 msgid "CrossPoint – memorize the Bible"
 msgstr "CrossPoint – Bibelverse lernen"
 
-#: app/main.py:178
+#: app/main.py:180
 msgid "Memorize Bible verses with spaced repetition – compatible with Anki."
 msgstr "Bibelverse lernen mit Spaced Repetition – kompatibel mit Anki."
 
@@ -103,6 +104,56 @@ msgstr "Die Datei konnte nicht importiert werden. Ist es eine gültige Anki-Date
 #: app/routes/admin.py:84
 msgid "This task is no longer known."
 msgstr "Dieser Vorgang ist nicht mehr bekannt."
+
+#: app/routes/admin_groups.py:22
+msgid "Group not found."
+msgstr "Gruppe nicht gefunden."
+
+#: app/routes/admin_groups.py:52
+msgid "Please enter a group name."
+msgstr "Bitte einen Gruppennamen eingeben."
+
+#: app/routes/admin_groups.py:58
+msgid "A group with this name already exists."
+msgstr "Eine Gruppe mit diesem Namen gibt es schon."
+
+#: app/routes/admin_groups.py:111 app/routes/admin_users.py:100
+msgid "Group decks for new members"
+msgstr "Gruppendecks für neue Mitglieder"
+
+#: app/routes/admin_progress.py:98 app/templates/admin/progress.html:48
+msgid "Refresh figures"
+msgstr "Werte aktualisieren"
+
+#: app/routes/admin_users.py:57
+msgid "User not found."
+msgstr "Nutzer nicht gefunden."
+
+#: app/routes/admin_users.py:89
+#, python-format
+msgid "Please enter one name per line (at most %(max)s)."
+msgstr "Bitte einen Namen pro Zeile eingeben (höchstens %(max)s)."
+
+#: app/routes/admin_users.py:127
+msgid "You cannot remove your own admin role."
+msgstr "Du kannst dir die Admin-Rolle nicht selbst entziehen."
+
+#: app/routes/admin_users.py:140
+#, python-format
+msgid "Group decks for %(name)s"
+msgstr "Gruppendecks für %(name)s"
+
+#: app/routes/admin_users.py:168
+msgid "You cannot deactivate yourself."
+msgstr "Du kannst dich nicht selbst deaktivieren."
+
+#: app/routes/admin_users.py:182
+msgid "You cannot delete yourself."
+msgstr "Du kannst dich nicht selbst löschen."
+
+#: app/routes/admin_users.py:185
+msgid "The name does not match. The user was not deleted."
+msgstr "Der Name stimmt nicht überein. Der Nutzer wurde nicht gelöscht."
 
 #: app/routes/auth.py:46
 msgid "Too many failed attempts. Please wait 15 minutes and try again."
@@ -147,7 +198,11 @@ msgstr "Gewünschte Behaltensquote: %(min)s bis %(max)s."
 msgid "Added: %(front)s"
 msgstr "Hinzugefügt: %(front)s"
 
-#: app/templates/base.html:22
+#: app/templates/admin/groups.html:4 app/templates/admin/home.html:2
+#: app/templates/admin/home.html:5 app/templates/admin/import.html:4
+#: app/templates/admin/progress.html:4 app/templates/admin/user_detail.html:22
+#: app/templates/admin/users.html:4 app/templates/admin/users.html:25
+#: app/templates/admin/users.html:53 app/templates/base.html:22
 msgid "Admin"
 msgstr "Verwaltung"
 
@@ -164,7 +219,7 @@ msgstr "Abmelden"
 msgid "You are editing the admin collection (group decks)."
 msgstr "Du bearbeitest die Admin-Sammlung (Gruppendecks)."
 
-#: app/templates/base.html:37
+#: app/templates/admin/home.html:21 app/templates/base.html:37
 msgid "Back to my cards"
 msgstr "Zurück zu meinen Karten"
 
@@ -216,7 +271,8 @@ msgstr "Optionen"
 msgid "Options: %(deck)s"
 msgstr "Optionen: %(deck)s"
 
-#: app/templates/deck_options.html:7 app/templates/note_edit.html:11
+#: app/templates/admin/user_detail.html:12 app/templates/deck_options.html:7
+#: app/templates/note_edit.html:11
 msgid "Saved."
 msgstr "Gespeichert."
 
@@ -236,7 +292,8 @@ msgstr "Gewünschte Behaltensquote:"
 msgid "Higher = you remember more, but review more often. 0.90 is a good default. The FSRS algorithm is always on."
 msgstr "Höher = du behältst mehr, musst aber öfter wiederholen. 0,90 ist ein guter Standard. Der Lernalgorithmus FSRS ist immer aktiv."
 
-#: app/templates/deck_options.html:22 app/templates/note_edit.html:21
+#: app/templates/admin/user_detail.html:31 app/templates/deck_options.html:22
+#: app/templates/note_edit.html:21
 msgid "Save"
 msgstr "Speichern"
 
@@ -262,7 +319,7 @@ msgstr "Neu"
 msgid "Learn"
 msgstr "Lern."
 
-#: app/templates/decks.html:12
+#: app/templates/admin/progress.html:26 app/templates/decks.html:12
 msgid "Due"
 msgstr "Fällig"
 
@@ -296,7 +353,7 @@ msgstr "z. B. Psalmen"
 msgid "Deck name"
 msgstr "Deckname"
 
-#: app/templates/decks.html:42
+#: app/templates/admin/groups.html:11 app/templates/decks.html:42
 msgid "Create"
 msgstr "Anlegen"
 
@@ -543,6 +600,396 @@ msgstr "[Name und Kontakt des Betreibers]"
 msgid "Study"
 msgstr "Lernen"
 
+#: app/templates/admin/group_detail.html:4 app/templates/admin/groups.html:2
+#: app/templates/admin/groups.html:6 app/templates/admin/home.html:8
+#: app/templates/admin/user_detail.html:25
+msgid "Groups"
+msgstr "Gruppen"
+
+#: app/templates/admin/group_detail.html:8 app/templates/admin/home.html:9
+#: app/templates/admin/progress.html:2 app/templates/admin/progress.html:6
+msgid "Progress"
+msgstr "Fortschritt"
+
+#: app/templates/admin/group_detail.html:9
+msgid "Codes / print sheet"
+msgstr "Codes / Druckblatt"
+
+#: app/templates/admin/group_detail.html:11
+msgid "The name does not match. The group was not deleted."
+msgstr "Der Name stimmt nicht überein. Die Gruppe wurde nicht gelöscht."
+
+#: app/templates/admin/group_detail.html:15 app/templates/admin/home.html:14
+msgid "Group decks"
+msgstr "Gruppendecks"
+
+#: app/templates/admin/group_detail.html:16
+msgid "Distributing copies the deck from the admin collection into every member's cards. Re-distributing updates changed cards and adds new ones – learning progress is kept. Cards deleted in the admin deck are not deleted for members."
+msgstr "Verteilen kopiert das Deck aus der Admin-Sammlung zu allen Mitgliedern. Erneutes Verteilen aktualisiert geänderte Karten und fügt neue hinzu – der Lernstand bleibt erhalten. Im Admin-Deck gelöschte Karten werden bei den Mitgliedern nicht gelöscht."
+
+#: app/templates/admin/group_detail.html:21
+#, python-format
+msgid "Last distributed: %(date)s"
+msgstr "Zuletzt verteilt: %(date)s"
+
+#: app/templates/admin/group_detail.html:21
+msgid "not distributed yet"
+msgstr "noch nicht verteilt"
+
+#: app/templates/admin/group_detail.html:25
+msgid "Distribute"
+msgstr "Verteilen"
+
+#: app/templates/admin/group_detail.html:28
+msgid "Remove this deck from the group? Members keep their cards."
+msgstr "Dieses Deck aus der Gruppe entfernen? Die Mitglieder behalten ihre Karten."
+
+#: app/templates/admin/group_detail.html:30
+msgid "Remove"
+msgstr "Entfernen"
+
+#: app/templates/admin/group_detail.html:34
+msgid "No group decks yet."
+msgstr "Noch keine Gruppendecks."
+
+#: app/templates/admin/group_detail.html:39
+msgid "Add deck from the admin collection"
+msgstr "Deck aus der Admin-Sammlung hinzufügen"
+
+#: app/templates/admin/group_detail.html:43
+msgid "Add and distribute"
+msgstr "Hinzufügen und verteilen"
+
+#: app/templates/admin/group_detail.html:46
+msgid "Create decks in the admin collection first (Admin → Edit admin collection, or import an .apkg)."
+msgstr "Lege zuerst Decks in der Admin-Sammlung an (Verwaltung → Admin-Sammlung bearbeiten, oder .apkg importieren)."
+
+#: app/templates/admin/group_detail.html:51
+#: app/templates/admin/group_detail.html:55
+msgid "Members"
+msgstr "Mitglieder"
+
+#: app/templates/admin/group_detail.html:57
+#: app/templates/admin/user_detail.html:10 app/templates/admin/users.html:25
+msgid "deactivated"
+msgstr "deaktiviert"
+
+#: app/templates/admin/group_detail.html:58 app/templates/admin/users.html:31
+msgid "No users yet."
+msgstr "Noch keine Nutzer."
+
+#: app/templates/admin/group_detail.html:60
+msgid "Save members"
+msgstr "Mitglieder speichern"
+
+#: app/templates/admin/group_detail.html:65
+msgid "Rename or delete group"
+msgstr "Gruppe umbenennen oder löschen"
+
+#: app/templates/admin/group_detail.html:68 app/templates/admin/groups.html:10
+msgid "Group name"
+msgstr "Gruppenname"
+
+#: app/templates/admin/group_detail.html:69
+msgid "Rename"
+msgstr "Umbenennen"
+
+#: app/templates/admin/group_detail.html:73
+msgid "Delete group – type the name to confirm:"
+msgstr "Gruppe löschen – zur Bestätigung den Namen eintippen:"
+
+#: app/templates/admin/group_detail.html:75
+msgid "Users and their cards are kept."
+msgstr "Nutzer und ihre Karten bleiben erhalten."
+
+#: app/templates/admin/group_detail.html:76
+msgid "Delete group"
+msgstr "Gruppe löschen"
+
+#: app/templates/admin/groups.html:10
+msgid "e.g. Youth group"
+msgstr "z. B. Jugendkreis"
+
+#: app/templates/admin/groups.html:18
+#, python-format
+msgid "%(num)s member"
+msgid_plural "%(num)s members"
+msgstr[0] "%(num)s Mitglied"
+msgstr[1] "%(num)s Mitglieder"
+
+#: app/templates/admin/groups.html:19
+#, python-format
+msgid "%(num)s group deck"
+msgid_plural "%(num)s group decks"
+msgstr[0] "%(num)s Gruppendeck"
+msgstr[1] "%(num)s Gruppendecks"
+
+#: app/templates/admin/groups.html:22 app/templates/admin/user_detail.html:28
+msgid "No groups yet."
+msgstr "Noch keine Gruppen."
+
+#: app/templates/admin/home.html:7 app/templates/admin/user_detail.html:4
+#: app/templates/admin/users.html:2 app/templates/admin/users.html:6
+msgid "Users"
+msgstr "Nutzer"
+
+#: app/templates/admin/home.html:15
+msgid "Group decks are maintained in the admin collection – with the same screens as your own cards. Then assign them to a group and distribute them."
+msgstr "Gruppendecks werden in der Admin-Sammlung gepflegt – mit denselben Seiten wie deine eigenen Karten. Danach einer Gruppe zuweisen und verteilen."
+
+#: app/templates/admin/home.html:24
+msgid "Edit admin collection"
+msgstr "Admin-Sammlung bearbeiten"
+
+#: app/templates/admin/home.html:27 app/templates/admin/import.html:2
+msgid "Import .apkg"
+msgstr ".apkg importieren"
+
+#: app/templates/admin/import.html:6
+msgid "Import .apkg into the admin collection"
+msgstr ".apkg in die Admin-Sammlung importieren"
+
+#: app/templates/admin/import.html:7
+msgid "For example a deck from the Bible Memorizer web tool or from Anki. Existing notes are updated, learning progress is not imported."
+msgstr "Zum Beispiel ein Deck aus dem Bible-Memorizer-Webtool oder aus Anki. Vorhandene Notizen werden aktualisiert, Lernstände nicht übernommen."
+
+#: app/templates/admin/import.html:12
+msgid "File"
+msgstr "Datei"
+
+#: app/templates/admin/import.html:14
+msgid "Import"
+msgstr "Importieren"
+
+#: app/templates/admin/job.html:4 app/templates/partials/review_card.html:23
+msgid "Back"
+msgstr "Rückseite"
+
+#: app/templates/admin/print_sheet.html:2
+#: app/templates/admin/print_sheet.html:6
+msgid "Print sheet"
+msgstr "Druckblatt"
+
+#: app/templates/admin/print_sheet.html:7
+msgid "The codes are shown only now. Print the sheet or note the codes before leaving this page."
+msgstr "Die Codes werden nur jetzt angezeigt. Drucke das Blatt oder notiere die Codes, bevor du die Seite verlässt."
+
+#: app/templates/admin/print_sheet.html:9
+msgid "Print"
+msgstr "Drucken"
+
+#: app/templates/admin/partials/job.html:10
+#: app/templates/admin/print_sheet.html:10
+msgid "Done"
+msgstr "Fertig"
+
+#: app/templates/admin/print_sheet.html:12
+#: app/templates/admin/user_detail.html:9
+#: app/templates/partials/browse_results.html:6
+#, python-format
+msgid "%(num)s card"
+msgid_plural "%(num)s cards"
+msgstr[0] "%(num)s Karte"
+msgstr[1] "%(num)s Karten"
+
+#: app/templates/admin/print_sheet.html:12
+msgid "8 per A4 page, cut along the lines."
+msgstr "8 pro A4-Seite, an den Linien ausschneiden."
+
+#: app/templates/admin/print_sheet.html:22
+msgid "Scan the QR code"
+msgstr "QR-Code scannen"
+
+#: app/templates/admin/print_sheet.html:23
+#, python-format
+msgid "or open %(url)s and enter the code"
+msgstr "oder %(url)s öffnen und den Code eingeben"
+
+#: app/templates/admin/progress.html:8 app/templates/admin/users.html:8
+msgid "Group"
+msgstr "Gruppe"
+
+#: app/templates/admin/progress.html:9
+msgid "All learners"
+msgstr "Alle Lernenden"
+
+#: app/templates/admin/progress.html:12
+msgid "Show"
+msgstr "Anzeigen"
+
+#: app/templates/admin/progress.html:14
+#, python-format
+msgid "Red: inactive for %(days)s+ days or more than %(due)s cards due."
+msgstr "Rot: seit %(days)s+ Tagen inaktiv oder mehr als %(due)s Karten fällig."
+
+#: app/templates/admin/progress.html:26 app/templates/admin/user_detail.html:17
+msgid "Name"
+msgstr "Name"
+
+#: app/templates/admin/progress.html:26
+msgid "Last activity"
+msgstr "Letzte Aktivität"
+
+#: app/templates/admin/progress.html:26
+msgid "Today"
+msgstr "Heute"
+
+#: app/templates/admin/progress.html:26
+msgid "7 days"
+msgstr "7 Tage"
+
+#: app/templates/admin/progress.html:26
+msgid "Retention"
+msgstr "Retention"
+
+#: app/templates/admin/progress.html:26
+msgid "Streak"
+msgstr "Serie"
+
+#: app/templates/admin/progress.html:31
+msgid "needs attention"
+msgstr "braucht Aufmerksamkeit"
+
+#: app/templates/admin/progress.html:40
+msgid "No learners yet."
+msgstr "Noch keine Lernenden."
+
+#: app/templates/admin/progress.html:50
+msgid "Figures are updated after every review and login. “Refresh” recomputes them for everyone (e.g. due cards after midnight)."
+msgstr "Die Werte werden nach jeder Wiederholung und jedem Login aktualisiert. „Aktualisieren“ berechnet sie für alle neu (z. B. fällige Karten nach Mitternacht)."
+
+#: app/templates/admin/user_detail.html:8
+#, python-format
+msgid "Last login: %(date)s"
+msgstr "Letzter Login: %(date)s"
+
+#: app/templates/admin/user_detail.html:8 app/templates/admin/users.html:27
+msgid "never logged in"
+msgstr "noch nie angemeldet"
+
+#: app/templates/admin/user_detail.html:9
+#, python-format
+msgid "Streak: %(n)s"
+msgstr "Serie: %(n)s"
+
+#: app/templates/admin/user_detail.html:19 app/templates/admin/users.html:50
+msgid "Role"
+msgstr "Rolle"
+
+#: app/templates/admin/user_detail.html:21 app/templates/admin/users.html:52
+msgid "Learner"
+msgstr "Lernende*r"
+
+#: app/templates/admin/user_detail.html:28
+msgid "Create a group"
+msgstr "Gruppe anlegen"
+
+#: app/templates/admin/user_detail.html:30
+msgid "New group members receive all decks of the group automatically."
+msgstr "Neue Gruppenmitglieder erhalten automatisch alle Decks der Gruppe."
+
+#: app/templates/admin/user_detail.html:36
+msgid "Login code"
+msgstr "Login-Code"
+
+#: app/templates/admin/user_detail.html:37
+msgid "Codes are not stored in readable form and cannot be shown again. If a code is lost, create a new one – the old one stops working."
+msgstr "Codes werden nicht lesbar gespeichert und können nicht erneut angezeigt werden. Bei Verlust einen neuen Code erzeugen – der alte wird ungültig."
+
+#: app/templates/admin/user_detail.html:39
+msgid "Create a new code? The old code stops working."
+msgstr "Neuen Code erzeugen? Der alte Code wird ungültig."
+
+#: app/templates/admin/user_detail.html:41
+msgid "New code + print sheet"
+msgstr "Neuer Code + Druckblatt"
+
+#: app/templates/admin/user_detail.html:47
+msgid "Deactivate or delete"
+msgstr "Deaktivieren oder löschen"
+
+#: app/templates/admin/user_detail.html:50
+msgid "Activate"
+msgstr "Aktivieren"
+
+#: app/templates/admin/user_detail.html:50
+msgid "Deactivate (cannot log in, data is kept)"
+msgstr "Deaktivieren (kein Login mehr, Daten bleiben)"
+
+#: app/templates/admin/user_detail.html:54
+msgid "Delete permanently – type the name to confirm:"
+msgstr "Endgültig löschen – zur Bestätigung den Namen eintippen:"
+
+#: app/templates/admin/user_detail.html:56
+msgid "Delete user and all cards"
+msgstr "Nutzer und alle Karten löschen"
+
+#: app/templates/admin/users.html:9
+msgid "All users"
+msgstr "Alle Nutzer"
+
+#: app/templates/admin/users.html:12
+msgid "Filter"
+msgstr "Filtern"
+
+#: app/templates/admin/users.html:17
+msgid "Create new codes for the selected users? Their old codes stop working."
+msgstr "Neue Codes für die ausgewählten Nutzer erzeugen? Ihre alten Codes werden ungültig."
+
+#: app/templates/admin/users.html:23
+#, python-format
+msgid "Select %(name)s"
+msgstr "%(name)s auswählen"
+
+#: app/templates/admin/users.html:34
+msgid "New codes + print sheet for selected users"
+msgstr "Neue Codes + Druckblatt für Ausgewählte"
+
+#: app/templates/admin/users.html:38
+msgid "Add users"
+msgstr "Nutzer anlegen"
+
+#: app/templates/admin/users.html:42
+msgid "Names (one per line)"
+msgstr "Namen (einer pro Zeile)"
+
+#: app/templates/admin/users.html:43
+msgid "Anna"
+msgstr "Anna"
+
+#: app/templates/admin/users.html:43
+msgid "Ben"
+msgstr "Ben"
+
+#: app/templates/admin/users.html:44
+msgid "A first name or initials is enough – no email address needed."
+msgstr "Vorname oder Kürzel genügt – keine E-Mail-Adresse nötig."
+
+#: app/templates/admin/users.html:45
+msgid "Group (optional)"
+msgstr "Gruppe (optional)"
+
+#: app/templates/admin/users.html:55
+msgid "Create users and print codes"
+msgstr "Nutzer anlegen und Codes drucken"
+
+#: app/templates/admin/partials/job.html:3
+#, python-format
+msgid "%(done)s of %(total)s done"
+msgstr "%(done)s von %(total)s erledigt"
+
+#: app/templates/admin/partials/job.html:3
+msgid "finished"
+msgstr "fertig"
+
+#: app/templates/admin/partials/job.html:6
+msgid "Errors:"
+msgstr "Fehler:"
+
+#: app/templates/admin/partials/job.html:11
+msgid "You can leave this page – the task continues in the background."
+msgstr "Du kannst die Seite verlassen – der Vorgang läuft im Hintergrund weiter."
+
 #: app/templates/partials/add_tabs.html:1
 msgid "Card type"
 msgstr "Kartenart"
@@ -576,13 +1023,6 @@ msgstr[1] "%(num)s Verse"
 #: app/templates/partials/browse_results.html:4
 msgid "No cards found."
 msgstr "Keine Karten gefunden."
-
-#: app/templates/partials/browse_results.html:6
-#, python-format
-msgid "%(num)s card"
-msgid_plural "%(num)s cards"
-msgstr[0] "%(num)s Karte"
-msgstr[1] "%(num)s Karten"
 
 #: app/templates/partials/browse_results.html:6
 #, python-format
@@ -658,10 +1098,6 @@ msgstr "Rückgängig"
 #: app/templates/partials/review_card.html:21
 msgid "Front"
 msgstr "Vorderseite"
-
-#: app/templates/partials/review_card.html:23
-msgid "Back"
-msgstr "Rückseite"
 
 #: app/templates/partials/review_card.html:27
 msgid "Show answer"

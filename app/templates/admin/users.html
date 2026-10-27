@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Users") }} – {{ app_name }}{% endblock %}
+{% block content %}
+<p><a href="/admin" class="back">‹ {{ _("Admin") }}</a></p>
+<section class="card">
+  <h1>{{ _("Users") }}</h1>
+  <form method="get" class="row">
+    <select name="group" class="input" aria-label="{{ _('Group') }}">
+      <option value="">{{ _("All users") }}</option>
+      {% for g in groups %}<option value="{{ g.id }}"{% if g.id == group %} selected{% endif %}>{{ g.name }}</option>{% endfor %}
+    </select>
+    <button class="btn">{{ _("Filter") }}</button>
+  </form>
+</section>
+
+<form method="post" action="/admin/users/print"
+      data-confirm="{{ _('Create new codes for the selected users? Their old codes stop working.') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="back" value="/admin/users{% if group %}?group={{ group }}{% endif %}">
+  <ul class="cardlist card flush">
+    {% for u in users %}
+    <li class="userrow">
+      {% if u.id != user.id %}<label class="pick"><input type="checkbox" name="user_ids" value="{{ u.id }}" aria-label="{{ _('Select %(name)s', name=u.display_name) }}"></label>{% else %}<span class="pick"></span>{% endif %}
+      <a href="/admin/users/{{ u.id }}" class="cardrow{% if u.disabled %} suspended{% endif %}">
+        <span class="cardfront">{{ u.display_name }}{% if u.is_admin %} <span class="badge">{{ _("Admin") }}</span>{% endif %}{% if u.disabled %} <span class="badge">{{ _("deactivated") }}</span>{% endif %}</span>
+        <span class="cardmeta"><span>{{ memberships.get(u.id, []) | join(", ") or "–" }}</span>
+          <span>{% if u.last_login_at %}{{ u.last_login_at.date() | date }}{% else %}{{ _("never logged in") }}{% endif %}</span></span>
+      </a>
+    </li>
+    {% else %}
+    <li class="cardrow muted">{{ _("No users yet.") }}</li>
+    {% endfor %}
+  </ul>
+  {% if users %}<button class="btn btn-block">{{ _("New codes + print sheet for selected users") }}</button>{% endif %}
+</form>
+
+<section class="card" style="margin-top:16px">
+  <h2>{{ _("Add users") }}</h2>
+  {% if error %}<p class="alert alert-error">{{ error }}</p>{% endif %}
+  <form method="post" action="/admin/users" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="names">{{ _("Names (one per line)") }}</label>
+    <textarea id="names" name="names" class="input" rows="5" required placeholder="{{ _('Anna') }}&#10;{{ _('Ben') }}"></textarea>
+    <p class="muted small">{{ _("A first name or initials is enough – no email address needed.") }}</p>
+    <label for="group_id">{{ _("Group (optional)") }}</label>
+    <select id="group_id" name="group_id" class="input">
+      <option value="">–</option>
+      {% for g in groups %}<option value="{{ g.id }}"{% if g.id == group %} selected{% endif %}>{{ g.name }}</option>{% endfor %}
+    </select>
+    <label for="role">{{ _("Role") }}</label>
+    <select id="role" name="role" class="input">
+      <option value="learner">{{ _("Learner") }}</option>
+      <option value="admin">{{ _("Admin") }}</option>
+    </select>
+    <button class="btn btn-primary btn-block">{{ _("Create users and print codes") }}</button>
+  </form>
+</section>
+{% endblock %}

@@ -421,3 +421,65 @@ textarea.input { resize: vertical; line-height: 1.4; }
 .langs a, .langs strong { display: inline-flex; align-items: center; min-height: var(--touch); padding: 0 12px; }
 .ws-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 12px; padding: 6px 16px; background: var(--info-bg); font-size: 0.9rem; }
 .ws-banner .linkbutton { color: var(--accent); min-height: 40px; text-decoration: underline; }
+
+/* ---------- admin ---------- */
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.badge { display: inline-block; padding: 0 6px; border-radius: 6px; background: var(--surface-2); color: var(--muted); font-size: 0.75rem; font-weight: 600; vertical-align: middle; }
+.userrow { display: flex; align-items: stretch; }
+.userrow .cardrow { flex: 1; min-width: 0; padding-left: 4px; }
+.pick { display: flex; align-items: center; justify-content: center; width: var(--touch); flex: none; }
+.pick input { width: 22px; height: 22px; accent-color: var(--accent); }
+.checklist { border: 1px solid var(--border); border-radius: 10px; padding: 4px 12px; margin: 8px 0 0; max-height: 320px; overflow-y: auto; }
+.checklist legend { font-weight: 600; padding: 0 4px; }
+.checklist .check { display: flex; align-items: center; gap: 10px; min-height: var(--touch); font-weight: 400; margin: 0; }
+.deck-assign { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.deck-assign form { margin: 0; }
+.progress { width: 100%; height: 16px; accent-color: var(--accent); }
+.table-wrap { overflow-x: auto; margin-bottom: 12px; }
+.progress-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.progress-table th, .progress-table td { padding: 10px 8px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.progress-table th:first-child { text-align: left; position: sticky; left: 0; background: var(--surface); }
+.progress-table thead th { font-weight: 600; color: var(--muted); }
+.progress-table thead a { color: inherit; text-decoration: none; display: inline-flex; min-height: 32px; align-items: center; }
+.progress-table tbody th { font-weight: 600; }
+.progress-table tbody th a { color: var(--text); text-decoration: none; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--c-rev); margin-right: 8px; }
+.dot.red { background: var(--c-learn); }
+.alert-row td { color: var(--error-text); }
+
+/* ---------- print sheet (8 cards per A4) ---------- */
+
+.sheet { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 560px) { .sheet { grid-template-columns: 1fr 1fr; } }
+.login-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; background: #fff; color: #000; border: 1px dashed #999; border-radius: 6px; }
+.login-card p { margin: 0; }
+.lc-app { font-size: 0.8rem; font-weight: 700; color: #2f6fdd; }
+.lc-name { font-size: 1.15rem; font-weight: 700; margin: 2px 0 6px; }
+.lc-code { font-family: ui-monospace, monospace; font-size: 1.35rem; letter-spacing: 0.08em; font-weight: 700; }
+.lc-steps { margin: 8px 0 0; padding-left: 18px; font-size: 0.75rem; line-height: 1.35; color: #333; }
+.lc-qr svg { display: block; width: 104px; height: 104px; }
+
+@media print {
+  @page { size: A4; margin: 0; }
+  body { background: #fff; display: block; min-height: 0; }
+  .topbar, .footer, .no-print, .ws-banner { display: none !important; }
+  .content { max-width: none; padding: 0; margin: 0; }
+  .sheet { display: grid; grid-template-columns: 105mm 105mm; grid-auto-rows: 74.25mm; gap: 0; }
+  .login-card { border: 0.2mm dashed #999; border-radius: 0; padding: 6mm; break-inside: avoid; height: 74.25mm; box-sizing: border-box; }
+  .login-card:nth-child(8n) { break-after: page; }
+  .lc-qr svg { width: 34mm; height: 34mm; }
+}
+
+@media (max-width: 420px) {
+  .topbar { padding-right: 4px; }
+  .navlink { padding: 0 8px; font-size: 0.9rem; }
+  .linkbutton.navlink { font-size: 0.9rem; }
+  .user-admin .nav-search { display: none; }
+}
+
+/* Admin pages are desktop-first: more room for tables and lists. */
+.admin-page .content { max-width: 1100px; }
+@media (min-width: 900px) {
+  .admin-page .sheet { grid-template-columns: repeat(3, 1fr); }
+}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Groups") }} – {{ app_name }}{% endblock %}
+{% block content %}
+<p><a href="/admin" class="back">‹ {{ _("Admin") }}</a></p>
+<section class="card">
+  <h1>{{ _("Groups") }}</h1>
+  {% if error %}<p class="alert alert-error">{{ error }}</p>{% endif %}
+  <form method="post" action="/admin/groups" class="row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input name="name" class="input" placeholder="{{ _('e.g. Youth group') }}" aria-label="{{ _('Group name') }}" required maxlength="100">
+    <button class="btn">{{ _("Create") }}</button>
+  </form>
+</section>
+<ul class="cardlist card flush">
+  {% for g in groups %}
+  <li><a href="/admin/groups/{{ g.id }}" class="cardrow">
+    <span class="cardfront">{{ g.name }}</span>
+    <span class="cardmeta"><span>{{ ngettext("%(num)s member", "%(num)s members", counts.get(g.id, 0)) }}</span>
+      <span>{{ ngettext("%(num)s group deck", "%(num)s group decks", deck_counts.get(g.id, 0)) }}</span></span>
+  </a></li>
+  {% else %}
+  <li class="cardrow muted">{{ _("No groups yet.") }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

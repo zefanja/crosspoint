@@ -1,0 +1,89 @@
+"""Admin hub: overview, switching to the admin collection, .apkg import, job progress."""
+
+import secrets
+
+from fastapi import APIRouter, Depends, Request, UploadFile
+from fastapi.responses import RedirectResponse
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session as DbSession
+
+from app import anki_service, distribution
+from app.auth import WORKSPACE_COOKIE, cookie_secure, require_admin, verify_csrf
+from app.config import get_settings
+from app.db import get_db
+from app.i18n import _
+from app.models import Group, User
+from app.templating import is_htmx, render
+
+router = APIRouter(prefix="/admin")
+
+MAX_UPLOAD = 100 * 1024 * 1024
+
+
+@router.get("")
+def home(request: Request, admin: User = Depends(require_admin), db: DbSession = Depends(get_db)):
+    users = db.scalar(select(func.count()).select_from(User)) or 0
+    groups = db.scalar(select(func.count()).select_from(Group)) or 0
+    return render(request, "admin/home.html", {"users": users, "groups": groups,
+                  "admin_ws": request.cookies.get(WORKSPACE_COOKIE) == "admin"})
+
+
+@router.post("/workspace")
+async def workspace(request: Request, admin: User = Depends(require_admin),
+                    _csrf: User = Depends(verify_csrf)):
+    form = await request.form()
+    response = RedirectResponse("/", status_code=303)
+    if form.get("ws") == "admin":
+        await anki_service.ensure_collection(anki_service.ADMIN_COLLECTION)
+        response.set_cookie(WORKSPACE_COOKIE, "admin", httponly=True, secure=cookie_secure(),
+                            samesite="lax")
+    else:
+        response.delete_cookie(WORKSPACE_COOKIE)
+    return response
+
+
+@router.get("/import")
+def import_page(request: Request, admin: User = Depends(require_admin)):
+    return render(request, "admin/import.html", {"message": None, "error": None})
+
+
+@router.post("/import")
+async def import_submit(request: Request, file: UploadFile,
+                        admin: User = Depends(require_admin), _csrf: User = Depends(verify_csrf)):
+    ctx = {"message": None, "error": None}
+    if not (file.filename or "").lower().endswith(".apkg"):
+        ctx["error"] = _("Please choose an .apkg file.")
+        return render(request, "admin/import.html", ctx, status_code=400)
+    tmp = get_settings().data_dir / "exports" / f"upload-{secrets.token_hex(8)}.apkg"
+    tmp.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        size = 0
+        with tmp.open("wb") as out:
+            while chunk := await file.read(1024 * 1024):
+                size += len(chunk)
+                if size > MAX_UPLOAD:
+                    raise ValueError(_("The file is too large (max. 100 MB)."))
+                out.write(chunk)
+        count = await anki_service.import_package(anki_service.ADMIN_COLLECTION, tmp)
+        ctx["message"] = _("“%(file)s” imported: %(count)s notes new or updated. The decks are "
+                           "now available in the admin collection.", file=file.filename, count=count)
+    except ValueError as exc:
+        ctx["error"] = str(exc)
+    except Exception:  # noqa: BLE001 - anki rejects broken packages with various errors
+        ctx["error"] = _("The file could not be imported. Is it a valid Anki file?")
+    finally:
+        tmp.unlink(missing_ok=True)
+    return render(request, "admin/import.html", ctx, status_code=400 if ctx["error"] else 200)
+
+
+@router.get("/jobs/{job_id}")
+def job_page(request: Request, job_id: str, back: str = "/admin",
+             admin: User = Depends(require_admin)):
+    job = distribution.get_job(job_id)
+    if job is None:
+        return render(request, "error.html", {"message": _("This task is no longer known.")}, 404)
+    back = back if back.startswith("/admin") else "/admin"
+    ctx = {"job": job, "back": back}
+    if is_htmx(request):
+        return render(request, "admin/partials/job.html", ctx)
+    return render(request, "admin/job.html", ctx)

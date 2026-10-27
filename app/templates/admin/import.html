@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Import .apkg") }} – {{ app_name }}{% endblock %}
+{% block content %}
+<p><a href="/admin" class="back">‹ {{ _("Admin") }}</a></p>
+<section class="card">
+  <h1>{{ _("Import .apkg into the admin collection") }}</h1>
+  <p class="muted">{{ _("For example a deck from the Bible Memorizer web tool or from Anki. Existing notes are updated, learning progress is not imported.") }}</p>
+  {% if message %}<p class="alert alert-success" role="status">{{ message }}</p>{% endif %}
+  {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
+  <form method="post" action="/admin/import" enctype="multipart/form-data" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="file">{{ _("File") }}</label>
+    <input id="file" name="file" type="file" accept=".apkg" class="input" required>
+    <button class="btn btn-primary btn-block">{{ _("Import") }}</button>
+  </form>
+</section>
+{% endblock %}

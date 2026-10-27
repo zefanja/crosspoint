@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 18:08+0100\n"
+"POT-Creation-Date: 2026-10-27 18:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,8 @@ msgstr ""
 msgid "My cards"
 msgstr ""
 
-#: app/anki_service.py:497 app/routes/export.py:58
+#: app/anki_service.py:497 app/routes/admin_groups.py:122
+#: app/routes/admin_groups.py:135 app/routes/export.py:58
 msgid "Deck not found."
 msgstr ""
 
@@ -66,19 +67,19 @@ msgstr ""
 msgid "Distribute “%(deck)s”"
 msgstr ""
 
-#: app/main.py:130
+#: app/main.py:132
 msgid "You don't have permission to do that."
 msgstr ""
 
-#: app/main.py:137
+#: app/main.py:139
 msgid "Your session has expired. Please reload the page and try again."
 msgstr ""
 
-#: app/main.py:176
+#: app/main.py:178
 msgid "CrossPoint – memorize the Bible"
 msgstr ""
 
-#: app/main.py:178
+#: app/main.py:180
 msgid "Memorize Bible verses with spaced repetition – compatible with Anki."
 msgstr ""
 
@@ -101,6 +102,56 @@ msgstr ""
 
 #: app/routes/admin.py:84
 msgid "This task is no longer known."
+msgstr ""
+
+#: app/routes/admin_groups.py:22
+msgid "Group not found."
+msgstr ""
+
+#: app/routes/admin_groups.py:52
+msgid "Please enter a group name."
+msgstr ""
+
+#: app/routes/admin_groups.py:58
+msgid "A group with this name already exists."
+msgstr ""
+
+#: app/routes/admin_groups.py:111 app/routes/admin_users.py:100
+msgid "Group decks for new members"
+msgstr ""
+
+#: app/routes/admin_progress.py:98 app/templates/admin/progress.html:48
+msgid "Refresh figures"
+msgstr ""
+
+#: app/routes/admin_users.py:57
+msgid "User not found."
+msgstr ""
+
+#: app/routes/admin_users.py:89
+#, python-format
+msgid "Please enter one name per line (at most %(max)s)."
+msgstr ""
+
+#: app/routes/admin_users.py:127
+msgid "You cannot remove your own admin role."
+msgstr ""
+
+#: app/routes/admin_users.py:140
+#, python-format
+msgid "Group decks for %(name)s"
+msgstr ""
+
+#: app/routes/admin_users.py:168
+msgid "You cannot deactivate yourself."
+msgstr ""
+
+#: app/routes/admin_users.py:182
+msgid "You cannot delete yourself."
+msgstr ""
+
+#: app/routes/admin_users.py:185
+msgid "The name does not match. The user was not deleted."
 msgstr ""
 
 #: app/routes/auth.py:46
@@ -146,7 +197,11 @@ msgstr ""
 msgid "Added: %(front)s"
 msgstr ""
 
-#: app/templates/base.html:22
+#: app/templates/admin/groups.html:4 app/templates/admin/home.html:2
+#: app/templates/admin/home.html:5 app/templates/admin/import.html:4
+#: app/templates/admin/progress.html:4 app/templates/admin/user_detail.html:22
+#: app/templates/admin/users.html:4 app/templates/admin/users.html:25
+#: app/templates/admin/users.html:53 app/templates/base.html:22
 msgid "Admin"
 msgstr ""
 
@@ -163,7 +218,7 @@ msgstr ""
 msgid "You are editing the admin collection (group decks)."
 msgstr ""
 
-#: app/templates/base.html:37
+#: app/templates/admin/home.html:21 app/templates/base.html:37
 msgid "Back to my cards"
 msgstr ""
 
@@ -215,7 +270,8 @@ msgstr ""
 msgid "Options: %(deck)s"
 msgstr ""
 
-#: app/templates/deck_options.html:7 app/templates/note_edit.html:11
+#: app/templates/admin/user_detail.html:12 app/templates/deck_options.html:7
+#: app/templates/note_edit.html:11
 msgid "Saved."
 msgstr ""
 
@@ -235,7 +291,8 @@ msgstr ""
 msgid "Higher = you remember more, but review more often. 0.90 is a good default. The FSRS algorithm is always on."
 msgstr ""
 
-#: app/templates/deck_options.html:22 app/templates/note_edit.html:21
+#: app/templates/admin/user_detail.html:31 app/templates/deck_options.html:22
+#: app/templates/note_edit.html:21
 msgid "Save"
 msgstr ""
 
@@ -261,7 +318,7 @@ msgstr ""
 msgid "Learn"
 msgstr ""
 
-#: app/templates/decks.html:12
+#: app/templates/admin/progress.html:26 app/templates/decks.html:12
 msgid "Due"
 msgstr ""
 
@@ -295,7 +352,7 @@ msgstr ""
 msgid "Deck name"
 msgstr ""
 
-#: app/templates/decks.html:42
+#: app/templates/admin/groups.html:11 app/templates/decks.html:42
 msgid "Create"
 msgstr ""
 
@@ -542,6 +599,396 @@ msgstr ""
 msgid "Study"
 msgstr ""
 
+#: app/templates/admin/group_detail.html:4 app/templates/admin/groups.html:2
+#: app/templates/admin/groups.html:6 app/templates/admin/home.html:8
+#: app/templates/admin/user_detail.html:25
+msgid "Groups"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:8 app/templates/admin/home.html:9
+#: app/templates/admin/progress.html:2 app/templates/admin/progress.html:6
+msgid "Progress"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:9
+msgid "Codes / print sheet"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:11
+msgid "The name does not match. The group was not deleted."
+msgstr ""
+
+#: app/templates/admin/group_detail.html:15 app/templates/admin/home.html:14
+msgid "Group decks"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:16
+msgid "Distributing copies the deck from the admin collection into every member's cards. Re-distributing updates changed cards and adds new ones – learning progress is kept. Cards deleted in the admin deck are not deleted for members."
+msgstr ""
+
+#: app/templates/admin/group_detail.html:21
+#, python-format
+msgid "Last distributed: %(date)s"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:21
+msgid "not distributed yet"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:25
+msgid "Distribute"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:28
+msgid "Remove this deck from the group? Members keep their cards."
+msgstr ""
+
+#: app/templates/admin/group_detail.html:30
+msgid "Remove"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:34
+msgid "No group decks yet."
+msgstr ""
+
+#: app/templates/admin/group_detail.html:39
+msgid "Add deck from the admin collection"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:43
+msgid "Add and distribute"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:46
+msgid "Create decks in the admin collection first (Admin → Edit admin collection, or import an .apkg)."
+msgstr ""
+
+#: app/templates/admin/group_detail.html:51
+#: app/templates/admin/group_detail.html:55
+msgid "Members"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:57
+#: app/templates/admin/user_detail.html:10 app/templates/admin/users.html:25
+msgid "deactivated"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:58 app/templates/admin/users.html:31
+msgid "No users yet."
+msgstr ""
+
+#: app/templates/admin/group_detail.html:60
+msgid "Save members"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:65
+msgid "Rename or delete group"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:68 app/templates/admin/groups.html:10
+msgid "Group name"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:69
+msgid "Rename"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:73
+msgid "Delete group – type the name to confirm:"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:75
+msgid "Users and their cards are kept."
+msgstr ""
+
+#: app/templates/admin/group_detail.html:76
+msgid "Delete group"
+msgstr ""
+
+#: app/templates/admin/groups.html:10
+msgid "e.g. Youth group"
+msgstr ""
+
+#: app/templates/admin/groups.html:18
+#, python-format
+msgid "%(num)s member"
+msgid_plural "%(num)s members"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/admin/groups.html:19
+#, python-format
+msgid "%(num)s group deck"
+msgid_plural "%(num)s group decks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/admin/groups.html:22 app/templates/admin/user_detail.html:28
+msgid "No groups yet."
+msgstr ""
+
+#: app/templates/admin/home.html:7 app/templates/admin/user_detail.html:4
+#: app/templates/admin/users.html:2 app/templates/admin/users.html:6
+msgid "Users"
+msgstr ""
+
+#: app/templates/admin/home.html:15
+msgid "Group decks are maintained in the admin collection – with the same screens as your own cards. Then assign them to a group and distribute them."
+msgstr ""
+
+#: app/templates/admin/home.html:24
+msgid "Edit admin collection"
+msgstr ""
+
+#: app/templates/admin/home.html:27 app/templates/admin/import.html:2
+msgid "Import .apkg"
+msgstr ""
+
+#: app/templates/admin/import.html:6
+msgid "Import .apkg into the admin collection"
+msgstr ""
+
+#: app/templates/admin/import.html:7
+msgid "For example a deck from the Bible Memorizer web tool or from Anki. Existing notes are updated, learning progress is not imported."
+msgstr ""
+
+#: app/templates/admin/import.html:12
+msgid "File"
+msgstr ""
+
+#: app/templates/admin/import.html:14
+msgid "Import"
+msgstr ""
+
+#: app/templates/admin/job.html:4 app/templates/partials/review_card.html:23
+msgid "Back"
+msgstr ""
+
+#: app/templates/admin/print_sheet.html:2
+#: app/templates/admin/print_sheet.html:6
+msgid "Print sheet"
+msgstr ""
+
+#: app/templates/admin/print_sheet.html:7
+msgid "The codes are shown only now. Print the sheet or note the codes before leaving this page."
+msgstr ""
+
+#: app/templates/admin/print_sheet.html:9
+msgid "Print"
+msgstr ""
+
+#: app/templates/admin/partials/job.html:10
+#: app/templates/admin/print_sheet.html:10
+msgid "Done"
+msgstr ""
+
+#: app/templates/admin/print_sheet.html:12
+#: app/templates/admin/user_detail.html:9
+#: app/templates/partials/browse_results.html:6
+#, python-format
+msgid "%(num)s card"
+msgid_plural "%(num)s cards"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/admin/print_sheet.html:12
+msgid "8 per A4 page, cut along the lines."
+msgstr ""
+
+#: app/templates/admin/print_sheet.html:22
+msgid "Scan the QR code"
+msgstr ""
+
+#: app/templates/admin/print_sheet.html:23
+#, python-format
+msgid "or open %(url)s and enter the code"
+msgstr ""
+
+#: app/templates/admin/progress.html:8 app/templates/admin/users.html:8
+msgid "Group"
+msgstr ""
+
+#: app/templates/admin/progress.html:9
+msgid "All learners"
+msgstr ""
+
+#: app/templates/admin/progress.html:12
+msgid "Show"
+msgstr ""
+
+#: app/templates/admin/progress.html:14
+#, python-format
+msgid "Red: inactive for %(days)s+ days or more than %(due)s cards due."
+msgstr ""
+
+#: app/templates/admin/progress.html:26 app/templates/admin/user_detail.html:17
+msgid "Name"
+msgstr ""
+
+#: app/templates/admin/progress.html:26
+msgid "Last activity"
+msgstr ""
+
+#: app/templates/admin/progress.html:26
+msgid "Today"
+msgstr ""
+
+#: app/templates/admin/progress.html:26
+msgid "7 days"
+msgstr ""
+
+#: app/templates/admin/progress.html:26
+msgid "Retention"
+msgstr ""
+
+#: app/templates/admin/progress.html:26
+msgid "Streak"
+msgstr ""
+
+#: app/templates/admin/progress.html:31
+msgid "needs attention"
+msgstr ""
+
+#: app/templates/admin/progress.html:40
+msgid "No learners yet."
+msgstr ""
+
+#: app/templates/admin/progress.html:50
+msgid "Figures are updated after every review and login. “Refresh” recomputes them for everyone (e.g. due cards after midnight)."
+msgstr ""
+
+#: app/templates/admin/user_detail.html:8
+#, python-format
+msgid "Last login: %(date)s"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:8 app/templates/admin/users.html:27
+msgid "never logged in"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:9
+#, python-format
+msgid "Streak: %(n)s"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:19 app/templates/admin/users.html:50
+msgid "Role"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:21 app/templates/admin/users.html:52
+msgid "Learner"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:28
+msgid "Create a group"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:30
+msgid "New group members receive all decks of the group automatically."
+msgstr ""
+
+#: app/templates/admin/user_detail.html:36
+msgid "Login code"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:37
+msgid "Codes are not stored in readable form and cannot be shown again. If a code is lost, create a new one – the old one stops working."
+msgstr ""
+
+#: app/templates/admin/user_detail.html:39
+msgid "Create a new code? The old code stops working."
+msgstr ""
+
+#: app/templates/admin/user_detail.html:41
+msgid "New code + print sheet"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:47
+msgid "Deactivate or delete"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:50
+msgid "Activate"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:50
+msgid "Deactivate (cannot log in, data is kept)"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:54
+msgid "Delete permanently – type the name to confirm:"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:56
+msgid "Delete user and all cards"
+msgstr ""
+
+#: app/templates/admin/users.html:9
+msgid "All users"
+msgstr ""
+
+#: app/templates/admin/users.html:12
+msgid "Filter"
+msgstr ""
+
+#: app/templates/admin/users.html:17
+msgid "Create new codes for the selected users? Their old codes stop working."
+msgstr ""
+
+#: app/templates/admin/users.html:23
+#, python-format
+msgid "Select %(name)s"
+msgstr ""
+
+#: app/templates/admin/users.html:34
+msgid "New codes + print sheet for selected users"
+msgstr ""
+
+#: app/templates/admin/users.html:38
+msgid "Add users"
+msgstr ""
+
+#: app/templates/admin/users.html:42
+msgid "Names (one per line)"
+msgstr ""
+
+#: app/templates/admin/users.html:43
+msgid "Anna"
+msgstr ""
+
+#: app/templates/admin/users.html:43
+msgid "Ben"
+msgstr ""
+
+#: app/templates/admin/users.html:44
+msgid "A first name or initials is enough – no email address needed."
+msgstr ""
+
+#: app/templates/admin/users.html:45
+msgid "Group (optional)"
+msgstr ""
+
+#: app/templates/admin/users.html:55
+msgid "Create users and print codes"
+msgstr ""
+
+#: app/templates/admin/partials/job.html:3
+#, python-format
+msgid "%(done)s of %(total)s done"
+msgstr ""
+
+#: app/templates/admin/partials/job.html:3
+msgid "finished"
+msgstr ""
+
+#: app/templates/admin/partials/job.html:6
+msgid "Errors:"
+msgstr ""
+
+#: app/templates/admin/partials/job.html:11
+msgid "You can leave this page – the task continues in the background."
+msgstr ""
+
 #: app/templates/partials/add_tabs.html:1
 msgid "Card type"
 msgstr ""
@@ -575,13 +1022,6 @@ msgstr[1] ""
 #: app/templates/partials/browse_results.html:4
 msgid "No cards found."
 msgstr ""
-
-#: app/templates/partials/browse_results.html:6
-#, python-format
-msgid "%(num)s card"
-msgid_plural "%(num)s cards"
-msgstr[0] ""
-msgstr[1] ""
 
 #: app/templates/partials/browse_results.html:6
 #, python-format
@@ -656,10 +1096,6 @@ msgstr ""
 
 #: app/templates/partials/review_card.html:21
 msgid "Front"
-msgstr ""
-
-#: app/templates/partials/review_card.html:23
-msgid "Back"
 msgstr ""
 
 #: app/templates/partials/review_card.html:27

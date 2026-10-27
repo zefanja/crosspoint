@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{{ u.display_name }} – {{ app_name }}{% endblock %}
+{% block content %}
+<p><a href="/admin/users" class="back">‹ {{ _("Users") }}</a></p>
+<section class="card">
+  <h1>{{ u.display_name }}</h1>
+  <p class="muted small">
+    {% if u.last_login_at %}{{ _("Last login: %(date)s", date=u.last_login_at.date() | date) }}{% else %}{{ _("never logged in") }}{% endif %}
+    {% if stats %} · {{ ngettext("%(num)s card", "%(num)s cards", stats.total_cards) }} · {{ _("Streak: %(n)s", n=stats.streak_days) }}{% endif %}
+    {% if u.disabled %} · <strong>{{ _("deactivated") }}</strong>{% endif %}
+  </p>
+  {% if saved %}<p class="alert alert-success">{{ _("Saved.") }}</p>{% endif %}
+  {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
+  {% if job %}{% set back = "/admin/users/" ~ u.id %}{% include "admin/partials/job.html" %}{% endif %}
+  <form method="post" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="display_name">{{ _("Name") }}</label>
+    <input id="display_name" name="display_name" class="input" value="{{ u.display_name }}" required maxlength="100">
+    <label for="role">{{ _("Role") }}</label>
+    <select id="role" name="role" class="input">
+      <option value="learner"{% if u.role != "admin" %} selected{% endif %}>{{ _("Learner") }}</option>
+      <option value="admin"{% if u.role == "admin" %} selected{% endif %}>{{ _("Admin") }}</option>
+    </select>
+    <fieldset class="checklist">
+      <legend>{{ _("Groups") }}</legend>
+      {% for g in groups %}
+      <label class="check"><input type="checkbox" name="groups" value="{{ g.id }}"{% if g.id in member_of %} checked{% endif %}><span>{{ g.name }}</span></label>
+      {% else %}<p class="muted small">{{ _("No groups yet.") }} <a href="/admin/groups">{{ _("Create a group") }}</a></p>{% endfor %}
+    </fieldset>
+    <p class="muted small">{{ _("New group members receive all decks of the group automatically.") }}</p>
+    <button class="btn btn-primary btn-block">{{ _("Save") }}</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>{{ _("Login code") }}</h2>
+  <p class="muted">{{ _("Codes are not stored in readable form and cannot be shown again. If a code is lost, create a new one – the old one stops working.") }}</p>
+  <form method="post" action="/admin/users/{{ u.id }}/reset-code"
+        data-confirm="{{ _('Create a new code? The old code stops working.') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="btn btn-block">{{ _("New code + print sheet") }}</button>
+  </form>
+</section>
+
+{% if not is_self %}
+<section class="card">
+  <h2>{{ _("Deactivate or delete") }}</h2>
+  <form method="post" action="/admin/users/{{ u.id }}/toggle-disabled">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="btn btn-block">{{ _("Activate") if u.disabled else _("Deactivate (cannot log in, data is kept)") }}</button>
+  </form>
+  <form method="post" action="/admin/users/{{ u.id }}/delete" class="stack" style="margin-top:16px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="confirm_name">{{ _("Delete permanently – type the name to confirm:") }} <strong>{{ u.display_name }}</strong></label>
+    <input id="confirm_name" name="confirm_name" class="input" autocomplete="off" required>
+    <button class="btn btn-danger btn-block">{{ _("Delete user and all cards") }}</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

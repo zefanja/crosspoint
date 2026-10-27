@@ -1,0 +1,12 @@
+<div id="job"{% if not job.finished %} hx-get="/admin/jobs/{{ job.id }}?back={{ back | urlencode }}" hx-trigger="load delay:1s" hx-swap="outerHTML"{% endif %}>
+  <progress max="100" value="{{ job.percent }}" class="progress">{{ job.percent }} %</progress>
+  <p aria-live="polite">{{ _("%(done)s of %(total)s done", done=job.done, total=job.total) }}{% if job.finished %} – <strong>{{ _("finished") }}</strong>{% endif %}</p>
+  {% if job.errors %}
+  <div class="alert alert-error">
+    <p><strong>{{ _("Errors:") }}</strong></p>
+    <ul>{% for e in job.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+  {% if job.finished %}<a href="{{ back }}" class="btn btn-primary">{{ _("Done") }}</a>
+  {% else %}<p class="muted small">{{ _("You can leave this page – the task continues in the background.") }}</p>{% endif %}
+</div>

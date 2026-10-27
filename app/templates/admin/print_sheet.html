@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Print sheet") }} – {{ app_name }}{% endblock %}
+{% block body_class %}print-page{% endblock %}
+{% block content %}
+<section class="card no-print">
+  <h1>{{ _("Print sheet") }}</h1>
+  <p class="alert alert-error">{{ _("The codes are shown only now. Print the sheet or note the codes before leaving this page.") }}</p>
+  <div class="actions-grid">
+    <button type="button" class="btn btn-primary" data-print>{{ _("Print") }}</button>
+    <a class="btn" href="{{ back }}">{{ _("Done") }}</a>
+  </div>
+  <p class="muted small">{{ ngettext("%(num)s card", "%(num)s cards", cards | length) }} · {{ _("8 per A4 page, cut along the lines.") }}</p>
+</section>
+<div class="sheet">
+  {% for c in cards %}
+  <article class="login-card">
+    <div class="login-card-text">
+      <p class="lc-app">{{ app_name }}</p>
+      <p class="lc-name">{{ c.name }}</p>
+      <p class="lc-code">{{ c.code }}</p>
+      <ol class="lc-steps">
+        <li>{{ _("Scan the QR code") }}</li>
+        <li>{{ _("or open %(url)s and enter the code", url=login_base) }}</li>
+      </ol>
+    </div>
+    <div class="lc-qr">{{ c.qr }}</div>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

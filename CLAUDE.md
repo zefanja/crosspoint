@@ -59,7 +59,8 @@ Anleitung: `docs/deploy.md`.
 - UI-Texte im Code/Templates **Englisch** als Quellsprache, immer über `_()`; Übersetzungen in
   `app/locales/<lang>/LC_MESSAGES/messages.po` (Deutsch muss vollständig sein, `tests/test_i18n.py`).
   Code/Kommentare/Commits **Englisch**.
-- Mobile-first: jede neue Seite bei 360 px Breite prüfen; Touch-Ziele ≥ 48 px.
+- Mobile-first für alle Lerner-Seiten: bei 360 px Breite prüfen; Touch-Ziele ≥ 48 px.
+  Admin-Seiten (`/admin`) sind Desktop-first (dürfen am Handy nur nicht kaputtgehen).
 - htmx-Partials liegen unter `templates/partials/`, Vollseiten erweitern `base.html`.
 - Kein JS-Framework, kein Build-Schritt, keine CDNs.
 - Neue Tabellen nur per Alembic-Migration.

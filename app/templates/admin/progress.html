@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Progress") }} – {{ app_name }}{% endblock %}
+{% block content %}
+<p><a href="/admin" class="back">‹ {{ _("Admin") }}</a></p>
+<section class="card">
+  <h1>{{ _("Progress") }}</h1>
+  <form method="get" class="row">
+    <select name="group" class="input" aria-label="{{ _('Group') }}">
+      <option value="">{{ _("All learners") }}</option>
+      {% for g in groups %}<option value="{{ g.id }}"{% if g.id == group %} selected{% endif %}>{{ g.name }}</option>{% endfor %}
+    </select>
+    <button class="btn">{{ _("Show") }}</button>
+  </form>
+  <p class="muted small">{{ _("Red: inactive for %(days)s+ days or more than %(due)s cards due.", days=inactive_days, due=max_due) }}</p>
+</section>
+
+{% macro th(key, label) -%}
+<th scope="col"{% if sort == key %} aria-sort="{{ 'descending' if desc else 'ascending' }}"{% endif %}>
+  <a href="?{% if group %}group={{ group }}&amp;{% endif %}sort={{ key }}&amp;desc={{ 0 if (sort == key and desc) else 1 if sort == key else 0 }}">{{ label }}{% if sort == key %} {{ "▼" if desc else "▲" }}{% endif %}</a>
+</th>
+{%- endmacro %}
+
+<div class="table-wrap card flush">
+  <table class="progress-table">
+    <thead><tr>
+      {{ th("name", _("Name")) }}{{ th("last", _("Last activity")) }}{{ th("today", _("Today")) }}{{ th("week", _("7 days")) }}{{ th("due", _("Due")) }}{{ th("retention", _("Retention")) }}{{ th("streak", _("Streak")) }}
+    </tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr class="{{ 'alert-row' if r.alert else '' }}">
+        <th scope="row"><span class="dot{{ ' red' if r.alert else '' }}" aria-hidden="true"></span><a href="/admin/users/{{ r.user_id }}">{{ r.name }}</a>{% if r.alert %}<span class="sr-only"> ({{ _("needs attention") }})</span>{% endif %}</th>
+        <td>{% if r.last_review_at %}{{ r.last_review_at.date() | date }}{% else %}–{% endif %}</td>
+        <td>{{ r.reviews_today }}</td>
+        <td>{{ r.reviews_week }}</td>
+        <td>{{ r.due }}</td>
+        <td>{% if r.retention is not none %}{{ (r.retention * 100) | round | int }}&nbsp;%{% else %}–{% endif %}</td>
+        <td>{{ r.streak }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="muted">{{ _("No learners yet.") }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<form method="post" action="/admin/progress/refresh">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  {% if group %}<input type="hidden" name="group" value="{{ group }}">{% endif %}
+  <button class="btn btn-block">{{ _("Refresh figures") }}</button>
+</form>
+<p class="muted small">{{ _("Figures are updated after every review and login. “Refresh” recomputes them for everyone (e.g. due cards after midnight).") }}</p>
+{% endblock %}

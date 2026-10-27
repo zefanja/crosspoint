@@ -229,10 +229,18 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 
 ### 7.2 Admin-Dashboard (MVP)
 
+*Umsetzung:* Desktop-first (Lerner-Seiten bleiben mobile-first). Erreichbar über „Verwaltung“
+in der Kopfzeile (`/admin`). Hintergrundaufgaben (Verteilen, Werte aktualisieren) laufen
+im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
+
 **Nutzer**
 - Anlegen einzeln oder als Liste (ein Name pro Zeile) → Codes werden erzeugt.
 - **Druckblatt** (PDF oder druckoptimiertes HTML): pro Nutzer Name, Code, QR-Code mit
   Login-Link, Kurzanleitung. 8 Kärtchen pro A4-Seite zum Ausschneiden.
+  *Umsetzung:* druckoptimiertes HTML (2 × 4 Kärtchen à 105 × 74 mm), QR als Inline-SVG
+  (`segno`), `Cache-Control: no-store`. Da Codes nur als HMAC gespeichert sind, erscheint das
+  Druckblatt direkt nach dem Anlegen bzw. nach „Neue Codes + Druckblatt“ (auch für eine
+  Auswahl/Gruppe) – alte Codes werden dabei ungültig.
 - Code neu erzeugen, deaktivieren, löschen (löscht Collection-Ordner – Bestätigung mit Namen tippen).
 - Gruppen zuordnen.
 
@@ -250,6 +258,9 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - Der Admin pflegt Gruppendecks in seiner **Admin-Collection** mit derselben Oberfläche wie
   Lerner (Karten anlegen, bearbeiten) – plus „`.apkg` importieren“ (z. B. aus dem eigenen
   Browser-Generator).
+  *Umsetzung:* Umschalter „Admin-Sammlung bearbeiten“ (Cookie `vf_ws`); ein Banner zeigt den
+  Modus an. Notizen in der Admin-Collection bekommen den Tag `gruppendeck` (beim Anlegen und
+  vor jedem Verteilen für das ganze Deck).
 - „An Gruppe verteilen“: Deck aus der Admin-Collection als `.apkg` **ohne** Lernstand exportieren
   und in jede Mitglieds-Collection importieren.
   - Notizen tragen den Tag `gruppendeck`.

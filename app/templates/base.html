@@ -14,12 +14,13 @@
   <script src="/static/app.js" defer></script>
   {% block head %}{% endblock %}
 </head>
-<body class="{% block body_class %}{% endblock %}"{% if csrf_token %} hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'{% endif %}>
+<body class="{% block body_class %}{% endblock %}{% if user and user.is_admin %} user-admin{% endif %}{% if request.url.path.startswith("/admin") %} admin-page{% endif %}"{% if csrf_token %} hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'{% endif %}>
   <header class="topbar">
     <a href="/" class="brand">{{ app_name }}</a>
     {% if user %}
     <nav class="topnav">
-      <a href="/browse" class="navlink">{{ _("Search") }}</a>
+      {% if user.is_admin %}<a href="/admin" class="navlink">{{ _("Admin") }}</a>{% endif %}
+      <a href="/browse" class="navlink nav-search">{{ _("Search") }}</a>
       <form method="post" action="/logout">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit" class="navlink linkbutton">{{ _("Log out") }}</button>

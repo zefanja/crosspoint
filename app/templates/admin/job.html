@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }} – {{ app_name }}{% endblock %}
+{% block content %}
+<p><a href="{{ back }}" class="back">‹ {{ _("Back") }}</a></p>
+<section class="card">
+  <h1>{{ job.title }}</h1>
+  {% include "admin/partials/job.html" %}
+</section>
+{% endblock %}

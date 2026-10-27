@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ group.name }} – {{ app_name }}{% endblock %}
+{% block content %}
+<p><a href="/admin/groups" class="back">‹ {{ _("Groups") }}</a></p>
+<section class="card">
+  <h1>{{ group.name }}</h1>
+  <div class="actions-grid">
+    <a class="btn" href="/admin/progress?group={{ group.id }}">{{ _("Progress") }}</a>
+    <a class="btn" href="/admin/users?group={{ group.id }}">{{ _("Codes / print sheet") }}</a>
+  </div>
+  {% if error == "name" %}<p class="alert alert-error">{{ _("The name does not match. The group was not deleted.") }}</p>{% endif %}
+</section>
+
+<section class="card">
+  <h2>{{ _("Group decks") }}</h2>
+  <p class="muted small">{{ _("Distributing copies the deck from the admin collection into every member's cards. Re-distributing updates changed cards and adds new ones – learning progress is kept. Cards deleted in the admin deck are not deleted for members.") }}</p>
+  <ul class="cardlist">
+    {% for d in decks %}
+    <li class="deck-assign">
+      <div><strong>{{ d.deck_name }}</strong><br>
+        <span class="muted small">{% if d.last_distributed_at %}{{ _("Last distributed: %(date)s", date=d.last_distributed_at.date() | date) }}{% else %}{{ _("not distributed yet") }}{% endif %}</span></div>
+      <div class="row">
+        <form method="post" action="/admin/groups/{{ group.id }}/decks/{{ d.id }}/distribute">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-small">{{ _("Distribute") }}</button>
+        </form>
+        <form method="post" action="/admin/groups/{{ group.id }}/decks/{{ d.id }}/remove"
+              data-confirm="{{ _('Remove this deck from the group? Members keep their cards.') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-small" aria-label="{{ _('Remove') }}">✕</button>
+        </form>
+      </div>
+    </li>
+    {% else %}<li class="muted">{{ _("No group decks yet.") }}</li>{% endfor %}
+  </ul>
+  {% if admin_decks %}
+  <form method="post" action="/admin/groups/{{ group.id }}/decks" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="admin_deck_id">{{ _("Add deck from the admin collection") }}</label>
+    <select id="admin_deck_id" name="admin_deck_id" class="input">
+      {% for did, name in admin_decks %}<option value="{{ did }}">{{ name }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-primary btn-block">{{ _("Add and distribute") }}</button>
+  </form>
+  {% else %}
+  <p class="muted small">{{ _("Create decks in the admin collection first (Admin → Edit admin collection, or import an .apkg).") }}</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>{{ _("Members") }}</h2>
+  <form method="post" action="/admin/groups/{{ group.id }}/members" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <fieldset class="checklist">
+      <legend class="sr-only">{{ _("Members") }}</legend>
+      {% for u in users %}
+      <label class="check"><input type="checkbox" name="user_ids" value="{{ u.id }}"{% if u.id in members %} checked{% endif %}><span>{{ u.display_name }}{% if u.disabled %} <span class="muted">({{ _("deactivated") }})</span>{% endif %}</span></label>
+      {% else %}<p class="muted small">{{ _("No users yet.") }}</p>{% endfor %}
+    </fieldset>
+    <button class="btn btn-primary btn-block">{{ _("Save members") }}</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>{{ _("Rename or delete group") }}</h2>
+  <form method="post" action="/admin/groups/{{ group.id }}" class="row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input name="name" class="input" value="{{ group.name }}" aria-label="{{ _('Group name') }}" required maxlength="100">
+    <button class="btn">{{ _("Rename") }}</button>
+  </form>
+  <form method="post" action="/admin/groups/{{ group.id }}/delete" class="stack" style="margin-top:16px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="confirm_name">{{ _("Delete group – type the name to confirm:") }} <strong>{{ group.name }}</strong></label>
+    <input id="confirm_name" name="confirm_name" class="input" autocomplete="off" required>
+    <p class="muted small">{{ _("Users and their cards are kept.") }}</p>
+    <button class="btn btn-danger btn-block">{{ _("Delete group") }}</button>
+  </form>
+</section>
+{% endblock %}

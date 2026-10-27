@@ -6,6 +6,10 @@ document.addEventListener("submit", (e) => {
   if (msg && !window.confirm(msg)) e.preventDefault();
 });
 
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-print]")) window.print();
+});
+
 document.addEventListener("input", (e) => {
   if (e.target.id === "desired_retention") {
     const out = document.getElementById("retention_out");
