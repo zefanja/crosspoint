@@ -93,6 +93,14 @@ BIBLE_VERSE_QFMT = (
     "{{#Translation}}<div class=translation>{{Translation}}</div>{{/Translation}}"
 )
 BIBLE_VERSE_AFMT = "{{FrontSide}}\n\n<hr id=answer>\n\n<div class=text>{{Text}}</div>"
+# Card 2 (optional, like Anki's "Basic (optional reversed card)"): only if Reverse is filled.
+BIBLE_VERSE_REVERSE_FIELD = "Reverse"
+BIBLE_VERSE_REVERSE_NAME = "Text → Reference"
+BIBLE_VERSE_REVERSE_QFMT = "{{#Reverse}}<div class=text>{{Text}}</div>{{/Reverse}}"
+BIBLE_VERSE_REVERSE_AFMT = (
+    "{{FrontSide}}\n\n<hr id=answer>\n\n{{Reference}}"
+    "{{#Translation}}<div class=translation>{{Translation}}</div>{{/Translation}}"
+)
 
 
 class AnkiServiceError(Exception):
@@ -365,6 +373,28 @@ def _ensure_notetypes(col: Collection) -> None:
             missing = True
     if missing:
         _import_seed(col)
+    _upgrade_notetypes(col)
+
+
+def _upgrade_notetypes(col: Collection) -> None:
+    """Bring the shared notetypes up to the current definition in place (ids stay).
+    Idempotent; runs on every open and when building the seed."""
+    mm = col.models
+    m = mm.get(SEED_IDS[BIBLE_VERSE]) or mm.by_name(BIBLE_VERSE)
+    if m is None:
+        return
+    changed = False
+    if BIBLE_VERSE_REVERSE_FIELD not in mm.field_names(m):
+        mm.add_field(m, mm.new_field(BIBLE_VERSE_REVERSE_FIELD))
+        changed = True
+    if not any(t["name"] == BIBLE_VERSE_REVERSE_NAME for t in m["tmpls"]):
+        t = mm.new_template(BIBLE_VERSE_REVERSE_NAME)
+        t["qfmt"] = BIBLE_VERSE_REVERSE_QFMT
+        t["afmt"] = BIBLE_VERSE_REVERSE_AFMT
+        mm.add_template(m, t)
+        changed = True
+    if changed:
+        mm.save(m)
 
 
 def _import_seed(col: Collection) -> None:
@@ -377,35 +407,42 @@ def _import_seed(col: Collection) -> None:
         col.decks.remove([seed_deck])
 
 
-def build_seed_package(out_path: Path) -> dict[str, int]:
-    """Create the seed .apkg with one dummy note per notetype. Returns the notetype ids.
+def build_seed_package(out_path: Path, fresh: bool = False) -> dict[str, int]:
+    """Write the seed .apkg (one dummy note per notetype). Returns the notetype ids.
 
-    Only run when the notetypes are introduced (python -m app.cli build-seed); the ids
-    then go into SEED_IDS. Rebuilding changes the ids and breaks group-deck matching.
+    By default the current seed is the starting point, so ids stay the same and only
+    the notetype definitions are updated (_upgrade_notetypes). `fresh=True` creates new
+    notetypes with NEW ids – only before any collection exists (breaks group decks).
     """
     with tempfile.TemporaryDirectory() as tmp:
         col = Collection(str(Path(tmp) / "collection.anki2"), backend=RustBackend(langs=[CREATE_LANG]))
         try:
-            _add_bibelvers_notetype(col)
-            _add_bible_memorizer_notetype(col)
+            if fresh or not SEED_PATH.exists():
+                _add_bible_verse_notetype(col)
+                _add_bible_memorizer_notetype(col)
+                _upgrade_notetypes(col)
+            else:
+                _ensure_notetypes(col)  # import the current seed, then upgrade in place
             did = col.decks.id(SEED_DECK)
             for name in SEED_IDS:
                 note = col.new_note(col.models.by_name(name))
                 note.fields[0] = "seed"
                 col.add_note(note, did)
+            tmp_out = Path(tmp) / "seed.apkg"
             col.export_anki_package(
-                out_path=str(out_path),
+                out_path=str(tmp_out),
                 options=ExportAnkiPackageOptions(
                     with_scheduling=False, with_deck_configs=False, with_media=False, legacy=False
                 ),
                 limit=DeckIdLimit(deck_id=did),
             )
+            shutil.move(str(tmp_out), out_path)
             return {name: int(col.models.by_name(name)["id"]) for name in SEED_IDS}
         finally:
             col.close()
 
 
-def _add_bibelvers_notetype(col: Collection) -> None:
+def _add_bible_verse_notetype(col: Collection) -> None:
     mm = col.models
     m = mm.new(BIBLE_VERSE)
     for name in ("Reference", "Text", "Translation"):

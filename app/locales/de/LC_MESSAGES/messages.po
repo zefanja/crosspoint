@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 19:26+0100\n"
+"POT-Creation-Date: 2026-10-27 20:51+0100\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -22,44 +22,44 @@ msgstr ""
 msgid "My cards"
 msgstr "Meine Karten"
 
-#: app/anki_service.py:499 app/routes/admin_groups.py:122
+#: app/anki_service.py:536 app/routes/admin_groups.py:122
 #: app/routes/admin_groups.py:135 app/routes/export.py:58
 msgid "Deck not found."
 msgstr "Deck nicht gefunden."
 
-#: app/anki_service.py:506
+#: app/anki_service.py:543
 msgid "Please enter a deck name."
 msgstr "Bitte einen Decknamen eingeben."
 
-#: app/anki_service.py:613
+#: app/anki_service.py:650
 msgid "Note not found."
 msgstr "Notiz nicht gefunden."
 
-#: app/anki_service.py:621
+#: app/anki_service.py:658
 msgid "The first field must not be empty."
 msgstr "Das erste Feld darf nicht leer sein."
 
-#: app/anki_service.py:627 app/routes/notes.py:55
+#: app/anki_service.py:664 app/routes/notes.py:55
 msgid "Note type not found."
 msgstr "Notiztyp nicht gefunden."
 
-#: app/anki_service.py:654
+#: app/anki_service.py:691
 msgid "Please enter a Bible text."
 msgstr "Bitte einen Bibeltext eingeben."
 
-#: app/anki_service.py:664
+#: app/anki_service.py:701
 msgid "[Beginning]"
 msgstr "[Anfang]"
 
-#: app/anki_service.py:714
+#: app/anki_service.py:751
 msgid "Cards from group decks cannot be edited."
 msgstr "Karten aus Gruppendecks können nicht bearbeitet werden."
 
-#: app/anki_service.py:716
+#: app/anki_service.py:753
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr "Bibeltext-Karten werden aus dem Text erzeugt. Zum Ändern bitte löschen und den Abschnitt neu importieren."
 
-#: app/anki_service.py:736
+#: app/anki_service.py:773
 msgid "Cards from group decks cannot be deleted."
 msgstr "Karten aus Gruppendecks können nicht gelöscht werden."
 
@@ -1174,7 +1174,11 @@ msgstr "z. B. Wer führte Israel durch das Rote Meer?"
 msgid "e.g. Moses (Exodus 14)"
 msgstr "z. B. Mose (2. Mose 14)"
 
-#: app/templates/partials/note_fields.html:15
+#: app/templates/partials/note_fields.html:9
+msgid "Also learn in reverse (text → reference)"
+msgstr "Auch umgekehrt lernen (Text → Referenz)"
+
+#: app/templates/partials/note_fields.html:23
 msgid "Line breaks are kept. Simple formatting like &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt; is allowed."
 msgstr "Zeilenumbrüche werden übernommen. Erlaubt sind einfache Formatierungen wie &lt;b&gt;fett&lt;/b&gt; oder &lt;i&gt;kursiv&lt;/i&gt;."
 

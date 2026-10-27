@@ -104,6 +104,8 @@ damit das Dashboard nicht 100+ Collections öffnen muss. Wahrheit bleibt die Col
    - Karte 1 „Reference → Text“: Vorderseite `{{Reference}}` (+ kleine Übersetzung),
      Rückseite Vorderseite + `<hr id=answer>` + `{{Text}}`
    - Schlichtes, gut lesbares CSS (große Schrift, Zeilenhöhe 1.5, zentriert, Dark-Mode-fähig).
+   - Feld `Reverse` (Checkbox „Auch umgekehrt lernen“) + Karte 2 „Text → Reference“, die nur
+     erzeugt wird, wenn `Reverse` gefüllt ist (wie Ankis „Basic (optional reversed card)“).
 
 3. **Bible Memorizer** – 1:1 aus dem Anki-Add-on
    [zefanja/bible-memorizer](https://github.com/zefanja/bible-memorizer) (`src/model.py`,
@@ -117,7 +119,10 @@ Gruppendecks Duplikate an („Basic+“, „Bible Verse+“). IDs lassen sich pe
 übernimmt sie aber: Die kanonischen Notiztypen liegen im Seed-Paket
 `app/seed/notetypes.apkg` (erzeugt mit `python -m app.cli build-seed`, IDs in
 `anki_service.SEED_IDS`) und werden bei Anlage einer Collection importiert. Ungenutzte
-Notiztypen mit fremder ID werden ersetzt. **Seed nie neu bauen**, sobald Nutzer existieren.
+Notiztypen mit fremder ID werden ersetzt.
+Änderungen an Notiztypen: in `_upgrade_notetypes` ergänzen (läuft idempotent bei jedem Öffnen,
+IDs bleiben) und `python -m app.cli build-seed` ausführen – das baut den Seed **aus dem
+bestehenden** und behält die IDs. `--fresh` (neue IDs) nur, solange keine Collection existiert.
 
 ## 6. Collection-Zugriff (`anki_service.py`)
 

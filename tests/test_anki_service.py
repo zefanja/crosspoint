@@ -65,7 +65,7 @@ def test_create_deck_and_names(run, deck):
 def test_notetypes_for_adding(run):
     nts = run(svc.notetypes_for_adding(U))
     assert [n.name for n in nts] == ["Bible Verse", "Basic"]
-    assert nts[0].fields == ["Reference", "Text", "Translation"]
+    assert nts[0].fields == ["Reference", "Text", "Translation", "Reverse"]
 
 
 def test_add_get_update_delete_note(run, deck):
@@ -304,8 +304,8 @@ def test_group_deck_import_does_not_duplicate_notetypes(run, tmp_path):
 
 
 def test_seed_package_matches_constants(tmp_path):
-    ids = svc.build_seed_package(tmp_path / "seed.apkg")
-    assert set(ids) == set(svc.SEED_IDS)  # ids differ per build; the committed file is canonical
+    # rebuilding from the committed seed keeps the ids
+    assert svc.build_seed_package(tmp_path / "seed.apkg") == svc.SEED_IDS
     (tmp_path / "c").mkdir()
     col = Collection(str(tmp_path / "c" / "collection.anki2"))
     try:
@@ -322,7 +322,7 @@ def test_existing_unused_notetype_is_replaced(run, data_dir):
     path = svc.collection_path("OLD")
     path.parent.mkdir(parents=True)
     col = Collection(str(path))  # Phase-1 style collection: random notetype ids
-    svc._add_bibelvers_notetype(col)
+    svc._add_bible_verse_notetype(col)
     col.close()
     run(svc.ensure_collection("OLD"))
     got = run(svc._run("OLD", lambda c: {m["name"]: m["id"] for m in c.models.all()}))
@@ -433,3 +433,36 @@ def test_learner_stats(run, deck):
     assert stats.today_answered == 3 and stats.new == 1
     assert sum(n for _, n in stats.forecast) >= 3  # all reviewed cards come back
     assert stats.heatmap[-1][0] == stats.forecast[0][0]  # both anchored at "today"
+
+
+def test_bible_verse_optional_reverse_card(run, deck):
+    nts = run(svc.notetypes_for_adding(U))
+    assert nts[0].fields == ["Reference", "Text", "Translation", "Reverse"]
+    one = run(svc.add_note(U, svc.BIBLE_VERSE, deck, {"Reference": "Ps 1", "Text": "Wohl dem"}))
+    two = run(svc.add_note(U, svc.BIBLE_VERSE, deck,
+                           {"Reference": "Ps 2", "Text": "Warum toben", "Reverse": "y"}))
+    count = lambda nid: run(svc._run(U, lambda col: len(col.get_note(nid).card_ids())))  # noqa: E731
+    assert count(one) == 1 and count(two) == 2
+    rows, _ = run(svc.search_cards(U, '"card:Text → Reference"'))
+    card = run(svc._run(U, lambda col: col.get_card(rows[0].card_id)))
+    q = run(svc._run(U, lambda col: card.question()))
+    assert "Warum toben" in q and "Ps 2" not in q
+
+
+def test_upgrade_adds_reverse_to_existing_bible_verse(run, data_dir):
+    # a collection whose Bible Verse notetype predates the reverse card
+    run(svc.ensure_collection(U))
+    deck = run(svc.current_deck_id(U))
+    nid = run(svc.add_note(U, svc.BIBLE_VERSE, deck, {"Reference": "Joh 1", "Text": "Im Anfang"}))
+
+    def strip(col):
+        mm = col.models
+        m = mm.get(svc.SEED_IDS[svc.BIBLE_VERSE])
+        mm.remove_template(m, m["tmpls"][1])
+        mm.remove_field(m, m["flds"][3])
+        mm.save(m)
+    run(svc._run(U, strip))
+    run(svc.close_all())
+    names = run(svc._run(U, lambda col: col.models.field_names(col.models.get(svc.SEED_IDS[svc.BIBLE_VERSE]))))
+    assert names[-1] == "Reverse"
+    assert dict(run(svc.get_note(U, nid)).fields)["Text"] == "Im Anfang"

@@ -26,19 +26,19 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("reset-code", help="issue a new code (old one stops working)")
     p.add_argument("user_id")
     sub.add_parser("list-users")
-    p = sub.add_parser("build-seed", help="(developers) rebuild app/seed/notetypes.apkg")
-    p.add_argument("--force", action="store_true")
+    p = sub.add_parser("build-seed", help="(developers) update app/seed/notetypes.apkg")
+    p.add_argument("--fresh", action="store_true",
+                   help="new notetype ids – only before any collection exists")
     args = parser.parse_args(argv)
 
     if args.cmd == "build-seed":
         from app import anki_service
 
-        if anki_service.SEED_PATH.exists() and not args.force:
-            print("Seed exists; rebuilding changes notetype ids. Use --force.", file=sys.stderr)
-            return 1
         anki_service.SEED_PATH.parent.mkdir(parents=True, exist_ok=True)
-        ids = anki_service.build_seed_package(anki_service.SEED_PATH)
+        ids = anki_service.build_seed_package(anki_service.SEED_PATH, fresh=args.fresh)
         print(f"SEED_IDS = {ids}")
+        if ids != anki_service.SEED_IDS:
+            print("Notetype ids changed – update SEED_IDS in app/anki_service.py.", file=sys.stderr)
         return 0
 
     with get_sessionmaker()() as db:
