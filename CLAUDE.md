@@ -18,7 +18,11 @@ python -m app.cli create-admin "Name"     # gibt Admin-Code aus
 
 # Docker lokal
 docker compose -f docker-compose.dev.yml up --build
-docker build -t versfest:local . && docker run --rm versfest:local python spike/check_anki.py
+docker build -t crosspoint:local . && docker run --rm crosspoint:local python spike/check_anki.py
+
+# Translations (docs/translations.md)
+pybabel extract -F babel.cfg -k N_ -o app/locales/messages.pot --no-wrap app
+pybabel update -i app/locales/messages.pot -d app/locales --no-wrap
 ```
 
 ## Deployment
@@ -52,7 +56,9 @@ Anleitung: `docs/deploy.md`.
 12. Alles unter `/data` ist persistent, alles andere im Container ist wegwerfbar.
 
 ## Konventionen
-- UI-Texte **Deutsch**, Code/Kommentare/Commits **Englisch**.
+- UI-Texte im Code/Templates **Englisch** als Quellsprache, immer über `_()`; Übersetzungen in
+  `app/locales/<lang>/LC_MESSAGES/messages.po` (Deutsch muss vollständig sein, `tests/test_i18n.py`).
+  Code/Kommentare/Commits **Englisch**.
 - Mobile-first: jede neue Seite bei 360 px Breite prüfen; Touch-Ziele ≥ 48 px.
 - htmx-Partials liegen unter `templates/partials/`, Vollseiten erweitern `base.html`.
 - Kein JS-Framework, kein Build-Schritt, keine CDNs.

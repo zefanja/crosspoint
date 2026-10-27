@@ -3,7 +3,7 @@
 services:
   app:
     image: ghcr.io/zefanja/crosspoint:sha-7dfd5b8
-    container_name: versfest
+    container_name: crosspoint
     restart: unless-stopped
     environment:
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY muss gesetzt sein}
@@ -13,8 +13,10 @@ services:
       FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-127.0.0.1}
       INITIAL_ADMIN_NAME: ${INITIAL_ADMIN_NAME:-Admin}
       BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-7}
+      DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-en}
     volumes:
-      # Absolute host path (e.g. /srv/versfest) or default: named volume.
+      # Absolute host path (e.g. /srv/crosspoint) or default: named volume.
+      # (The volume keeps its old name so existing installs keep their data.)
       # Never use a relative bind mount (./data) in a Portainer Git stack.
       - ${DATA_PATH:-versfest-data}:/data
     ports:

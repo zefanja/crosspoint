@@ -1,5 +1,5 @@
 {% if rows %}
-<p class="muted small" aria-live="polite">Vorschau: {{ rows | length }} Abschnitt{{ "" if rows | length == 1 else "e" }} in {{ verses }} Vers{{ "" if verses == 1 else "en" }}</p>
+<p class="muted small" aria-live="polite">{{ _("Preview:") }} {{ ngettext("%(num)s step", "%(num)s steps", rows | length) }} · {{ ngettext("%(num)s verse", "%(num)s verses", verses) }}</p>
 <ol class="verse-preview">
   {% for r in rows %}
   <li><span class="verse-ref">{{ r.verse }}{{ r.part }}</span><span>{{ r.text }}</span></li>

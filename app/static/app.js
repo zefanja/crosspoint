@@ -9,7 +9,8 @@ document.addEventListener("submit", (e) => {
 document.addEventListener("input", (e) => {
   if (e.target.id === "desired_retention") {
     const out = document.getElementById("retention_out");
-    if (out) out.textContent = Number(e.target.value).toFixed(2).replace(".", ",");
+    const lang = document.documentElement.lang || undefined;
+    if (out) out.textContent = Number(e.target.value).toLocaleString(lang, { minimumFractionDigits: 2 });
   }
 });
 

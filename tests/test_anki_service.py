@@ -9,6 +9,7 @@ from anki.collection import Collection, ImportAnkiPackageOptions, ImportAnkiPack
 from app import anki_service as svc
 
 U = "01TESTUSER0000000000000000"
+DECK = "Meine Karten"  # "My cards" in German (DEFAULT_LANGUAGE=de)
 
 
 def add_verse(run, deck_id, ref="Joh 3,16", text="Denn also hat Gott die Welt geliebt", tags=()):
@@ -19,7 +20,7 @@ def add_verse(run, deck_id, ref="Joh 3,16", text="Denn also hat Gott die Welt ge
 @pytest.fixture
 def deck(run):
     decks = run(svc.deck_list(U))
-    return next(d.id for d in decks if d.name == svc.DEFAULT_DECK)
+    return next(d.id for d in decks if d.name == DECK)
 
 
 def test_new_collection_setup(run, data_dir):
@@ -33,7 +34,7 @@ def test_new_collection_setup(run, data_dir):
         assert col.get_preferences().scheduling.rollover == 4
         assert col.models.by_name("Bibelvers") is not None
         assert col.models.by_name("Basic") is not None
-        assert col.decks.by_name(svc.DEFAULT_DECK) is not None
+        assert col.decks.by_name(DECK) is not None
         conf = col.decks.config_dict_for_deck_id(1)
         assert conf["new"]["perDay"] == 10
     finally:
@@ -47,7 +48,7 @@ def test_invalid_user_id_rejected():
 
 def test_deck_list_hides_empty_default(run):
     names = [d.name for d in run(svc.deck_list(U))]
-    assert names == [svc.DEFAULT_DECK]
+    assert names == [DECK]
 
 
 def test_create_deck_and_names(run, deck):
@@ -110,14 +111,14 @@ def test_suspend_and_search(run, deck):
     nid = add_verse(run, deck)
     add_verse(run, deck, ref="Ps 23,1", text="Der HERR ist mein Hirte")
     rows, total = run(svc.search_cards(U, ""))
-    assert total == 2 and {r.due for r in rows} == {"neu"}
+    assert total == 2 and {r.status for r in rows} == {"new"}
     run(svc.set_suspended(U, nid, True))
     rows, total = run(svc.search_cards(U, "is:suspended"))
-    assert total == 1 and rows[0].note_id == nid and rows[0].due == "ausgesetzt"
+    assert total == 1 and rows[0].note_id == nid and rows[0].status == "suspended"
     run(svc.set_suspended(U, nid, False))
     assert run(svc.search_cards(U, "is:suspended"))[1] == 0
     rows, _ = run(svc.search_cards(U, "Hirte"))
-    assert rows[0].front == "Ps 23,1" and rows[0].deck == svc.DEFAULT_DECK
+    assert rows[0].front == "Ps 23,1" and rows[0].deck == DECK
     with pytest.raises(svc.InvalidSearch):
         run(svc.search_cards(U, "deck:("))
 
@@ -188,7 +189,7 @@ def test_export_roundtrip(run, deck, tmp_path):
     run(svc.export_collection(U, colpkg))
     assert run(svc.export_deck(U, deck, apkg)) == 5
     # collection still usable after colpkg export (it gets reopened)
-    assert run(svc.review_state(U, deck)).deck_name == svc.DEFAULT_DECK
+    assert run(svc.review_state(U, deck)).deck_name == DECK
 
     (tmp_path / "fresh").mkdir()
     target = Collection(str(tmp_path / "fresh" / "collection.anki2"))
@@ -237,7 +238,7 @@ def test_import_package_updates_by_guid_and_keeps_progress(run, deck, tmp_path):
     rows, total = run(svc.search_cards(U, "deck:Gruppe"))
     note = run(svc.get_note(U, rows[0].note_id))
     assert total == 1 and dict(note.fields)["Text"] == "neu" and note.readonly
-    assert rows[0].due != "neu"  # learning progress kept
+    assert rows[0].status == "scheduled" and rows[0].due is not None  # learning progress kept
     assert run(svc.collection_stats(U)).reviews_today == before
 
 
@@ -369,7 +370,7 @@ def test_bible_memorizer_notetype_matches_addon(run):
 
 
 def test_tag_deck_notes(run, deck):
-    sub = run(svc.create_deck(U, f"{svc.DEFAULT_DECK}::Unter"))
+    sub = run(svc.create_deck(U, f"{DECK}::Unter"))
     other = run(svc.create_deck(U, "Andere"))
     add_verse(run, deck)
     add_verse(run, sub, ref="Sub")

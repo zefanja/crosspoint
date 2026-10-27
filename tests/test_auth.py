@@ -49,7 +49,7 @@ def test_qr_link_redirects_and_removes_code(client, make_user):
     r = client.get(f"/login?c={code}", follow_redirects=False)
     assert r.status_code == 303 and r.headers["location"] == "/"
     r = client.get("/login?c=WRONGCOD", follow_redirects=False)
-    assert r.headers["location"] == "/login?fehler=code"
+    assert r.headers["location"] == "/login?error=code"
 
 
 def test_rate_limit(client, make_user, db):
@@ -57,7 +57,7 @@ def test_rate_limit(client, make_user, db):
     for _ in range(auth.MAX_FAILURES):
         client.get("/login?c=WRONGCOD")
     r = client.get(f"/login?c={code}", follow_redirects=False)
-    assert r.headers["location"] == "/login?fehler=gesperrt"
+    assert r.headers["location"] == "/login?error=locked"
     client.get("/login")
     r = client.post("/login", data={"code": code,
                                     "login_token": client.cookies[auth.LOGIN_CSRF_COOKIE]})
@@ -87,7 +87,7 @@ def test_disabled_user_cannot_login(client, make_user, db):
     user.disabled = True
     db.commit()
     r = client.get(f"/login?c={code}", follow_redirects=False)
-    assert r.headers["location"] == "/login?fehler=code"
+    assert r.headers["location"] == "/login?error=code"
 
 
 def test_pages_require_login(client):
@@ -147,7 +147,7 @@ def test_bootstrap_creates_admin_once(migrated, capsys):
     from app import bootstrap
     assert bootstrap.main() == 0
     out = capsys.readouterr().out
-    assert "Admin-Code" in out
+    assert "Admin code" in out
     assert bootstrap.ensure_initial_admin() is None
 
 

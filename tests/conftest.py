@@ -8,6 +8,8 @@ def data_dir(tmp_path, monkeypatch):
     monkeypatch.setenv("SECRET_KEY", "test-secret-key-test-secret-key-0123")
     monkeypatch.setenv("BASE_URL", "http://testserver")
     monkeypatch.setenv("APP_VERSION", "abcdef0123456789")
+    # Tests run in German, which also exercises the translation catalog.
+    monkeypatch.setenv("DEFAULT_LANGUAGE", "de")
 
     from app.config import get_settings
     from app.db import get_engine, get_sessionmaker

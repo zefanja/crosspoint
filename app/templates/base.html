@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="de">
+<html lang="{{ get_language() }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#2f6fdd">
-  <title>{% block title %}Versfest{% endblock %}</title>
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
   <link rel="stylesheet" href="/static/app.css">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/static/icons/icon.svg" type="image/svg+xml">
@@ -16,28 +16,43 @@
 </head>
 <body class="{% block body_class %}{% endblock %}"{% if csrf_token %} hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'{% endif %}>
   <header class="topbar">
-    <a href="/" class="brand">Versfest</a>
+    <a href="/" class="brand">{{ app_name }}</a>
     {% if user %}
     <nav class="topnav">
-      <a href="/browse" class="navlink">Suchen</a>
+      <a href="/browse" class="navlink">{{ _("Search") }}</a>
       <form method="post" action="/logout">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-        <button type="submit" class="navlink linkbutton">Abmelden</button>
+        <button type="submit" class="navlink linkbutton">{{ _("Log out") }}</button>
       </form>
     </nav>
     {% endif %}
   </header>
+  {% if admin_workspace %}
+  <div class="ws-banner" role="status">
+    <span>{{ _("You are editing the admin collection (group decks).") }}</span>
+    <form method="post" action="/admin/workspace" class="inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="ws" value="own">
+      <button class="linkbutton">{{ _("Back to my cards") }}</button>
+    </form>
+  </div>
+  {% endif %}
   <main class="content">
     {% block content %}{% endblock %}
   </main>
   <footer class="footer">
-    <span>Kompatibel mit Anki</span>
+    <span>{{ _("Compatible with Anki") }}</span>
     <span aria-hidden="true">·</span>
-    <a href="/datenschutz">Datenschutz</a>
+    <a href="/privacy">{{ _("Privacy") }}</a>
     <span aria-hidden="true">·</span>
-    <a href="{{ source_url }}">Quellcode</a>
+    <a href="{{ source_url }}">{{ _("Source code") }}</a>
     <span aria-hidden="true">·</span>
-    <span class="version" title="Version">{{ app_version }}</span>
+    <span class="version" title="{{ _('Version') }}">{{ app_version }}</span>
+    <nav class="langs" aria-label="{{ _('Language') }}">
+      {% for code, name in available_languages().items() %}
+      {% if code == get_language() %}<strong lang="{{ code }}">{{ name }}</strong>{% else %}<a href="/lang/{{ code }}" lang="{{ code }}" hreflang="{{ code }}">{{ name }}</a>{% endif %}
+      {% endfor %}
+    </nav>
   </footer>
 </body>
 </html>

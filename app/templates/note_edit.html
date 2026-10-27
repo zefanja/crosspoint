@@ -1,24 +1,24 @@
 {% extends "base.html" %}
-{% block title %}Karte bearbeiten{% endblock %}
+{% block title %}{{ _("Edit card") }}{% endblock %}
 {% block content %}
-<p><a href="/browse" class="back">‹ Karten</a></p>
+<p><a href="/browse" class="back">‹ {{ _("Cards") }}</a></p>
 <section class="card">
-  <h1>Karte bearbeiten</h1>
-  <p class="muted small">Notiztyp: {{ note.notetype }}{% if note.suspended %} · <strong>ausgesetzt</strong>{% endif %}</p>
-  {% if note.readonly %}<p class="alert">Diese Karte gehört zu einem Gruppendeck und kann nicht bearbeitet werden.</p>
-  {% elif note.generated %}<p class="alert">Bibeltext-Karten werden aus dem Text erzeugt und können nicht einzeln bearbeitet werden. Zum Ändern löschen und den Abschnitt neu importieren.</p>{% endif %}
+  <h1>{{ _("Edit card") }}</h1>
+  <p class="muted small">{{ _("Note type: %(type)s", type=note.notetype) }}{% if note.suspended %} · <strong>{{ _("suspended") }}</strong>{% endif %}</p>
+  {% if note.readonly %}<p class="alert">{{ _("This card belongs to a group deck and cannot be edited.") }}</p>
+  {% elif note.generated %}<p class="alert">{{ _("Bible text cards are generated from the text and cannot be edited individually. To change them, delete and import the passage again.") }}</p>{% endif %}
   {% set locked = note.readonly or note.generated %}
-  {% if saved %}<p class="alert alert-success" role="status">Gespeichert.</p>{% endif %}
+  {% if saved %}<p class="alert alert-success" role="status">{{ _("Saved.") }}</p>{% endif %}
   {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
   <form method="post" class="stack">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <label for="deck_id">Deck</label>
+    <label for="deck_id">{{ _("Deck") }}</label>
     <select id="deck_id" name="deck_id" class="input"{% if locked %} disabled{% endif %}>
       {% for did, name in decks %}<option value="{{ did }}"{% if did == note.deck_id %} selected{% endif %}>{{ name }}</option>{% endfor %}
     </select>
     {% set field_names = note.fields | map("first") | list %}{% set readonly = locked %}
     {% include "partials/note_fields.html" %}
-    {% if not locked %}<button type="submit" class="btn btn-primary btn-block">Speichern</button>{% endif %}
+    {% if not locked %}<button type="submit" class="btn btn-primary btn-block">{{ _("Save") }}</button>{% endif %}
   </form>
 </section>
 
@@ -26,12 +26,12 @@
   <form method="post" action="/notes/{{ note.id }}/suspend">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="suspended" value="{{ 0 if note.suspended else 1 }}">
-    <button class="btn btn-block">{{ "Wieder aktivieren" if note.suspended else "Aussetzen" }}</button>
+    <button class="btn btn-block">{{ _("Unsuspend") if note.suspended else _("Suspend") }}</button>
   </form>
   {% if not note.readonly %}
-  <form method="post" action="/notes/{{ note.id }}/delete" data-confirm="Diese Karte wirklich löschen? Der Lernstand geht verloren.">
+  <form method="post" action="/notes/{{ note.id }}/delete" data-confirm="{{ _('Really delete this card? Its learning progress will be lost.') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <button class="btn btn-danger btn-block">Löschen</button>
+    <button class="btn btn-danger btn-block">{{ _("Delete") }}</button>
   </form>
   {% endif %}
 </div>

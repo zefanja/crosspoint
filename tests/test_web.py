@@ -197,11 +197,11 @@ def test_users_are_isolated(client, login):
 def test_security_headers_and_pwa(client):
     r = client.get("/login")
     assert "frame-ancestors 'none'" in r.headers["content-security-policy"]
-    assert client.get("/manifest.webmanifest").json()["short_name"] == "Versfest"
+    assert client.get("/manifest.webmanifest").json()["short_name"] == "CrossPoint"
     sw = client.get("/sw.js")
     assert sw.status_code == 200 and sw.headers["service-worker-allowed"] == "/"
     assert "Keine Verbindung" in client.get("/offline").text
-    assert "Datenschutz" in client.get("/datenschutz").text
+    assert "Datenschutz" in client.get("/privacy").text
 
 
 def test_bible_text_import(client, learner):
@@ -234,4 +234,40 @@ def test_bible_text_requires_title(client, learner):
 
 def test_basic_is_question_answer(client, learner):
     r = client.get("/notes/new?notetype=Basic")
-    assert "Frage" in r.text and "Antwort" in r.text and 'aria-current="page">Frage &amp; Antwort' in r.text
+    assert "Frage" in r.text and "Antwort" in r.text and 'aria-current="page">Frage & Antwort' in r.text
+
+
+def test_english_and_language_switch(client, login, monkeypatch):
+    monkeypatch.setenv("DEFAULT_LANGUAGE", "en")
+    from app.config import get_settings
+    get_settings.cache_clear()
+    page = client.get("/login")
+    assert '<html lang="en">' in page.text and "Log in" in page.text
+    # Accept-Language beats the default
+    de = client.get("/login", headers={"Accept-Language": "de-DE,de;q=0.9,en;q=0.5"})
+    assert '<html lang="de">' in de.text and "Anmelden" in de.text
+    # the switcher cookie beats Accept-Language
+    r = client.get("/lang/en", headers={"referer": "http://testserver/browse?q=x"},
+                   follow_redirects=False)
+    assert r.headers["location"] == "/browse?q=x"
+    assert "Log in" in client.get("/login", headers={"Accept-Language": "de"}).text
+    client.get("/lang/xx")  # unknown languages are ignored
+    assert client.cookies.get("vf_lang") == "en"
+
+
+def test_english_collection_and_labels(client, login, monkeypatch):
+    monkeypatch.setenv("DEFAULT_LANGUAGE", "en")
+    from app.config import get_settings
+    get_settings.cache_clear()
+    _, csrf = login()
+    page = client.get("/")
+    assert "My cards" in page.text and "Add card" in page.text
+    deck = int(re.search(r'href="/review/(\d+)">My cards<', page.text).group(1))
+    client.post("/notes/new", data={"csrf_token": csrf, "notetype": "Basic", "deck_id": deck,
+                                    "field_0": "Who led Israel through the Red Sea?",
+                                    "field_1": "Moses"})
+    review = client.get(f"/review/{deck}")
+    assert "Show answer" in review.text and "<10m" in review.text.replace("&lt;", "<")
+    # switching to German reopens the collection with a German backend
+    client.get("/lang/de")
+    assert "Min." in client.get(f"/review/{deck}").text

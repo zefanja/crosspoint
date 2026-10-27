@@ -1,6 +1,6 @@
-# SPEC – Web-Lernplattform „Anki-kompatibel“ (Arbeitstitel: *Versfest*)
+# SPEC – CrossPoint: Web-Lernplattform „kompatibel mit Anki“
 
-> Arbeitstitel frei wählbar – aber **nicht** „Anki…“ oder „AnkiWeb“ im Namen (Markenrecht).
+> Name: **CrossPoint** – bewusst **nicht** „Anki…“ oder „AnkiWeb“ im Namen (Markenrecht).
 > Formulierung erlaubt: „kompatibel mit Anki“.
 
 ## 1. Ziel
@@ -270,7 +270,14 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
   darstellen – schützt vor Skripten aus importierten Decks und isoliert das Template-CSS.
 - **PWA:** `manifest.webmanifest`, Icons, minimaler Service Worker (nur App-Shell-Cache,
   Offline-Seite „Keine Verbindung“). Kein Offline-Lernen.
-- **Sprache:** UI komplett Deutsch; Code, Kommentare, Commits Englisch.
+- **Sprache:** UI mehrsprachig. Quellsprache Englisch (`_("…")` in Code und Templates),
+  Übersetzungen per gettext/Babel in `app/locales/<lang>/LC_MESSAGES/messages.po`
+  (zur Laufzeit im Speicher kompiliert, kein Build-Schritt). Erste Übersetzung: Deutsch.
+  Auswahl: Sprach-Cookie (Umschalter im Footer) → `Accept-Language` → `DEFAULT_LANGUAGE`.
+  Die Anki-Collection wird mit einem Backend in der UI-Sprache geöffnet (Intervall-Labels);
+  das Standard-Deck heißt bei Anlage in der Sprache des Nutzers („My cards“/„Meine Karten“).
+  Notiztyp- und Feldnamen sind Daten und bleiben unübersetzt (nur die Labels).
+  Code, Kommentare, Commits Englisch.
 - **Konfiguration** ausschließlich per Umgebungsvariablen (12-Factor):
 
 | Variable | Pflicht | Standard | Zweck |
@@ -282,6 +289,7 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 | `FORWARDED_ALLOW_IPS` | nein | `127.0.0.1` | IPs des Reverse Proxys, deren `X-Forwarded-For` vertraut wird (wichtig für Rate-Limit) |
 | `INITIAL_ADMIN_NAME` | nein | `Admin` | Name des beim Erststart angelegten Admins |
 | `BACKUP_KEEP_DAYS` | nein | `7` | Aufbewahrung der nächtlichen Backups |
+| `DEFAULT_LANGUAGE` | nein | `en` | Fallback-Sprache der Oberfläche (`en`, `de`, …) |
 
 - Start bricht mit klarer Fehlermeldung ab, wenn Pflichtvariablen fehlen.
 - Footer zeigt die laufende Version (`APP_VERSION` = Git-Commit, beim Image-Build gesetzt) –
@@ -293,7 +301,7 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 ## 9. Datenschutz
 
 - Gespeichert wird nur ein Anzeigename (Vorname/Kürzel genügt), keine E-Mail.
-- Datenschutzhinweis-Seite (Platzhaltertext) im Footer.
+- Datenschutzhinweis-Seite `/privacy` (Platzhaltertext) im Footer.
 - Nutzer kann jederzeit exportieren; Admin kann Nutzer samt Daten löschen.
 - Logs ohne Login-Codes (Query-Parameter `c` aus Access-Logs filtern).
 
@@ -345,7 +353,7 @@ Compose-File im Repo. Jede Version steht damit nachvollziehbar in der Git-Histor
 services:
   app:
     image: ghcr.io/OWNER/REPO:sha-0000000   # wird von CI automatisch aktualisiert
-    container_name: versfest
+    container_name: crosspoint
     restart: unless-stopped
     environment:
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY muss gesetzt sein}
@@ -354,8 +362,9 @@ services:
       DATA_DIR: /data
       FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-127.0.0.1}
       INITIAL_ADMIN_NAME: ${INITIAL_ADMIN_NAME:-Admin}
+      DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-en}
     volumes:
-      # Absoluter Host-Pfad (z. B. /srv/versfest) oder Standard: benanntes Volume
+      # Absoluter Host-Pfad (z. B. /srv/crosspoint) oder Standard: benanntes Volume
       - ${DATA_PATH:-versfest-data}:/data
     ports:
       - "${PORT:-8000}:8000"
@@ -405,7 +414,7 @@ zeigen in Portainers internen Klon des Repos und gehen bei Updates verloren.
    (IP des Reverse Proxys), optional `PORT`.
 4. **GitOps updates** aktivieren: Mechanismus *Polling*, Intervall `5m`.
    Falls angeboten zusätzlich *Re-pull image* aktivieren.
-5. **Deploy** → unter *Containers → versfest → Logs* den einmalig ausgegebenen Admin-Code notieren.
+5. **Deploy** → unter *Containers → crosspoint → Logs* den einmalig ausgegebenen Admin-Code notieren.
 6. **Reverse Proxy** (bestehender Caddy/nginx) auf `http://<server>:<PORT>` zeigen lassen,
    TLS dort terminieren. Die App selbst spricht nur HTTP.
 7. **Prüfen:** Footer zeigt Commit-Kurz-ID. Nach dem nächsten Push sollte sie sich innerhalb

@@ -1,26 +1,25 @@
 {% extends "base.html" %}
-{% block title %}Optionen – {{ deck_name }}{% endblock %}
+{% block title %}{{ _("Options") }} – {{ deck_name }}{% endblock %}
 {% block content %}
-<p><a href="/" class="back">‹ Decks</a></p>
+<p><a href="/" class="back">‹ {{ _("Decks") }}</a></p>
 <section class="card">
-  <h1>Optionen: {{ deck_name }}</h1>
-  {% if saved %}<p class="alert alert-success">Gespeichert.</p>{% endif %}
+  <h1>{{ _("Options: %(deck)s", deck=deck_name) }}</h1>
+  {% if saved %}<p class="alert alert-success">{{ _("Saved.") }}</p>{% endif %}
   {% for e in errors %}<p class="alert alert-error">{{ e }}</p>{% endfor %}
   <form method="post" class="stack">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <label for="new_per_day">Neue Karten pro Tag</label>
+    <label for="new_per_day">{{ _("New cards per day") }}</label>
     <input id="new_per_day" name="new_per_day" type="number" min="0" max="9999" inputmode="numeric"
            class="input" value="{{ opts.new_per_day }}" required>
-    <label for="reviews_per_day">Maximale Wiederholungen pro Tag</label>
+    <label for="reviews_per_day">{{ _("Maximum reviews per day") }}</label>
     <input id="reviews_per_day" name="reviews_per_day" type="number" min="0" max="9999" inputmode="numeric"
            class="input" value="{{ opts.reviews_per_day }}" required>
-    <label for="desired_retention">Gewünschte Behaltensquote:
-      <output id="retention_out" for="desired_retention">{{ "%.2f"|format(opts.desired_retention)|replace(".", ",") }}</output></label>
+    <label for="desired_retention">{{ _("Desired retention:") }}
+      <output id="retention_out" for="desired_retention">{{ opts.desired_retention | decimal }}</output></label>
     <input id="desired_retention" name="desired_retention" type="range" min="0.80" max="0.97" step="0.01"
            class="slider" value="{{ "%.2f"|format(opts.desired_retention) }}">
-    <p class="muted small">Höher = du behältst mehr, musst aber öfter wiederholen. 0,90 ist ein guter Standard.
-      Der Lernalgorithmus FSRS ist immer aktiv.</p>
-    <button type="submit" class="btn btn-primary btn-block">Speichern</button>
+    <p class="muted small">{{ _("Higher = you remember more, but review more often. 0.90 is a good default. The FSRS algorithm is always on.") }}</p>
+    <button type="submit" class="btn btn-primary btn-block">{{ _("Save") }}</button>
   </form>
 </section>
 {% endblock %}

@@ -9,10 +9,11 @@ from fastapi.responses import FileResponse
 from starlette.background import BackgroundTask
 
 from app import anki_service
-from app.auth import require_user, verify_csrf
+from app.auth import current_collection, require_user, verify_csrf
 from app.config import get_settings
 from app.models import User
 from app.templating import render
+from app.i18n import N_
 
 router = APIRouter()
 
@@ -35,23 +36,26 @@ def _safe_name(name: str) -> str:
 
 
 @router.get("/export")
-async def export_page(request: Request, user: User = Depends(require_user)):
-    decks = await anki_service.deck_names(user.id)
+async def export_page(request: Request, user: User = Depends(require_user),
+    col: str = Depends(current_collection)):
+    decks = await anki_service.deck_names(col)
     return render(request, "export.html", {"decks": decks})
 
 
 @router.post("/export/collection")
-async def export_collection(user: User = Depends(verify_csrf)):
+async def export_collection(user: User = Depends(verify_csrf),
+    col: str = Depends(current_collection)):
     path = _temp_path(".colpkg")
-    await anki_service.export_collection(user.id, path)
-    return _download(path, f"Versfest-{date.today().isoformat()}.colpkg")
+    await anki_service.export_collection(col, path)
+    return _download(path, f"CrossPoint-{date.today().isoformat()}.colpkg")
 
 
 @router.post("/export/deck")
-async def export_deck(deck_id: int = Form(...), user: User = Depends(verify_csrf)):
-    names = dict(await anki_service.deck_names(user.id))
+async def export_deck(deck_id: int = Form(...), user: User = Depends(verify_csrf),
+    col: str = Depends(current_collection)):
+    names = dict(await anki_service.deck_names(col))
     if deck_id not in names:
-        raise anki_service.NotFound("Deck nicht gefunden")
+        raise anki_service.NotFound(N_("Deck not found."))
     path = _temp_path(".apkg")
-    await anki_service.export_deck(user.id, deck_id, path)
+    await anki_service.export_deck(col, deck_id, path)
     return _download(path, f"{_safe_name(names[deck_id])}-{date.today().isoformat()}.apkg")

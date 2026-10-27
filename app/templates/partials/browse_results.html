@@ -1,15 +1,15 @@
 {% if error %}
 <p class="alert alert-error">{{ error }}</p>
 {% elif not rows %}
-<p class="muted">Keine Karten gefunden.</p>
+<p class="muted">{{ _("No cards found.") }}</p>
 {% else %}
-<p class="muted small">{{ total }} Karte{{ "" if total == 1 else "n" }}{% if total > limit %} – die ersten {{ limit }} werden angezeigt{% endif %}</p>
+<p class="muted small">{{ ngettext("%(num)s card", "%(num)s cards", total) }}{% if total > limit %} – {{ _("showing the first %(limit)s", limit=limit) }}{% endif %}</p>
 <ul class="cardlist card flush">
   {% for r in rows %}
   <li>
     <a href="/notes/{{ r.note_id }}" class="cardrow{% if r.suspended %} suspended{% endif %}">
-      <span class="cardfront">{{ r.front or "(leer)" }}</span>
-      <span class="cardmeta"><span>{{ r.deck }}</span><span>{{ r.due }}</span></span>
+      <span class="cardfront">{{ r.front or _("(empty)") }}</span>
+      <span class="cardmeta"><span>{{ r.deck }}</span><span>{% if r.status == "new" %}{{ _("new") }}{% elif r.status == "suspended" %}{{ _("suspended") }}{% elif r.due %}{{ r.due | date }}{% else %}–{% endif %}</span></span>
     </a>
   </li>
   {% endfor %}

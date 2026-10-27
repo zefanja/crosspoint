@@ -11,6 +11,7 @@ from app import auth, stats
 from app.db import get_db
 from app.models import User
 from app.templating import render
+from app.i18n import N_, _
 
 router = APIRouter()
 
@@ -32,7 +33,8 @@ def _login_success(request: Request, db: DbSession, user: User, tasks: Backgroun
 def _login_form(request: Request, error: str | None = None, status_code: int = 200):
     token = request.cookies.get(auth.LOGIN_CSRF_COOKIE) or secrets.token_urlsafe(24)
     response = render(
-        request, "login.html", {"login_token": token, "error": error}, status_code=status_code
+        request, "login.html", {"login_token": token, "error": error and _(error)},
+        status_code=status_code,
     )
     response.set_cookie(
         auth.LOGIN_CSRF_COOKIE, token, httponly=True, secure=auth.cookie_secure(),
@@ -41,8 +43,8 @@ def _login_form(request: Request, error: str | None = None, status_code: int = 2
     return response
 
 
-LOCKED = "Zu viele Fehlversuche. Bitte warte 15 Minuten und versuche es dann erneut."
-WRONG = "Dieser Code ist ungültig. Bitte prüfe die Eingabe."
+LOCKED = N_("Too many failed attempts. Please wait 15 minutes and try again.")
+WRONG = N_("This code is not valid. Please check your input.")
 
 
 @router.get("/login")
@@ -50,7 +52,7 @@ def login_page(
     request: Request,
     tasks: BackgroundTasks,
     c: str | None = None,
-    fehler: str | None = None,
+    error: str | None = None,
     user: User | None = Depends(auth.current_user),
     db: DbSession = Depends(get_db),
 ):
@@ -58,14 +60,14 @@ def login_page(
         # QR link: log in and redirect, so the code disappears from the address bar.
         ip = _client_ip(request)
         if auth.is_locked_out(db, ip):
-            return RedirectResponse("/login?fehler=gesperrt", status_code=303)
+            return RedirectResponse("/login?error=locked", status_code=303)
         found = auth.authenticate(db, c, ip)
         if found is None:
-            return RedirectResponse("/login?fehler=code", status_code=303)
+            return RedirectResponse("/login?error=code", status_code=303)
         return _login_success(request, db, found, tasks)
     if user is not None:
         return RedirectResponse("/", status_code=303)
-    error = {"gesperrt": LOCKED, "code": WRONG}.get(fehler or "")
+    error = {"locked": LOCKED, "code": WRONG}.get(error or "")
     return _login_form(request, error)
 
 
@@ -79,7 +81,7 @@ def login_submit(
 ):
     cookie = request.cookies.get(auth.LOGIN_CSRF_COOKIE, "")
     if not cookie or not hmac.compare_digest(cookie, login_token):
-        return _login_form(request, "Bitte versuche es noch einmal.", 400)
+        return _login_form(request, N_("Please try again."), 400)
     ip = _client_ip(request)
     if auth.is_locked_out(db, ip):
         return _login_form(request, LOCKED, 429)
@@ -92,7 +94,7 @@ def login_submit(
 @router.post("/logout")
 def logout(
     request: Request,
-    _: User = Depends(auth.verify_csrf),
+    _csrf: User = Depends(auth.verify_csrf),
     db: DbSession = Depends(get_db),
 ):
     auth.delete_session(db, request.cookies.get(auth.SESSION_COOKIE))

@@ -25,8 +25,8 @@ def main() -> int:
     if code:
         line = "=" * 64
         print(
-            f"\n{line}\n  Erster Start: Admin '{get_settings().initial_admin_name}' angelegt.\n"
-            f"  Admin-Code (wird nur dieses eine Mal angezeigt):\n\n"
+            f"\n{line}\n  First start: admin '{get_settings().initial_admin_name}' created.\n"
+            f"  Admin code (shown only this once):\n\n"
             f"      {format_code(code)}\n\n"
             f"  Login: {get_settings().base_url}/login\n{line}\n",
             flush=True,

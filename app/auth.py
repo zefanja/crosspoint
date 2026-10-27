@@ -12,6 +12,7 @@ from fastapi import Depends, Request
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session as DbSession
 
+from app.anki_service import ADMIN_COLLECTION
 from app.config import get_settings
 from app.db import get_db
 from app.models import LoginAttempt, Session, User
@@ -21,6 +22,7 @@ USER_CODE_LEN = 8
 ADMIN_CODE_LEN = 16
 SESSION_COOKIE = "vf_session"
 LOGIN_CSRF_COOKIE = "vf_login_csrf"
+WORKSPACE_COOKIE = "vf_ws"  # "admin" = admin edits the admin collection (group decks)
 SESSION_DAYS = 180
 MAX_FAILURES = 10
 FAILURE_WINDOW = timedelta(minutes=15)
@@ -211,6 +213,14 @@ def require_admin(user: User = Depends(require_user)) -> User:
     if not user.is_admin:
         raise Forbidden()
     return user
+
+
+def current_collection(request: Request, user: User = Depends(require_user)) -> str:
+    """Collection the learner UI works on: own, or the admin collection for admins
+    who switched to it (cookie)."""
+    admin_ws = user.is_admin and request.cookies.get(WORKSPACE_COOKIE) == "admin"
+    request.state.admin_workspace = admin_ws
+    return ADMIN_COLLECTION if admin_ws else user.id
 
 
 async def verify_csrf(request: Request, user: User = Depends(require_user)) -> User:

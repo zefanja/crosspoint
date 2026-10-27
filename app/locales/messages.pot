@@ -1,0 +1,692 @@
+# Translations template for CrossPoint.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the CrossPoint project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: CrossPoint VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-10-27 18:08+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/anki_service.py:49 app/templates/browse.html:13
+msgid "My cards"
+msgstr ""
+
+#: app/anki_service.py:497 app/routes/export.py:58
+msgid "Deck not found."
+msgstr ""
+
+#: app/anki_service.py:504
+msgid "Please enter a deck name."
+msgstr ""
+
+#: app/anki_service.py:611
+msgid "Note not found."
+msgstr ""
+
+#: app/anki_service.py:619
+msgid "The first field must not be empty."
+msgstr ""
+
+#: app/anki_service.py:625 app/routes/notes.py:55
+msgid "Note type not found."
+msgstr ""
+
+#: app/anki_service.py:652
+msgid "Please enter a Bible text."
+msgstr ""
+
+#: app/anki_service.py:662
+msgid "[Beginning]"
+msgstr ""
+
+#: app/anki_service.py:712
+msgid "Cards from group decks cannot be edited."
+msgstr ""
+
+#: app/anki_service.py:714
+msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
+msgstr ""
+
+#: app/anki_service.py:734
+msgid "Cards from group decks cannot be deleted."
+msgstr ""
+
+#: app/distribution.py:136
+#, python-format
+msgid "Distribute “%(deck)s”"
+msgstr ""
+
+#: app/main.py:130
+msgid "You don't have permission to do that."
+msgstr ""
+
+#: app/main.py:137
+msgid "Your session has expired. Please reload the page and try again."
+msgstr ""
+
+#: app/main.py:176
+msgid "CrossPoint – memorize the Bible"
+msgstr ""
+
+#: app/main.py:178
+msgid "Memorize Bible verses with spaced repetition – compatible with Anki."
+msgstr ""
+
+#: app/routes/admin.py:55
+msgid "Please choose an .apkg file."
+msgstr ""
+
+#: app/routes/admin.py:65
+msgid "The file is too large (max. 100 MB)."
+msgstr ""
+
+#: app/routes/admin.py:68
+#, python-format
+msgid "“%(file)s” imported: %(count)s notes new or updated. The decks are now available in the admin collection."
+msgstr ""
+
+#: app/routes/admin.py:73
+msgid "The file could not be imported. Is it a valid Anki file?"
+msgstr ""
+
+#: app/routes/admin.py:84
+msgid "This task is no longer known."
+msgstr ""
+
+#: app/routes/auth.py:46
+msgid "Too many failed attempts. Please wait 15 minutes and try again."
+msgstr ""
+
+#: app/routes/auth.py:47
+msgid "This code is not valid. Please check your input."
+msgstr ""
+
+#: app/routes/auth.py:84
+msgid "Please try again."
+msgstr ""
+
+#: app/routes/bible.py:72
+msgid "Please enter a title, e.g. “Psalm 23”."
+msgstr ""
+
+#: app/routes/bible.py:80
+#, python-format
+msgid "“%(title)s”: %(notes)s steps with %(cards)s cards added."
+msgstr ""
+
+#: app/routes/browse.py:23
+msgid "The search is not valid. Examples: John, is:due, is:new"
+msgstr ""
+
+#: app/routes/decks.py:68
+msgid "New cards per day: 0 to 9999."
+msgstr ""
+
+#: app/routes/decks.py:70
+msgid "Reviews per day: 0 to 9999."
+msgstr ""
+
+#: app/routes/decks.py:72
+#, python-format
+msgid "Desired retention: %(min)s to %(max)s."
+msgstr ""
+
+#: app/routes/notes.py:69
+#, python-format
+msgid "Added: %(front)s"
+msgstr ""
+
+#: app/templates/base.html:22
+msgid "Admin"
+msgstr ""
+
+#: app/templates/base.html:23 app/templates/browse.html:7
+#: app/templates/browse.html:8
+msgid "Search"
+msgstr ""
+
+#: app/templates/base.html:26
+msgid "Log out"
+msgstr ""
+
+#: app/templates/base.html:33
+msgid "You are editing the admin collection (group decks)."
+msgstr ""
+
+#: app/templates/base.html:37
+msgid "Back to my cards"
+msgstr ""
+
+#: app/templates/base.html:45
+msgid "Compatible with Anki"
+msgstr ""
+
+#: app/templates/base.html:47 app/templates/privacy.html:2
+#: app/templates/privacy.html:5
+msgid "Privacy"
+msgstr ""
+
+#: app/templates/base.html:49
+msgid "Source code"
+msgstr ""
+
+#: app/templates/base.html:51
+msgid "Version"
+msgstr ""
+
+#: app/templates/base.html:52
+msgid "Language"
+msgstr ""
+
+#: app/templates/browse.html:2 app/templates/decks.html:32
+msgid "Browse cards"
+msgstr ""
+
+#: app/templates/browse.html:4 app/templates/deck_options.html:4
+#: app/templates/export.html:4 app/templates/note_add.html:4
+#: app/templates/note_bible.html:4
+msgid "Decks"
+msgstr ""
+
+#: app/templates/browse.html:7
+msgid "Search (Anki search syntax)"
+msgstr ""
+
+#: app/templates/browse.html:13
+msgid "Examples:"
+msgstr ""
+
+#: app/templates/deck_options.html:2 app/templates/decks.html:23
+msgid "Options"
+msgstr ""
+
+#: app/templates/deck_options.html:6
+#, python-format
+msgid "Options: %(deck)s"
+msgstr ""
+
+#: app/templates/deck_options.html:7 app/templates/note_edit.html:11
+msgid "Saved."
+msgstr ""
+
+#: app/templates/deck_options.html:11
+msgid "New cards per day"
+msgstr ""
+
+#: app/templates/deck_options.html:14
+msgid "Maximum reviews per day"
+msgstr ""
+
+#: app/templates/deck_options.html:17
+msgid "Desired retention:"
+msgstr ""
+
+#: app/templates/deck_options.html:21
+msgid "Higher = you remember more, but review more often. 0.90 is a good default. The FSRS algorithm is always on."
+msgstr ""
+
+#: app/templates/deck_options.html:22 app/templates/note_edit.html:21
+msgid "Save"
+msgstr ""
+
+#: app/templates/decks.html:4
+msgid "Done for today 🎉 – more cards tomorrow"
+msgstr ""
+
+#: app/templates/decks.html:6
+msgid "No cards yet. Add your first card – a Bible verse, a question about the Bible or a whole passage."
+msgstr ""
+
+#: app/templates/decks.html:11 app/templates/export.html:24
+#: app/templates/note_add.html:14 app/templates/note_bible.html:14
+#: app/templates/note_edit.html:15
+msgid "Deck"
+msgstr ""
+
+#: app/templates/decks.html:12
+msgid "New"
+msgstr ""
+
+#: app/templates/decks.html:12
+msgid "Learn"
+msgstr ""
+
+#: app/templates/decks.html:12
+msgid "Due"
+msgstr ""
+
+#: app/templates/decks.html:23
+#, python-format
+msgid "Options for %(deck)s"
+msgstr ""
+
+#: app/templates/decks.html:30 app/templates/note_add.html:2
+#: app/templates/note_add.html:6 app/templates/note_bible.html:6
+msgid "Add card"
+msgstr ""
+
+#: app/templates/decks.html:31 app/templates/note_bible.html:2
+msgid "Import Bible text"
+msgstr ""
+
+#: app/templates/decks.html:33 app/templates/export.html:2
+msgid "Export"
+msgstr ""
+
+#: app/templates/decks.html:37
+msgid "Create new deck"
+msgstr ""
+
+#: app/templates/decks.html:41
+msgid "e.g. Psalms"
+msgstr ""
+
+#: app/templates/decks.html:41
+msgid "Deck name"
+msgstr ""
+
+#: app/templates/decks.html:42
+msgid "Create"
+msgstr ""
+
+#: app/templates/decks.html:44
+msgid "Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>."
+msgstr ""
+
+#: app/templates/error.html:2
+msgid "Notice"
+msgstr ""
+
+#: app/templates/error.html:5
+msgid "Oops"
+msgstr ""
+
+#: app/templates/error.html:7
+msgid "Home"
+msgstr ""
+
+#: app/templates/export.html:6
+msgid "Export to Anki"
+msgstr ""
+
+#: app/templates/export.html:7
+msgid "Your cards belong to you. You can download them <strong>with your learning progress</strong> at any time and continue in Anki (computer, AnkiDroid, AnkiMobile)."
+msgstr ""
+
+#: app/templates/export.html:11
+msgid "Export everything"
+msgstr ""
+
+#: app/templates/export.html:11
+msgid "(for new Anki users)"
+msgstr ""
+
+#: app/templates/export.html:12
+msgid "Replaces the collection in Anki when imported – only for empty/new Anki installations."
+msgstr ""
+
+#: app/templates/export.html:15
+msgid "Download everything (.colpkg)"
+msgstr ""
+
+#: app/templates/export.html:20
+msgid "Export deck"
+msgstr ""
+
+#: app/templates/export.html:20
+msgid "(add to an existing Anki)"
+msgstr ""
+
+#: app/templates/export.html:21
+msgid "One deck with learning progress and deck options. Existing cards in Anki are kept."
+msgstr ""
+
+#: app/templates/export.html:28
+msgid "Download deck (.apkg)"
+msgstr ""
+
+#: app/templates/export.html:33
+msgid "How to continue in Anki"
+msgstr ""
+
+#: app/templates/export.html:36
+msgid "Install Anki"
+msgstr ""
+
+#: app/templates/export.html:37
+msgid "Computer: <a href=\"https://apps.ankiweb.net\">apps.ankiweb.net</a> (free) · Android: “AnkiDroid” in the Play Store (free) · iPhone: “AnkiMobile” in the App Store."
+msgstr ""
+
+#: app/templates/export.html:39
+msgid "Open the file"
+msgstr ""
+
+#: app/templates/export.html:40
+msgid "Computer: double-click the file or use <em>File → Import</em> in Anki. AnkiDroid: menu <em>⋮ → Import</em> and choose the downloaded file."
+msgstr ""
+
+#: app/templates/export.html:42
+msgid "Create an AnkiWeb account"
+msgstr ""
+
+#: app/templates/export.html:43
+msgid "Free at <a href=\"https://ankiweb.net\">ankiweb.net</a> – keeps your phone and computer in sync."
+msgstr ""
+
+#: app/templates/export.html:45
+msgid "Sync"
+msgstr ""
+
+#: app/templates/export.html:46
+msgid "Tap <em>Sync</em> in Anki and log in with your AnkiWeb account. Done!"
+msgstr ""
+
+#: app/templates/login.html:2 app/templates/login.html:5
+#: app/templates/login.html:14
+msgid "Log in"
+msgstr ""
+
+#: app/templates/login.html:6
+msgid "Enter your personal code – or scan the QR code on your card."
+msgstr ""
+
+#: app/templates/login.html:10
+msgid "Code"
+msgstr ""
+
+#: app/templates/note_add.html:20
+msgid "Add"
+msgstr ""
+
+#: app/templates/note_bible.html:9
+msgid "Memorize a whole passage: every line becomes a step with first-letter, gap and context cards (like the Anki add-on <a href=\"https://github.com/zefanja/bible-memorizer\">Bible Memorizer</a>)."
+msgstr ""
+
+#: app/templates/note_bible.html:18
+msgid "Title"
+msgstr ""
+
+#: app/templates/note_bible.html:19
+msgid "e.g. Psalm 23"
+msgstr ""
+
+#: app/templates/note_bible.html:20 app/templates/partials/add_tabs.html:2
+msgid "Bible text"
+msgstr ""
+
+#: app/templates/note_bible.html:22
+msgid "1 The LORD is my shepherd; I shall not want."
+msgstr ""
+
+#: app/templates/note_bible.html:22
+msgid "2 He makes me lie down in green pastures …"
+msgstr ""
+
+#: app/templates/note_bible.html:24
+msgid "Best pasted with verse numbers – they are detected automatically, also as superscripts (¹ ² ³). Every line becomes its own step; split long verses with line breaks."
+msgstr ""
+
+#: app/templates/note_bible.html:25
+msgid "Lines of context (before/after)"
+msgstr ""
+
+#: app/templates/note_bible.html:29
+#, python-format
+msgid "Create overview table (from %(n)s verses)"
+msgstr ""
+
+#: app/templates/note_bible.html:32
+msgid "Create cards"
+msgstr ""
+
+#: app/templates/note_edit.html:2 app/templates/note_edit.html:6
+msgid "Edit card"
+msgstr ""
+
+#: app/templates/note_edit.html:4
+msgid "Cards"
+msgstr ""
+
+#: app/templates/note_edit.html:7
+#, python-format
+msgid "Note type: %(type)s"
+msgstr ""
+
+#: app/templates/note_edit.html:7 app/templates/partials/browse_results.html:12
+msgid "suspended"
+msgstr ""
+
+#: app/templates/note_edit.html:8
+msgid "This card belongs to a group deck and cannot be edited."
+msgstr ""
+
+#: app/templates/note_edit.html:9
+msgid "Bible text cards are generated from the text and cannot be edited individually. To change them, delete and import the passage again."
+msgstr ""
+
+#: app/templates/note_edit.html:29
+msgid "Unsuspend"
+msgstr ""
+
+#: app/templates/note_edit.html:29
+msgid "Suspend"
+msgstr ""
+
+#: app/templates/note_edit.html:32
+msgid "Really delete this card? Its learning progress will be lost."
+msgstr ""
+
+#: app/templates/note_edit.html:34
+msgid "Delete"
+msgstr ""
+
+#: app/templates/offline.html:2 app/templates/offline.html:5
+msgid "No connection"
+msgstr ""
+
+#: app/templates/offline.html:6
+msgid "CrossPoint needs an internet connection. Please check your connection and try again."
+msgstr ""
+
+#: app/templates/offline.html:7
+msgid "Try again"
+msgstr ""
+
+#: app/templates/privacy.html:6
+msgid "Placeholder text – to be completed by the operator."
+msgstr ""
+
+#: app/templates/privacy.html:7
+msgid "What data is stored?"
+msgstr ""
+
+#: app/templates/privacy.html:9
+msgid "A display name (a first name or initials is enough). No email address."
+msgstr ""
+
+#: app/templates/privacy.html:10
+msgid "Your cards and your learning history."
+msgstr ""
+
+#: app/templates/privacy.html:11
+msgid "A session cookie to keep you logged in, and a cookie for your language. No tracking or advertising cookies."
+msgstr ""
+
+#: app/templates/privacy.html:13
+msgid "Your rights"
+msgstr ""
+
+#: app/templates/privacy.html:14
+msgid "You can export your cards at any time. The administrator can delete your account including all data."
+msgstr ""
+
+#: app/templates/privacy.html:15
+msgid "Responsible"
+msgstr ""
+
+#: app/templates/privacy.html:16
+msgid "[Name and contact of the operator]"
+msgstr ""
+
+#: app/templates/review.html:2
+msgid "Study"
+msgstr ""
+
+#: app/templates/partials/add_tabs.html:1
+msgid "Card type"
+msgstr ""
+
+#: app/templates/partials/add_tabs.html:2
+msgid "Bible verse"
+msgstr ""
+
+#: app/templates/partials/add_tabs.html:2
+msgid "Question & answer"
+msgstr ""
+
+#: app/templates/partials/bible_preview.html:2
+msgid "Preview:"
+msgstr ""
+
+#: app/templates/partials/bible_preview.html:2
+#, python-format
+msgid "%(num)s step"
+msgid_plural "%(num)s steps"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/partials/bible_preview.html:2
+#, python-format
+msgid "%(num)s verse"
+msgid_plural "%(num)s verses"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/partials/browse_results.html:4
+msgid "No cards found."
+msgstr ""
+
+#: app/templates/partials/browse_results.html:6
+#, python-format
+msgid "%(num)s card"
+msgid_plural "%(num)s cards"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/partials/browse_results.html:6
+#, python-format
+msgid "showing the first %(limit)s"
+msgstr ""
+
+#: app/templates/partials/browse_results.html:11
+msgid "(empty)"
+msgstr ""
+
+#: app/templates/partials/browse_results.html:12
+msgid "new"
+msgstr ""
+
+#: app/templates/partials/note_fields.html:2
+msgid "Question"
+msgstr ""
+
+#: app/templates/partials/note_fields.html:2
+msgid "Answer"
+msgstr ""
+
+#: app/templates/partials/note_fields.html:2
+msgid "Reference"
+msgstr ""
+
+#: app/templates/partials/note_fields.html:2
+msgid "Text"
+msgstr ""
+
+#: app/templates/partials/note_fields.html:2
+msgid "Translation (optional)"
+msgstr ""
+
+#: app/templates/partials/note_fields.html:3
+msgid "e.g. John 3:16"
+msgstr ""
+
+#: app/templates/partials/note_fields.html:3
+msgid "e.g. ESV"
+msgstr ""
+
+#: app/templates/partials/note_fields.html:3
+msgid "e.g. Who led Israel through the Red Sea?"
+msgstr ""
+
+#: app/templates/partials/note_fields.html:3
+msgid "e.g. Moses (Exodus 14)"
+msgstr ""
+
+#: app/templates/partials/note_fields.html:15
+msgid "Line breaks are kept. Simple formatting like &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt; is allowed."
+msgstr ""
+
+#: app/templates/partials/review_card.html:3
+#: app/templates/partials/review_card.html:48
+msgid "Back to decks"
+msgstr ""
+
+#: app/templates/partials/review_card.html:4
+#, python-format
+msgid "Remaining: %(new)s new, %(learn)s learning, %(due)s due"
+msgstr ""
+
+#: app/templates/partials/review_card.html:13
+msgid "Undo (Z)"
+msgstr ""
+
+#: app/templates/partials/review_card.html:13
+msgid "Undo"
+msgstr ""
+
+#: app/templates/partials/review_card.html:21
+msgid "Front"
+msgstr ""
+
+#: app/templates/partials/review_card.html:23
+msgid "Back"
+msgstr ""
+
+#: app/templates/partials/review_card.html:27
+msgid "Show answer"
+msgstr ""
+
+#: app/templates/partials/review_card.html:34
+msgid "Again"
+msgstr ""
+
+#: app/templates/partials/review_card.html:34
+msgid "Hard"
+msgstr ""
+
+#: app/templates/partials/review_card.html:34
+msgid "Good"
+msgstr ""
+
+#: app/templates/partials/review_card.html:34
+msgid "Easy"
+msgstr ""
+
+#: app/templates/partials/review_card.html:46
+msgid "Done for today!"
+msgstr ""
+
+#: app/templates/partials/review_card.html:47
+msgid "Nothing else is due in this deck right now. More cards tomorrow."
+msgstr ""
+

@@ -24,6 +24,7 @@ class Settings:
     initial_admin_name: str
     backup_keep_days: int
     app_version: str
+    default_language: str
 
     @property
     def db_path(self) -> Path:
@@ -55,6 +56,7 @@ def load_settings() -> Settings:
         initial_admin_name=os.environ.get("INITIAL_ADMIN_NAME", "Admin"),
         backup_keep_days=int(os.environ.get("BACKUP_KEEP_DAYS", "7")),
         app_version=os.environ.get("APP_VERSION", "dev"),
+        default_language=os.environ.get("DEFAULT_LANGUAGE", "en"),
     )
 
 

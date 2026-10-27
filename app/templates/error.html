@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Hinweis – Versfest{% endblock %}
+{% block title %}{{ _("Notice") }} – {{ app_name }}{% endblock %}
 {% block content %}
 <section class="card narrow">
-  <h1>Hoppla</h1>
+  <h1>{{ _("Oops") }}</h1>
   <p>{{ message }}</p>
-  <a href="/" class="btn btn-primary">Zur Startseite</a>
+  <a href="/" class="btn btn-primary">{{ _("Home") }}</a>
 </section>
 {% endblock %}

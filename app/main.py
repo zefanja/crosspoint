@@ -13,12 +13,13 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Resp
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
-from app import anki_service, auth, backup
+from app import anki_service, auth, backup, i18n
 from app.config import get_settings
 from app.db import get_engine, get_sessionmaker
 from app.routes import auth as auth_routes
 from app.routes import bible, browse, decks, export, notes, pages, review
 from app.templating import BASE_DIR, is_htmx, render, templates
+from app.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -99,7 +100,15 @@ for module in (auth_routes, decks, review, bible, notes, browse, export, pages):
 
 @app.middleware("http")
 async def headers_and_session_refresh(request: Request, call_next):
-    response = await call_next(request)
+    lang = i18n.negotiate(request.cookies.get(i18n.LANG_COOKIE),
+                          request.headers.get("accept-language"))
+    token = i18n.set_language(lang)
+    try:
+        response = await call_next(request)
+    finally:
+        i18n._current.reset(token)
+    response.headers.setdefault("Content-Language", lang)
+    response.headers.setdefault("Vary", "Accept-Language, Cookie")
     raw = getattr(request.state, "refresh_cookie", None)
     if raw:
         auth.set_session_cookie(response, raw)
@@ -118,21 +127,21 @@ async def login_required(request: Request, exc):
 
 @app.exception_handler(auth.Forbidden)
 async def forbidden(request: Request, exc):
-    return render(request, "error.html", {"message": "Dafür fehlen dir die Rechte."}, 403)
+    return render(request, "error.html", {"message": _("You don't have permission to do that.")}, 403)
 
 
 @app.exception_handler(auth.CsrfError)
 async def csrf_error(request: Request, exc):
     return render(
         request, "error.html",
-        {"message": "Die Sitzung ist abgelaufen. Bitte lade die Seite neu und versuche es noch einmal."},
+        {"message": _("Your session has expired. Please reload the page and try again.")},
         403,
     )
 
 
 @app.exception_handler(anki_service.NotFound)
 async def not_found(request: Request, exc):
-    return render(request, "error.html", {"message": str(exc)}, 404)
+    return render(request, "error.html", {"message": _(str(exc))}, 404)
 
 
 @app.get("/healthz")
@@ -162,6 +171,23 @@ def service_worker():
 
 @app.get("/manifest.webmanifest", include_in_schema=False)
 def manifest():
-    return FileResponse(
-        BASE_DIR / "static" / "manifest.webmanifest", media_type="application/manifest+json"
-    )
+    icons = "/static/icons"
+    data = {
+        "name": _("CrossPoint – memorize the Bible"),
+        "short_name": "CrossPoint",
+        "description": _("Memorize Bible verses with spaced repetition – compatible with Anki."),
+        "lang": i18n.get_language(),
+        "start_url": "/",
+        "scope": "/",
+        "display": "standalone",
+        "background_color": "#f6f6f4",
+        "theme_color": "#2f6fdd",
+        "icons": [
+            {"src": f"{icons}/icon-192.png", "sizes": "192x192", "type": "image/png"},
+            {"src": f"{icons}/icon-512.png", "sizes": "512x512", "type": "image/png"},
+            {"src": f"{icons}/maskable-512.png", "sizes": "512x512", "type": "image/png",
+             "purpose": "maskable"},
+            {"src": f"{icons}/icon.svg", "sizes": "any", "type": "image/svg+xml"},
+        ],
+    }
+    return JSONResponse(data, media_type="application/manifest+json")

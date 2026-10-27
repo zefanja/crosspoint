@@ -414,3 +414,10 @@ textarea.input { resize: vertical; line-height: 1.4; }
 .verse-preview li { display: flex; gap: 10px; padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
 .verse-preview li:last-child { border-bottom: 0; }
 .verse-ref { flex: none; min-width: 2.6rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ---------- language switcher ---------- */
+
+.langs { flex-basis: 100%; display: flex; justify-content: center; gap: 4px; }
+.langs a, .langs strong { display: inline-flex; align-items: center; min-height: var(--touch); padding: 0 12px; }
+.ws-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 12px; padding: 6px 16px; background: var(--info-bg); font-size: 0.9rem; }
+.ws-banner .linkbutton { color: var(--accent); min-height: 40px; text-decoration: underline; }

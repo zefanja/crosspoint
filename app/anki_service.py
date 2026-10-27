@@ -37,6 +37,7 @@ from starlette.concurrency import run_in_threadpool
 from app.bible_memorizer import gen_notes as bm_gen
 from app.bible_memorizer import model as bm_model
 from app.config import get_settings
+from app.i18n import N_, get_language, translate
 from app.sanitize import plain_text
 
 log = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ ADMIN_COLLECTION = "_admin"
 MAX_OPEN = 20
 IDLE_SECONDS = 600
 GROUP_TAG = "gruppendeck"
-DEFAULT_DECK = "Meine Karten"
+DEFAULT_DECK = N_("My cards")  # created in the user's language
 BASIC = "Basic"
 BIBELVERS = "Bibelvers"
 BIBLE_MEMORIZER = bm_model.MODEL_NAME  # "Bible Memorizer"
@@ -53,12 +54,11 @@ DEFAULT_NEW_PER_DAY = 10
 DEFAULT_REVIEWS_PER_DAY = 200
 DEFAULT_RETENTION = 0.9
 # Collections are created with an English backend so stock names stay "Basic"/"Default"
-# (a German backend would create "Einfach"); afterwards they are opened in German so
-# interval labels and error messages are localized.
+# (a German backend would create "Einfach"); afterwards they are opened with a backend in
+# the UI language so interval labels are localized.
 CREATE_LANG = "en"
-UI_LANG = "de"
 SEED_PATH = Path(__file__).resolve().parent / "seed" / "notetypes.apkg"
-SEED_DECK = "_versfest_seed"
+SEED_DECK = "_versfest_seed"  # baked into app/seed/notetypes.apkg (old working title)
 SEED_IDS = {BASIC: 1793118616169, BIBELVERS: 1793118616181, BIBLE_MEMORIZER: 1793118616188}  # from `python -m app.cli build-seed`
 
 RATINGS = {1: CardAnswer.AGAIN, 2: CardAnswer.HARD, 3: CardAnswer.GOOD, 4: CardAnswer.EASY}
@@ -172,7 +172,8 @@ class CardRow:
     note_id: int
     front: str
     deck: str
-    due: str
+    status: str  # "new" | "suspended" | "scheduled"
+    due: date | None
     suspended: bool
 
 
@@ -210,6 +211,7 @@ class CollectionStats:
 class _Entry:
     col: Collection
     last_used: float
+    lang: str
 
 
 _open: "OrderedDict[str, _Entry]" = OrderedDict()
@@ -236,8 +238,9 @@ def collection_path(user_id: str) -> Path:
     return collections_dir() / user_id / "collection.anki2"
 
 
-def _get_col(user_id: str) -> Collection:
-    """Return the open collection, opening (and creating) it if needed.
+def _get_col(user_id: str, lang: str) -> Collection:
+    """Return the open collection, opening (and creating) it if needed. The backend
+    language follows the UI language; a cached collection is reopened if it differs.
 
     Must run in the threadpool while holding the user's lock.
     """
@@ -246,29 +249,34 @@ def _get_col(user_id: str) -> Collection:
         if entry is not None:
             _open.move_to_end(user_id)
             entry.last_used = time.monotonic()
-            return entry.col
+            if entry.lang == lang:
+                return entry.col
+            del _open[user_id]
+    if entry is not None:
+        entry.col.close()
     path = collection_path(user_id)
     if not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
         col = Collection(str(path), backend=RustBackend(langs=[CREATE_LANG]))
         try:
-            _setup_new_collection(col)
+            _setup_new_collection(col, translate(DEFAULT_DECK, lang))
         finally:
             col.close()
-    col = Collection(str(path), backend=RustBackend(langs=[UI_LANG]))
+    col = Collection(str(path), backend=RustBackend(langs=[lang]))
     try:
         _ensure_notetypes(col)
     except Exception:
         col.close()
         raise
     with _cache_lock:
-        _open[user_id] = _Entry(col, time.monotonic())
+        _open[user_id] = _Entry(col, time.monotonic(), lang)
     return col
 
 
 async def _run(user_id: str, fn: Callable[..., T], *args: Any) -> T:
+    lang = get_language()  # read on the event loop, where the request context lives
     async with _lock(user_id):
-        result = await run_in_threadpool(lambda: fn(_get_col(user_id), *args))
+        result = await run_in_threadpool(lambda: fn(_get_col(user_id, lang), *args))
     await _evict_if_needed()
     return result
 
@@ -319,7 +327,7 @@ def open_count() -> int:
 # --------------------------------------------------------------------------- setup
 
 
-def _setup_new_collection(col: Collection) -> None:
+def _setup_new_collection(col: Collection, deck_name: str) -> None:
     col.set_config("fsrs", True)
     prefs = col.get_preferences()
     prefs.scheduling.rollover = 4
@@ -332,7 +340,7 @@ def _setup_new_collection(col: Collection) -> None:
     conf["desiredRetention"] = DEFAULT_RETENTION
     col.decks.update_config(conf)
 
-    col.decks.select(col.decks.id(DEFAULT_DECK))
+    col.decks.select(col.decks.id(deck_name))
 
 
 def _ensure_notetypes(col: Collection) -> None:
@@ -472,17 +480,28 @@ async def deck_names(user_id: str) -> list[tuple[int, str]]:
     return await _run(user_id, _deck_names)
 
 
+def _current_deck_id(col: Collection) -> int:
+    did = int(col.decks.get_current_id())
+    names = dict(_deck_names(col))
+    return did if did in names else next(iter(names))
+
+
+async def current_deck_id(user_id: str) -> int:
+    """The last used deck (created as "My cards"); default for forms."""
+    return await _run(user_id, _current_deck_id)
+
+
 def _require_deck(col: Collection, deck_id: int) -> dict:
     deck = col.decks.get(deck_id, default=False)
     if deck is None:
-        raise NotFound("Deck nicht gefunden")
+        raise NotFound(N_("Deck not found."))
     return deck
 
 
 def _create_deck(col: Collection, name: str) -> int:
     name = "::".join(part.strip() for part in name.split("::") if part.strip())
     if not name:
-        raise AnkiServiceError("Bitte einen Decknamen eingeben.")
+        raise AnkiServiceError(N_("Please enter a deck name."))
     return int(col.decks.id(name))
 
 
@@ -589,7 +608,7 @@ def _get_note_obj(col: Collection, note_id: int):
     try:
         return col.get_note(note_id)
     except NotFoundError as exc:
-        raise NotFound("Notiz nicht gefunden") from exc
+        raise NotFound(N_("Note not found.")) from exc
 
 
 def _set_fields(note, fields: dict[str, str]) -> None:
@@ -597,13 +616,13 @@ def _set_fields(note, fields: dict[str, str]) -> None:
         if name in fields:
             note[name] = fields[name]
     if note.fields_check() == NoteFieldsCheckResult.EMPTY:
-        raise EmptyNote("Das erste Feld darf nicht leer sein.")
+        raise EmptyNote(N_("The first field must not be empty."))
 
 
 def _add_note(col: Collection, notetype: str, deck_id: int, fields: dict[str, str], tags):
     m = col.models.by_name(notetype)
     if m is None or notetype not in (BASIC, BIBELVERS):
-        raise NotFound("Notiztyp nicht gefunden")
+        raise NotFound(N_("Note type not found."))
     _require_deck(col, deck_id)
     note = col.new_note(m)
     _set_fields(note, fields)
@@ -624,13 +643,13 @@ async def add_note(
 
 
 def _add_bible_text(col: Collection, deck_id: int, title: str, recite: int, text: str,
-                    table: bool, tags) -> tuple[int, int]:
+                    table: bool, tags, lang: str) -> tuple[int, int]:
     """Mirror of add_notes() from bible-memorizer's gen_notes.py, using its helpers."""
     _require_deck(col, deck_id)
     model = col.models.get(SEED_IDS[BIBLE_MEMORIZER]) or col.models.by_name(BIBLE_MEMORIZER)
     data = bm_gen.process_lines(text)
     if not data:
-        raise EmptyNote("Bitte einen Bibeltext eingeben.")
+        raise EmptyNote(N_("Please enter a Bible text."))
     sorted_data = bm_gen.sort_by_verse_number(data)
     ms = int(time.time() * 1000)
     cards = 0
@@ -639,8 +658,8 @@ def _add_bible_text(col: Collection, deck_id: int, title: str, recite: int, text
         if len(sorted_data) > 4 and table:
             html = bm_gen.create_html_table(sorted_data, d["verse_number"], d["verse_part"])
         front, back = bm_gen.get_verses(data, d["verse_number"], d["verse_part"], recite)
-        if front == "[Beginning]":  # the only change to the add-on's output: German UI
-            front = "[Anfang]"
+        if front == "[Beginning]":  # the only change to the add-on's output: localized
+            front = translate(N_("[Beginning]"), lang)
         note = col.new_note(model)
         note["answer"] = d["answer"]
         note["verse_number"] = str(d["verse_number"])
@@ -664,7 +683,8 @@ async def add_bible_text(
 ) -> tuple[int, int]:
     """Create Bible Memorizer notes from a formatted, sanitized text (one line per note).
     Returns (notes, cards)."""
-    return await _run(user_id, _add_bible_text, deck_id, title, recite, text, table, tags)
+    return await _run(user_id, _add_bible_text, deck_id, title, recite, text, table, tags,
+                      get_language())
 
 
 def _note_data(col: Collection, note_id: int) -> NoteData:
@@ -689,10 +709,10 @@ async def get_note(user_id: str, note_id: int) -> NoteData:
 def _update_note(col: Collection, note_id, fields, deck_id, allow_group: bool) -> None:
     note = _get_note_obj(col, note_id)
     if note.has_tag(GROUP_TAG) and not allow_group:
-        raise ReadOnlyNote("Karten aus Gruppendecks können nicht bearbeitet werden.")
+        raise ReadOnlyNote(N_("Cards from group decks cannot be edited."))
     if note.note_type()["name"] == BIBLE_MEMORIZER:
-        raise ReadOnlyNote("Bibeltext-Karten werden aus dem Text erzeugt. "
-                           "Zum Ändern bitte löschen und neu importieren.")
+        raise ReadOnlyNote(N_("Bible text cards are generated from the text. "
+                              "To change them, delete and import the passage again."))
     _require_deck(col, deck_id)
     _set_fields(note, fields)
     col.update_note(note)
@@ -711,7 +731,7 @@ async def update_note(
 def _delete_note(col: Collection, note_id: int, allow_group: bool) -> None:
     note = _get_note_obj(col, note_id)
     if note.has_tag(GROUP_TAG) and not allow_group:
-        raise ReadOnlyNote("Karten aus Gruppendecks können nicht gelöscht werden.")
+        raise ReadOnlyNote(N_("Cards from group decks cannot be deleted."))
     col.remove_notes([note.id])
 
 
@@ -735,15 +755,15 @@ async def set_suspended(user_id: str, note_id: int, suspended: bool) -> None:
 # --------------------------------------------------------------------------- browse
 
 
-def _due_text(col: Collection, card) -> str:
+def _due(col: Collection, card) -> tuple[str, date | None]:
     if card.queue == QUEUE_SUSPENDED:
-        return "ausgesetzt"
+        return "suspended", None
     if card.type == CARD_TYPE_NEW:
-        return "neu"
+        return "new", None
     stats = col.card_stats_data(card.id)
     if stats.HasField("due_date"):
-        return datetime.fromtimestamp(stats.due_date).strftime("%d.%m.%Y")
-    return "–"
+        return "scheduled", datetime.fromtimestamp(stats.due_date).date()
+    return "scheduled", None
 
 
 def _search(col: Collection, query: str, limit: int) -> tuple[list[CardRow], int]:
@@ -755,13 +775,15 @@ def _search(col: Collection, query: str, limit: int) -> tuple[list[CardRow], int
     for cid in card_ids[:limit]:
         card = col.get_card(cid)
         note = card.note()
+        status, due = _due(col, card)
         rows.append(
             CardRow(
                 card_id=int(card.id),
                 note_id=int(note.id),
                 front=plain_text(note.fields[0])[:80],
                 deck=col.decks.name(card.did),
-                due=_due_text(col, card),
+                status=status,
+                due=due,
                 suspended=card.queue == QUEUE_SUSPENDED,
             )
         )

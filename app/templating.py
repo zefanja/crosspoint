@@ -5,6 +5,8 @@ from pathlib import Path
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
+from app import i18n
+
 BASE_DIR = Path(__file__).resolve().parent
 SOURCE_URL = "https://github.com/zefanja/crosspoint"
 
@@ -31,8 +33,19 @@ def card_document(html: str) -> str:
     return _CARD_HEAD + html + _CARD_TAIL
 
 
+APP_NAME = "CrossPoint"
+
+templates.env.add_extension("jinja2.ext.i18n")
+templates.env.install_gettext_callables(i18n.gettext, i18n.ngettext, newstyle=True)
 templates.env.filters["card_document"] = card_document
-templates.env.globals["source_url"] = SOURCE_URL
+templates.env.filters["date"] = i18n.format_date
+templates.env.filters["decimal"] = i18n.format_decimal
+templates.env.globals.update(
+    source_url=SOURCE_URL,
+    app_name=APP_NAME,
+    get_language=i18n.get_language,
+    available_languages=i18n.available_languages,
+)
 
 
 def is_htmx(request: Request) -> bool:
@@ -44,6 +57,7 @@ def render(request: Request, name: str, context: dict | None = None, status_code
     ctx = {
         "user": getattr(request.state, "user", None),
         "csrf_token": getattr(request.state, "csrf_token", ""),
+        "admin_workspace": getattr(request.state, "admin_workspace", False),
     }
     ctx.update(context or {})
     return templates.TemplateResponse(request, name, ctx, status_code=status_code, headers=headers)

@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 {% if all_done %}
-<p class="alert alert-success">Fertig für heute 🎉 – nächste Karten morgen</p>
+<p class="alert alert-success">{{ _("Done for today 🎉 – more cards tomorrow") }}</p>
 {% elif total_cards == 0 %}
-<p class="alert">Noch keine Karten. Füge deine erste Karte hinzu – einen Bibelvers, eine Frage zur Bibel oder einen ganzen Bibelabschnitt.</p>
+<p class="alert">{{ _("No cards yet. Add your first card – a Bible verse, a question about the Bible or a whole passage.") }}</p>
 {% endif %}
 
 <section class="card flush">
   <div class="decklist-head">
-    <span>Deck</span>
-    <span class="counts"><span class="c-new" title="Neu">Neu</span><span class="c-learn" title="Lernen">Lern.</span><span class="c-rev" title="Fällig">Fällig</span></span>
+    <span>{{ _("Deck") }}</span>
+    <span class="counts"><span class="c-new">{{ _("New") }}</span><span class="c-learn">{{ _("Learn") }}</span><span class="c-rev">{{ _("Due") }}</span></span>
   </div>
   <ul class="decklist">
     {% for d in decks %}
@@ -20,27 +20,27 @@
         <span class="c-learn{% if not d.learn %} zero{% endif %}">{{ d.learn }}</span>
         <span class="c-rev{% if not d.review %} zero{% endif %}">{{ d.review }}</span>
       </span>
-      <a class="iconlink" href="/decks/{{ d.id }}/options" aria-label="Optionen für {{ d.short_name }}" title="Optionen">⚙</a>
+      <a class="iconlink" href="/decks/{{ d.id }}/options" aria-label="{{ _('Options for %(deck)s', deck=d.short_name) }}" title="{{ _('Options') }}">⚙</a>
     </li>
     {% endfor %}
   </ul>
 </section>
 
 <div class="actions-grid">
-  <a class="btn btn-primary" href="/notes/new">Karte hinzufügen</a>
-  <a class="btn" href="/notes/bible">Bibeltext importieren</a>
-  <a class="btn" href="/browse">Karten durchsuchen</a>
-  <a class="btn" href="/export">Export</a>
+  <a class="btn btn-primary" href="/notes/new">{{ _("Add card") }}</a>
+  <a class="btn" href="/notes/bible">{{ _("Import Bible text") }}</a>
+  <a class="btn" href="/browse">{{ _("Browse cards") }}</a>
+  <a class="btn" href="/export">{{ _("Export") }}</a>
 </div>
 
 <details class="card">
-  <summary>Neues Deck anlegen</summary>
+  <summary>{{ _("Create new deck") }}</summary>
   {% if error %}<p class="alert alert-error">{{ error }}</p>{% endif %}
   <form method="post" action="/decks" class="row">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <input name="name" class="input" placeholder="z. B. Psalmen" aria-label="Deckname" required maxlength="100">
-    <button class="btn">Anlegen</button>
+    <input name="name" class="input" placeholder="{{ _('e.g. Psalms') }}" aria-label="{{ _('Deck name') }}" required maxlength="100">
+    <button class="btn">{{ _("Create") }}</button>
   </form>
-  <p class="muted small">Unterdecks mit <code>::</code>, z. B. <code>Bibel::Psalmen</code>.</p>
+  <p class="muted small">{{ _("Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>.") }}</p>
 </details>
 {% endblock %}

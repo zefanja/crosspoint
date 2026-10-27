@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Privacy") }} – {{ app_name }}{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ _("Privacy") }}</h1>
+  <p class="alert">{{ _("Placeholder text – to be completed by the operator.") }}</p>
+  <h2>{{ _("What data is stored?") }}</h2>
+  <ul>
+    <li>{{ _("A display name (a first name or initials is enough). No email address.") }}</li>
+    <li>{{ _("Your cards and your learning history.") }}</li>
+    <li>{{ _("A session cookie to keep you logged in, and a cookie for your language. No tracking or advertising cookies.") }}</li>
+  </ul>
+  <h2>{{ _("Your rights") }}</h2>
+  <p>{{ _("You can export your cards at any time. The administrator can delete your account including all data.") }}</p>
+  <h2>{{ _("Responsible") }}</h2>
+  <p>{{ _("[Name and contact of the operator]") }}</p>
+</section>
+{% endblock %}

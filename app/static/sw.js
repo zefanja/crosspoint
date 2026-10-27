@@ -1,5 +1,5 @@
 // Minimal service worker: app shell cache + offline page. No offline learning.
-const CACHE = "versfest-shell-v1";
+const CACHE = "crosspoint-shell-v1";
 const SHELL = [
   "/offline",
   "/static/app.css",

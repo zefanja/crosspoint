@@ -82,3 +82,34 @@ class DailyReviews(Base):
     reviews: Mapped[int] = mapped_column(Integer, default=0)
     again_count: Mapped[int] = mapped_column(Integer, default=0)
     new_count: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class Group(Base):
+    __tablename__ = "groups"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+
+class GroupMember(Base):
+    __tablename__ = "group_members"
+
+    group_id: Mapped[int] = mapped_column(
+        ForeignKey("groups.id", ondelete="CASCADE"), primary_key=True
+    )
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True, index=True
+    )
+
+
+class GroupDeck(Base):
+    """A deck of the admin collection assigned to a group."""
+
+    __tablename__ = "group_decks"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    group_id: Mapped[int] = mapped_column(ForeignKey("groups.id", ondelete="CASCADE"), index=True)
+    admin_deck_id: Mapped[int] = mapped_column(Integer)
+    deck_name: Mapped[str] = mapped_column(String(200))
+    last_distributed_at: Mapped[datetime | None] = mapped_column(DateTime)

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Keine Verbindung – Versfest{% endblock %}
+{% block title %}{{ _("No connection") }} – {{ app_name }}{% endblock %}
 {% block content %}
 <section class="card narrow">
-  <h1>Keine Verbindung</h1>
-  <p>Versfest braucht eine Internetverbindung. Bitte prüfe deine Verbindung und versuche es erneut.</p>
-  <a href="/" class="btn btn-primary">Erneut versuchen</a>
+  <h1>{{ _("No connection") }}</h1>
+  <p>{{ _("CrossPoint needs an internet connection. Please check your connection and try again.") }}</p>
+  <a href="/" class="btn btn-primary">{{ _("Try again") }}</a>
 </section>
 {% endblock %}

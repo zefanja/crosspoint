@@ -1,5 +1,6 @@
-{% set labels = {"Front": "Frage", "Back": "Antwort", "Referenz": "Referenz", "Text": "Text", "Übersetzung": "Übersetzung (optional)"} %}
-{% set hints = {"Referenz": "z. B. Joh 3,16", "Übersetzung": "z. B. LUT17", "Front": "z. B. Wer führte Israel durch das Rote Meer?", "Back": "z. B. Mose (2. Mose 14)"} %}
+{# Field names are data (Anki note types); only their labels are translated. #}
+{% set labels = {"Front": _("Question"), "Back": _("Answer"), "Referenz": _("Reference"), "Text": _("Text"), "Übersetzung": _("Translation (optional)")} %}
+{% set hints = {"Referenz": _("e.g. John 3:16"), "Übersetzung": _("e.g. ESV"), "Front": _("e.g. Who led Israel through the Red Sea?"), "Back": _("e.g. Moses (Exodus 14)")} %}
 {% for name in field_names %}
 <label for="field_{{ loop.index0 }}">{{ labels.get(name, name) }}</label>
 {% if name in ("Referenz", "Übersetzung") %}
@@ -11,4 +12,4 @@
           {% if loop.first %}autofocus required{% endif %}{% if readonly %} readonly{% endif %}>{{ values.get(loop.index0, '') }}</textarea>
 {% endif %}
 {% endfor %}
-<p class="muted small">Zeilenumbrüche werden übernommen. Erlaubt sind einfache Formatierungen wie &lt;b&gt;fett&lt;/b&gt; oder &lt;i&gt;kursiv&lt;/i&gt;.</p>
+<p class="muted small">{{ _("Line breaks are kept. Simple formatting like &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt; is allowed.") }}</p>
