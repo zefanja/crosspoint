@@ -5,7 +5,10 @@ import re
 
 import nh3
 
-ALLOWED_TAGS = {"b", "i", "u", "br", "div", "span", "sup", "sub", "ul", "ol", "li"}
+ALLOWED_TAGS = {"b", "i", "u", "br", "div", "span", "sup", "sub", "ul", "ol", "li",
+                # a little more structure, mainly for imported packages (e.g. from an LLM)
+                "p", "strong", "em", "hr", "blockquote", "code", "pre", "h1", "h2", "h3", "h4",
+                "table", "thead", "tbody", "tr", "th", "td"}
 _BR = re.compile(r"<br\s*/?>", re.IGNORECASE)
 # Images only as files from the collection's media folder (no URLs, no paths).
 _EMPTY_IMG = re.compile(r"<img\s*/?>", re.IGNORECASE)
@@ -21,7 +24,12 @@ def _attribute_filter(tag: str, attr: str, value: str) -> str | None:
 def field_from_input(text: str) -> str:
     """Textarea input -> safe field HTML. Line breaks become <br>."""
     text = text.replace("\r\n", "\n").replace("\r", "\n").strip()
-    html = text.replace("\n", "<br>")
+    return field_from_import(text.replace("\n", "<br>"))
+
+
+def field_from_import(html: str) -> str:
+    """Field HTML (e.g. from an imported package) -> safe field HTML (no scripts, styles,
+    links, external images)."""
     html = nh3.clean(html, tags=ALLOWED_TAGS | {"img"}, attributes={"img": {"src"}},
                      attribute_filter=_attribute_filter, url_schemes=set(), link_rel=None)
     return _EMPTY_IMG.sub("", html)  # images whose src was rejected

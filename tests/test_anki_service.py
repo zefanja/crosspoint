@@ -301,6 +301,18 @@ def test_export_roundtrip(run, deck, tmp_path):
         col.close()
 
 
+def test_import_package_cleans_fields(run, deck, tmp_path):
+    src = "01TESTSOURCE00000000000000"
+    sdeck = run(svc.create_deck(src, "KI"))
+    run(svc.add_note(src, svc.BASIC, sdeck, {"Front": "<b>F</b><script>x()</script>", "Back": "B"}))
+    pkg = tmp_path / "ki.apkg"
+    run(svc.export_deck(src, sdeck, pkg, with_scheduling=False))
+    assert run(svc.import_package(U, pkg, clean_field=lambda v: v.replace("<script>x()</script>", ""))) == 1
+    rows, _total = run(svc.search_cards(U, "deck:KI"))
+    note = run(svc.get_note(U, rows[0].note_id))
+    assert dict(note.fields) == {"Front": "<b>F</b>", "Back": "B"} and not note.readonly
+
+
 def test_import_package_updates_by_guid_and_keeps_progress(run, deck, tmp_path):
     admin = svc.ADMIN_COLLECTION
     adeck = run(svc.create_deck(admin, "Gruppe"))

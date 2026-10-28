@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-28 09:46+0000\n"
+"POT-Creation-Date: 2026-10-28 09:50+0000\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -71,11 +71,11 @@ msgstr "Karten aus Gruppendecks können nicht gelöscht werden."
 msgid "Card not found."
 msgstr "Karte nicht gefunden."
 
-#: app/anki_service.py:1355
+#: app/anki_service.py:1375
 msgid "The image is too large (max. 5 MB)."
 msgstr "Das Bild ist zu groß (max. 5 MB)."
 
-#: app/anki_service.py:1358
+#: app/anki_service.py:1378
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr "Nur PNG-, JPEG-, GIF- oder WebP-Bilder werden unterstützt."
 
@@ -100,24 +100,12 @@ msgstr "CrossPoint – Bibelverse lernen"
 msgid "Memorize Bible verses with spaced repetition – compatible with Anki."
 msgstr "Bibelverse lernen mit Spaced Repetition – kompatibel mit Anki."
 
-#: app/routes/admin.py:55
-msgid "Please choose an .apkg file."
-msgstr "Bitte eine .apkg-Datei auswählen."
-
-#: app/routes/admin.py:65
-msgid "The file is too large (max. 100 MB)."
-msgstr "Die Datei ist zu groß (max. 100 MB)."
-
-#: app/routes/admin.py:68
+#: app/routes/admin.py:53
 #, python-format
 msgid "“%(file)s” imported: %(count)s notes new or updated. The decks are now available in the admin collection."
 msgstr "„%(file)s“ importiert: %(count)s Notizen neu oder aktualisiert. Die Decks stehen jetzt in der Admin-Sammlung bereit."
 
-#: app/routes/admin.py:73
-msgid "The file could not be imported. Is it a valid Anki file?"
-msgstr "Die Datei konnte nicht importiert werden. Ist es eine gültige Anki-Datei?"
-
-#: app/routes/admin.py:84
+#: app/routes/admin.py:63
 msgid "This task is no longer known."
 msgstr "Dieser Vorgang ist nicht mehr bekannt."
 
@@ -209,6 +197,23 @@ msgstr "Wiederholungen pro Tag: 0 bis 9999."
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr "Gewünschte Behaltensquote: %(min)s bis %(max)s."
 
+#: app/routes/imports.py:25
+msgid "Please choose an .apkg file."
+msgstr "Bitte eine .apkg-Datei auswählen."
+
+#: app/routes/imports.py:34
+msgid "The file is too large (max. 100 MB)."
+msgstr "Die Datei ist zu groß (max. 100 MB)."
+
+#: app/routes/imports.py:52
+msgid "The file could not be imported. Is it a valid Anki file?"
+msgstr "Die Datei konnte nicht importiert werden. Ist es eine gültige Anki-Datei?"
+
+#: app/routes/imports.py:67
+#, python-format
+msgid "“%(file)s” imported: %(count)s notes new or updated. The decks are now in your deck list."
+msgstr "„%(file)s“ importiert: %(count)s Notizen neu oder aktualisiert. Die Decks stehen jetzt in deiner Deckliste."
+
 #: app/routes/notes.py:84
 #, python-format
 msgid "Added: %(front)s"
@@ -219,7 +224,7 @@ msgstr "Hinzugefügt: %(front)s"
 #: app/templates/admin/progress.html:4 app/templates/admin/user_detail.html:23
 #: app/templates/admin/users.html:4 app/templates/admin/users.html:26
 #: app/templates/admin/users.html:55 app/templates/base.html:25
-#: app/templates/me.html:9
+#: app/templates/me.html:10
 msgid "Admin"
 msgstr "Verwaltung"
 
@@ -228,7 +233,7 @@ msgstr "Verwaltung"
 msgid "Search"
 msgstr "Suchen"
 
-#: app/templates/base.html:30 app/templates/me.html:12
+#: app/templates/base.html:30 app/templates/me.html:13
 msgid "Log out"
 msgstr "Abmelden"
 
@@ -240,24 +245,24 @@ msgstr "Du bearbeitest die Admin-Sammlung (Gruppendecks)."
 msgid "Back to my cards"
 msgstr "Zurück zu meinen Karten"
 
-#: app/templates/base.html:51 app/templates/me.html:26
+#: app/templates/base.html:51 app/templates/me.html:27
 msgid "Compatible with Anki"
 msgstr "Kompatibel mit Anki"
 
-#: app/templates/base.html:53 app/templates/me.html:27
+#: app/templates/base.html:53 app/templates/me.html:28
 #: app/templates/privacy.html:2 app/templates/privacy.html:5
 msgid "Privacy"
 msgstr "Datenschutz"
 
-#: app/templates/base.html:55 app/templates/me.html:28
+#: app/templates/base.html:55 app/templates/me.html:29
 msgid "Source code"
 msgstr "Quellcode"
 
-#: app/templates/base.html:57 app/templates/me.html:29
+#: app/templates/base.html:57 app/templates/me.html:30
 msgid "Version"
 msgstr "Version"
 
-#: app/templates/base.html:58 app/templates/me.html:17 app/templates/me.html:18
+#: app/templates/base.html:58 app/templates/me.html:18 app/templates/me.html:19
 msgid "Language"
 msgstr "Sprache"
 
@@ -582,6 +587,43 @@ msgstr "Synchronisieren"
 msgid "Tap <em>Sync</em> in Anki and log in with your AnkiWeb account. Done!"
 msgstr "In Anki auf <em>Synchronisieren</em> tippen und mit dem AnkiWeb-Konto anmelden. Fertig!"
 
+#: app/templates/import.html:2 app/templates/import.html:6
+msgid "Import Anki deck"
+msgstr "Anki-Deck importieren"
+
+#: app/templates/import.html:4 app/templates/me.html:2
+#: app/templates/partials/tabbar.html:21
+msgid "Me"
+msgstr "Ich"
+
+#: app/templates/import.html:7
+msgid "A ready-made deck as an .apkg file, e.g. shared from Anki or created by an AI assistant. The cards are added to your collection; learning progress is not imported. Importing the same file again updates the cards."
+msgstr "Ein fertiges Deck als .apkg-Datei, z. B. aus Anki geteilt oder von einem KI-Assistenten erstellt. Die Karten kommen in deine Sammlung; ein Lernstand wird nicht übernommen. Wird dieselbe Datei erneut importiert, werden die Karten aktualisiert."
+
+#: app/templates/admin/import.html:12 app/templates/import.html:12
+msgid "File"
+msgstr "Datei"
+
+#: app/templates/admin/import.html:14 app/templates/import.html:14
+msgid "Import"
+msgstr "Importieren"
+
+#: app/templates/import.html:19
+msgid "Creating a deck with an AI assistant"
+msgstr "Deck mit einem KI-Assistenten erstellen"
+
+#: app/templates/import.html:20
+msgid "Ask an AI assistant that can create files (e.g. Claude or ChatGPT), for example:"
+msgstr "Bitte einen KI-Assistenten, der Dateien erstellen kann (z. B. Claude oder ChatGPT), etwa so:"
+
+#: app/templates/import.html:21
+msgid "“Create an Anki deck as an .apkg file with 20 cards about the Gospel of John. Use the Python library genanki and the note type Basic (fields Front and Back). Deck name: John.”"
+msgstr "„Erstelle ein Anki-Deck als .apkg-Datei mit 20 Karten zum Johannesevangelium. Verwende die Python-Bibliothek genanki und den Notiztyp Basic (Felder Front und Back). Deckname: Johannes.“"
+
+#: app/templates/import.html:22
+msgid "Simple formatting (bold, lists, tables, images) is kept; scripts, styles and links are removed. Audio is not played."
+msgstr "Einfache Formatierung (fett, Listen, Tabellen, Bilder) bleibt erhalten; Skripte, Styles und Links werden entfernt. Audio wird nicht abgespielt."
+
 #: app/templates/login.html:2 app/templates/login.html:5
 #: app/templates/login.html:14
 msgid "Log in"
@@ -595,13 +637,13 @@ msgstr "Gib deinen persönlichen Code ein – oder scanne den QR-Code auf deinem
 msgid "Code"
 msgstr "Code"
 
-#: app/templates/me.html:2 app/templates/partials/tabbar.html:21
-msgid "Me"
-msgstr "Ich"
-
 #: app/templates/me.html:8 app/templates/note_bible.html:2
 msgid "Import Bible text"
 msgstr "Bibeltext importieren"
+
+#: app/templates/me.html:9
+msgid "Import Anki deck (.apkg)"
+msgstr "Anki-Deck importieren (.apkg)"
 
 #: app/templates/note_add.html:2 app/templates/note_add.html:6
 #: app/templates/note_bible.html:6 app/templates/partials/tabbar.html:12
@@ -988,14 +1030,6 @@ msgstr ".apkg in die Admin-Sammlung importieren"
 #: app/templates/admin/import.html:7
 msgid "For example a deck from the Bible Memorizer web tool or from Anki. Existing notes are updated, learning progress is not imported."
 msgstr "Zum Beispiel ein Deck aus dem Bible-Memorizer-Webtool oder aus Anki. Vorhandene Notizen werden aktualisiert, Lernstände nicht übernommen."
-
-#: app/templates/admin/import.html:12
-msgid "File"
-msgstr "Datei"
-
-#: app/templates/admin/import.html:14
-msgid "Import"
-msgstr "Importieren"
 
 #: app/templates/admin/job.html:4 app/templates/partials/review_card.html:26
 msgid "Back"

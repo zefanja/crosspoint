@@ -32,3 +32,10 @@ def test_images_only_local_media_files():
     out = field_from_input('a<img src="abc_1.png" onerror="x()">b<img src="https://evil/x.png">'
                            '<img src="../etc/passwd.png"><img src="x.svg">')
     assert out == 'a<img src="abc_1.png">b'
+
+
+def test_field_from_import_keeps_structure_drops_scripts():
+    from app.sanitize import field_from_import
+    out = field_from_import('<p style="color:red"><strong>A</strong></p>\n<table><tr><td>1</td></tr>'
+                            '</table><script>x()</script><a href="https://evil">l</a>{{c1::B}}')
+    assert out == "<p><strong>A</strong></p>\n<table><tbody><tr><td>1</td></tr></tbody></table>l{{c1::B}}"

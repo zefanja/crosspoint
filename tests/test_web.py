@@ -66,6 +66,7 @@ def test_me_page(client, learner):
     r = client.get("/me")
     assert r.status_code == 200
     assert "Abmelden" in r.text and 'href="/export"' in r.text and "Sprache" in r.text
+    assert 'href="/import"' in r.text
     assert 'aria-current="page"' in r.text
 
 
@@ -407,3 +408,24 @@ def test_image_upload_rejects_non_images(client, learner):
                                         "deck_id": default_deck(client), "field_0": "Q", "field_1": "A"},
                     files={"image": ("x.svg", b"<svg onload=alert(1)></svg>", "image/svg+xml")})
     assert r.status_code == 400 and "PNG" in r.text
+
+
+def test_apkg_import_into_own_collection_sanitizes(client, learner, tmp_path):
+    user, csrf = learner
+    assert client.get("/import").status_code == 200
+    did = client.portal.call(anki_service.create_deck, "SRC", "Johannes")
+    client.portal.call(anki_service.add_note, "SRC", "Basic", did,
+                       {"Front": "<b>F</b><script>alert(1)</script>", "Back": '<a href="x">B</a>'})
+    pkg = tmp_path / "joh.apkg"
+    client.portal.call(anki_service.export_deck, "SRC", did, pkg, False)
+    r = client.post("/import", data={"csrf_token": csrf},
+                    files={"file": ("joh.apkg", pkg.read_bytes())})
+    assert r.status_code == 200 and "importiert" in r.text
+    rows, total = client.portal.call(anki_service.search_cards, user.id, "deck:Johannes")
+    note = client.portal.call(anki_service.get_note, user.id, rows[0].note_id)
+    assert total == 1 and dict(note.fields) == {"Front": "<b>F</b>", "Back": "B"}
+    for name, data in (("x.colpkg", pkg.read_bytes()), ("x.apkg", b"not a zip")):
+        r = client.post("/import", data={"csrf_token": csrf}, files={"file": (name, data)})
+        assert r.status_code == 400
+    r = client.post("/import", files={"file": ("joh.apkg", pkg.read_bytes())})
+    assert r.status_code == 403
