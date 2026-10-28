@@ -56,6 +56,9 @@ BIBLE_MEMORIZER = bm_model.MODEL_NAME  # "Bible Memorizer"
 DEFAULT_NEW_PER_DAY = 5
 DEFAULT_REVIEWS_PER_DAY = 200
 BURY_SIBLINGS_KEY = "crosspointBurySiblings"  # collection config: one-time upgrade done
+ALL_DECKS = 0  # pseudo deck id: review all top-level decks in one session
+ALL_DECKS_NAME = N_("All decks")
+MATURE_IVL = 21  # days; Anki's "mature" threshold, shown as "memorized"
 DEFAULT_RETENTION = 0.9
 # Collections are created with an English backend so stock names stay "Basic"/"Default"
 # (a German backend would create "Einfach"); afterwards they are opened with a backend in
@@ -147,6 +150,9 @@ class DeckInfo:
     new: int
     learn: int
     review: int
+    total: int = 0  # active cards incl. subdecks (suspended excluded)
+    mature: int = 0  # of those, interval >= MATURE_IVL
+    group: bool = False  # contains group deck cards
 
 
 @dataclass
@@ -511,29 +517,49 @@ async def ensure_collection(user_id: str) -> None:
 
 def _deck_list(col: Collection) -> list[DeckInfo]:
     result: list[DeckInfo] = []
+    counts = {
+        did: (total, mature)
+        for did, total, mature in col.db.all(
+            "select case when odid then odid else did end, count(), sum(type = 2 and ivl >= ?)"
+            " from cards where queue != -1 group by 1",
+            MATURE_IVL,
+        )
+    }
+    group_dids = set(col.db.list(
+        "select distinct case when c.odid then c.odid else c.did end from cards c"
+        " join notes n on n.id = c.nid where n.tags like ?",
+        f"% {GROUP_TAG} %",
+    ))
 
-    def walk(node, depth: int, prefix: str) -> None:
+    def walk(node, depth: int, prefix: str) -> tuple[int, int]:
+        total = mature = 0
         for child in node.children:
             full = f"{prefix}::{child.name}" if prefix else child.name
-            result.append(
-                DeckInfo(
-                    id=child.deck_id,
-                    name=full,
-                    short_name=child.name,
-                    depth=depth,
-                    new=child.new_count,
-                    learn=child.learn_count,
-                    review=child.review_count,
-                )
+            info = DeckInfo(
+                id=child.deck_id,
+                name=full,
+                short_name=child.name,
+                depth=depth,
+                new=child.new_count,
+                learn=child.learn_count,
+                review=child.review_count,
+                group=child.deck_id in group_dids,
             )
-            walk(child, depth + 1, full)
+            result.append(info)
+            sub_total, sub_mature = walk(child, depth + 1, full)
+            own_total, own_mature = counts.get(child.deck_id, (0, 0))
+            info.total, info.mature = own_total + sub_total, own_mature + sub_mature
+            total += info.total
+            mature += info.mature
+        return total, mature
 
     walk(col.sched.deck_due_tree(), 0, "")
     return result
 
 
 async def deck_list(user_id: str) -> list[DeckInfo]:
-    """Deck tree flattened in display order, with new/learn/review counts."""
+    """Deck tree flattened in display order, with new/learn/review counts and
+    total/mature card counts (subdecks included)."""
     return await _run(user_id, _deck_list)
 
 
@@ -586,13 +612,36 @@ def _can_undo_review(col: Collection) -> bool:
     return col.undo_status().undo == col.tr.actions_answer_card()
 
 
+def _queue(col: Collection, deck_id: int):
+    """Select the deck and fetch its next queued card.
+
+    The v3 queue is scoped to the current deck, so ALL_DECKS serves the top-level decks one
+    after another (the current one first, so a session stays in its deck) with the counts of
+    the whole tree. Selecting another deck is an undo step of its own, so only the deck that
+    serves the card is selected. Returns (deck name, queued card or None, (new, learn, review)).
+    """
+    if deck_id != ALL_DECKS:
+        deck = _require_deck(col, deck_id)
+        col.decks.select(deck_id)
+        queued = col.sched.get_queued_cards(fetch_limit=1)
+        first = queued.cards[0] if queued.cards else None
+        return deck["name"], first, (queued.new_count, queued.learning_count, queued.review_count)
+    tree = col.sched.deck_due_tree()
+    counts = (tree.new_count, tree.learn_count, tree.review_count)
+    current = col.decks.get_current_id()
+    pending = [n for n in tree.children if n.new_count + n.learn_count + n.review_count]
+    for node in sorted(pending, key=lambda n: n.deck_id != current):
+        col.decks.select(node.deck_id)
+        queued = col.sched.get_queued_cards(fetch_limit=1)
+        if queued.cards:
+            return ALL_DECKS_NAME, queued.cards[0], counts  # name translated by the route
+    return ALL_DECKS_NAME, None, counts
+
+
 def _review_state(col: Collection, deck_id: int) -> ReviewState:
-    deck = _require_deck(col, deck_id)
-    col.decks.select(deck_id)  # the v3 queue is scoped to the current deck
-    queued = col.sched.get_queued_cards(fetch_limit=1)
+    deck_name, qc, (new, learn, review) = _queue(col, deck_id)
     card_data = None
-    if queued.cards:
-        qc = queued.cards[0]
+    if qc is not None:
         card = col.get_card(qc.card.id)
         card_data = ReviewCard(
             card_id=card.id,
@@ -604,17 +653,17 @@ def _review_state(col: Collection, deck_id: int) -> ReviewState:
         )
     return ReviewState(
         deck_id=deck_id,
-        deck_name=deck["name"],
+        deck_name=deck_name,
         card=card_data,
-        new=queued.new_count,
-        learn=queued.learning_count,
-        review=queued.review_count,
+        new=new,
+        learn=learn,
+        review=review,
         can_undo=_can_undo_review(col),
     )
 
 
 async def review_state(user_id: str, deck_id: int) -> ReviewState:
-    """Next card of the deck (or None) plus remaining counts."""
+    """Next card of the deck (or None) plus remaining counts; deck_id may be ALL_DECKS."""
     return await _run(user_id, _review_state, deck_id)
 
 
@@ -643,19 +692,22 @@ async def compare_typed(user_id: str, deck_id: int, card_id: int, typed: str):
 def _answer(col: Collection, deck_id: int, card_id: int, rating: int, taken_secs: float):
     if rating not in RATINGS:
         raise ValueError(f"invalid rating {rating}")
-    _require_deck(col, deck_id)
-    col.decks.select(deck_id)
-    queued = col.sched.get_queued_cards(fetch_limit=1)
+    _name, qc, _counts = _queue(col, deck_id)
     answered = False
     # Only answer if the card is still the current one (protects against double taps).
-    if queued.cards and queued.cards[0].card.id == card_id:
+    if qc is not None and qc.card.id == card_id:
         card = col.get_card(card_id)
         card.timer_started = time.time() - max(0.0, taken_secs)
         col.sched.answer_card(
-            col.sched.build_answer(card=card, states=queued.cards[0].states, rating=RATINGS[rating])
+            col.sched.build_answer(card=card, states=qc.states, rating=RATINGS[rating])
         )
         answered = True
-    return _review_state(col, deck_id), answered
+        step = col.undo_status().last_step
+    state = _review_state(col, deck_id)
+    if answered:
+        col.merge_undo_entries(step)  # a deck switch (ALL_DECKS) belongs to the answer
+        state.can_undo = _can_undo_review(col)
+    return state, answered
 
 
 async def answer_card(

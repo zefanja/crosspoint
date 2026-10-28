@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Me") }}{% endblock %}
+{% block content %}
+<h1 class="hello">{{ user.display_name }}</h1>
+
+<div class="me-links">
+  <a class="btn btn-block" href="/export">{{ _("Export to Anki") }}</a>
+  <a class="btn btn-block" href="/notes/bible">{{ _("Import Bible text") }}</a>
+  {% if user.is_staff %}<a class="btn btn-block" href="/admin">{{ _("Admin") }}</a>{% endif %}
+  <form method="post" action="/logout">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit" class="btn btn-block btn-danger">{{ _("Log out") }}</button>
+  </form>
+</div>
+
+<section class="card">
+  <h2>{{ _("Language") }}</h2>
+  <nav class="me-langs" aria-label="{{ _('Language') }}">
+    {% for code, name in available_languages().items() %}
+    {% if code == get_language() %}<strong class="btn btn-primary" lang="{{ code }}" aria-current="true">{{ name }}</strong>{% else %}<a class="btn" href="/lang/{{ code }}" lang="{{ code }}" hreflang="{{ code }}">{{ name }}</a>{% endif %}
+    {% endfor %}
+  </nav>
+</section>
+
+<p class="muted small me-about">
+  {{ _("Compatible with Anki") }} ·
+  <a href="/privacy">{{ _("Privacy") }}</a> ·
+  <a href="{{ source_url }}">{{ _("Source code") }}</a> ·
+  <span class="version" title="{{ _('Version') }}">{{ app_version }}</span>
+</p>
+{% endblock %}

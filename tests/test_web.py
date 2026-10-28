@@ -18,7 +18,7 @@ def learner(login):
 
 def default_deck(client):
     page = client.get("/")
-    return int(re.search(r'href="/review/(\d+)">Meine Karten<', page.text).group(1))
+    return int(re.search(r'href="/review/(\d+)">\s*<span class="deck-info">\s*<span class="deck-title"><span class="deck-name">Meine Karten<', page.text).group(1))
 
 
 def add_verse(client, csrf, deck, ref="Joh 3,16", text="Denn also hat Gott die Welt geliebt"):
@@ -31,7 +31,42 @@ def test_deck_list_and_empty_hint(client, learner):
     r = client.get("/")
     assert r.status_code == 200
     assert "Meine Karten" in r.text and "Noch keine Karten" in r.text
-    assert "Karte hinzufügen" in r.text and "Export" in r.text
+    assert "Erste Karte anlegen" in r.text and 'aria-label="Karte hinzufügen"' in r.text
+    assert 'href="/me"' in r.text and "Abmelden" not in r.text  # log out moved to "Me"
+
+
+def test_start_page_mission_and_review_all(client, learner):
+    _, csrf = learner
+    deck = default_deck(client)
+    client.post("/decks", data={"csrf_token": csrf, "name": "Psalmen"})
+    page = client.get("/")
+    other = int(re.search(r'href="/review/(\d+)">\s*<span class="deck-info">\s*<span class="deck-title"><span class="deck-name">Psalmen<', page.text).group(1))
+    add_verse(client, csrf, deck, ref="Joh 3,16")
+    add_verse(client, csrf, other, ref="Ps 23,1")
+
+    page = client.get("/")
+    assert 'class="mission-num">2<' in page.text
+    assert "2 neu" in page.text and "Los geht's · ~1 Min." in page.text
+    assert "0 von 1 gelernt" in page.text and 'href="/review/0"' in page.text
+
+    for _i in range(2):
+        r = client.get("/review/0")
+        assert "‹ Alle Decks" in r.text
+        card_id = re.search(r'name="card_id" value="(\d+)"', r.text).group(1)
+        r = client.post("/review/0/answer", headers=HX,
+                        data={"csrf_token": csrf, "card_id": card_id, "rating": 4})
+        assert r.status_code == 200
+    assert "Fertig für heute" in r.text
+    page = client.get("/")
+    assert "Fertig<br>für heute" in page.text and "2 Karten wiederholt." in page.text
+    assert "1 Tag" in page.text  # streak pill
+
+
+def test_me_page(client, learner):
+    r = client.get("/me")
+    assert r.status_code == 200
+    assert "Abmelden" in r.text and 'href="/export"' in r.text and "Sprache" in r.text
+    assert 'aria-current="page"' in r.text
 
 
 def test_create_deck(client, learner):
@@ -97,7 +132,7 @@ def test_review_done_and_banner(client, learner):
     r = client.post(f"/review/{deck}/answer", headers=HX,
                     data={"csrf_token": csrf, "card_id": card_id, "rating": 4})
     assert "Fertig für heute" in r.text
-    assert "Fertig für heute 🎉" in client.get("/").text
+    assert "Fertig<br>für heute" in client.get("/").text
 
 
 def test_stats_cache_updated_after_review(client, learner, db):
@@ -266,7 +301,7 @@ def test_english_collection_and_labels(client, login, monkeypatch):
     _, csrf = login()
     page = client.get("/")
     assert "My cards" in page.text and "Add card" in page.text
-    deck = int(re.search(r'href="/review/(\d+)">My cards<', page.text).group(1))
+    deck = int(re.search(r'href="/review/(\d+)">\s*<span class="deck-info">\s*<span class="deck-title"><span class="deck-name">My cards<', page.text).group(1))
     client.post("/notes/new", data={"csrf_token": csrf, "notetype": "Basic", "deck_id": deck,
                                     "field_0": "Who led Israel through the Red Sea?",
                                     "field_1": "Moses"})
