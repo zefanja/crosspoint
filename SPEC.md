@@ -182,7 +182,7 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 ### 7.1 Lerner (MVP)
 
 **Startseite / Deckliste** (Entwurf „1a Mission“, Zielgruppe Jugendliche)
-- Kopfzeile mit Serie („N Tage“, aus `collection_stats`), Begrüßung „Hey <Vorname>.“
+- Kopfzeile mit Serie („N Tage“, aus `collection_stats`; Tippen öffnet den Fortschritt `/stats`), Begrüßung „Hey <Vorname>.“
 - Große „Heute“-Karte: Summe aller fälligen Karten, Chips neu/lernen/wiederholen und
   Button „Los geht's · ~N Min.“ (Schätzung 15 s pro Karte) → Lernansicht **aller Decks**
   (`/review/0`, `anki_service.ALL_DECKS`). Erledigt: „Fertig für heute“ mit Anzahl der
