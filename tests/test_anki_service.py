@@ -36,7 +36,8 @@ def test_new_collection_setup(run, data_dir):
         assert col.models.by_name("Basic") is not None
         assert col.decks.by_name(DECK) is not None
         conf = col.decks.config_dict_for_deck_id(1)
-        assert conf["new"]["perDay"] == 10
+        assert conf["new"]["perDay"] == 5
+        assert conf["new"]["bury"] is True and conf["rev"]["bury"] is True
     finally:
         col.close()
 
@@ -60,6 +61,39 @@ def test_create_deck_and_names(run, deck):
     assert (child.short_name, child.depth) == ("Psalmen", 1)
     with pytest.raises(svc.AnkiServiceError):
         run(svc.create_deck(U, " :: "))
+
+
+def test_deck_list_card_counts(run, deck):
+    child = run(svc.create_deck(U, f"{DECK}::Psalmen"))
+    add_verse(run, deck, ref="Joh 3,16")
+    nid = add_verse(run, child, ref="Ps 23,1", tags=(svc.GROUP_TAG,))
+    add_verse(run, child, ref="Ps 23,2")
+
+    def mature_one(col):
+        cid = col.card_ids_of_note(nid)[0]
+        col.db.execute("update cards set type = 2, queue = 2, ivl = 30 where id = ?", cid)
+
+    run(svc._run(U, mature_one))
+    rows = {d.id: d for d in run(svc.deck_list(U))}
+    assert (rows[deck].total, rows[deck].mature, rows[deck].group) == (3, 1, False)
+    assert (rows[child].total, rows[child].mature, rows[child].group) == (2, 1, True)
+
+
+def test_review_all_decks(run, deck):
+    other = run(svc.create_deck(U, "Psalmen"))
+    add_verse(run, deck, ref="Joh 3,16")
+    add_verse(run, other, ref="Ps 23,1")
+    state = run(svc.review_state(U, svc.ALL_DECKS))
+    assert (state.new, state.learn, state.review) == (2, 0, 0)
+    assert state.deck_name == svc.ALL_DECKS_NAME and state.card is not None
+    seen = set()
+    while state.card is not None:
+        seen.add(state.card.card_id)
+        state, answered = run(svc.answer_card(U, svc.ALL_DECKS, state.card.card_id, 4, 3.0))
+        assert answered and state.can_undo  # also right after switching decks
+    assert len(seen) == 2 and (state.new, state.learn, state.review) == (0, 0, 0)
+    state, undone = run(svc.undo_review(U, svc.ALL_DECKS))
+    assert undone and state.card is not None and state.new == 1
 
 
 def test_notetypes_for_adding(run):
@@ -190,12 +224,37 @@ def test_review_unknown_deck(run):
 
 def test_deck_options_are_per_deck(run, deck):
     other = run(svc.create_deck(U, "Andere"))
-    assert run(svc.get_deck_options(U, deck)) == svc.DeckOptions(10, 200, 0.9)
-    run(svc.set_deck_options(U, deck, svc.DeckOptions(5, 100, 0.85)))
-    assert run(svc.get_deck_options(U, deck)) == svc.DeckOptions(5, 100, 0.85)
-    assert run(svc.get_deck_options(U, other)) == svc.DeckOptions(10, 200, 0.9)
+    assert run(svc.get_deck_options(U, deck)) == svc.DeckOptions(5, 200, 0.9, True, True)
+    run(svc.set_deck_options(U, deck, svc.DeckOptions(5, 100, 0.85, False, True)))
+    assert run(svc.get_deck_options(U, deck)) == svc.DeckOptions(5, 100, 0.85, False, True)
+    assert run(svc.get_deck_options(U, other)) == svc.DeckOptions(5, 200, 0.9, True, True)
     run(svc.set_deck_options(U, deck, svc.DeckOptions(7, 100, 0.85)))
     assert run(svc.get_deck_options(U, deck)).new_per_day == 7
+
+
+def test_bury_siblings_upgrade_runs_once(run, deck):
+    def reset(col):  # an existing collection from before the upgrade
+        for conf in col.decks.all_config():
+            conf["new"]["bury"] = conf["rev"]["bury"] = False
+            col.decks.update_config(conf)
+        col.remove_config(svc.BURY_SIBLINGS_KEY)
+
+    run(svc._run(U, reset))
+    run(svc.close_all())
+    opts = run(svc.get_deck_options(U, deck))  # reopens and upgrades
+    assert (opts.bury_new, opts.bury_reviews) == (True, True)
+    run(svc.set_deck_options(U, deck, svc.DeckOptions(5, 200, 0.9, False, False)))
+    run(svc.close_all())
+    opts = run(svc.get_deck_options(U, deck))  # the user's choice survives reopening
+    assert (opts.bury_new, opts.bury_reviews) == (False, False)
+
+
+def test_bury_new_siblings_on_different_days(run, deck):
+    run(svc.add_note(U, svc.BIBLE_VERSE, deck, {"Reference": "Joh 3,16", "Text": "Denn also",
+                                               "Reverse": "y"}, ()))
+    assert run(svc.review_state(U, deck)).new == 1  # the reverse card waits for tomorrow
+    run(svc.set_deck_options(U, deck, svc.DeckOptions(5, 200, 0.9, False, True)))
+    assert run(svc.review_state(U, deck)).new == 2
 
 
 def _review_all(run, deck, n):

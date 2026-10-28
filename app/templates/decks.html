@@ -1,47 +1,64 @@
 {% extends "base.html" %}
+{% block body_class %}home-page{% endblock %}
+{% block topbar_extra %}
+<span class="streak-pill" title="{{ _('Days in a row with reviews') }}"><span class="streak-dot" aria-hidden="true"></span>{{ ngettext("%(num)s day", "%(num)s days", streak) }}</span>
+{% endblock %}
 {% block content %}
-{% if all_done %}
-<p class="alert alert-success">{{ _("Done for today 🎉 – more cards tomorrow") }}</p>
-{% elif total_cards == 0 %}
-<p class="alert">{{ _("No cards yet. Add your first card – a Bible verse, a question about the Bible or a whole passage.") }}</p>
-{% endif %}
+{% if first_name %}<h1 class="hello">{{ _("Hey %(name)s.", name=first_name) }}</h1>{% endif %}
 
-<section class="card flush">
-  <div class="decklist-head">
-    <span>{{ _("Deck") }}</span>
-    <span class="counts"><span class="c-new">{{ _("New") }}</span><span class="c-learn">{{ _("Learn") }}</span><span class="c-rev">{{ _("Due") }}</span></span>
+<section class="mission">
+  {% if total_cards == 0 %}
+  <p class="mission-text">{{ _("No cards yet. Add your first card – a Bible verse, a question about the Bible or a whole passage.") }}</p>
+  <a class="mission-go" href="/notes/new">{{ _("Add your first card") }}</a>
+  {% elif all_done %}
+  <p class="mission-done">{{ _("All done<br>for today") }}</p>
+  <p class="mission-text">{{ ngettext("%(num)s card reviewed.", "%(num)s cards reviewed.", reviews_today) }} {{ _("Your streak is safe. New cards unlock tomorrow.") }}</p>
+  <a class="mission-alt" href="/notes/new?notetype=Bible%20Verse">{{ _("Add a new verse") }}</a>
+  {% else %}
+  <div class="mission-count">
+    <span class="mission-num">{{ todo }}</span>
+    <span class="mission-label">{{ ngettext("card waiting<br>for you today", "cards waiting<br>for you today", todo) }}</span>
   </div>
-  <ul class="decklist">
-    {% for d in decks %}
-    <li class="deckrow" style="--depth: {{ d.depth }}">
-      <a class="deckname" href="/review/{{ d.id }}">{{ d.short_name }}</a>
-      <span class="counts">
-        <span class="c-new{% if not d.new %} zero{% endif %}">{{ d.new }}</span>
-        <span class="c-learn{% if not d.learn %} zero{% endif %}">{{ d.learn }}</span>
-        <span class="c-rev{% if not d.review %} zero{% endif %}">{{ d.review }}</span>
-      </span>
-      <a class="iconlink" href="/decks/{{ d.id }}/options" aria-label="{{ _('Options for %(deck)s', deck=d.short_name) }}" title="{{ _('Options') }}">⚙</a>
-    </li>
-    {% endfor %}
-  </ul>
+  <div class="mission-chips">
+    <span>{{ _("%(num)s new", num=totals.new) }}</span>
+    <span>{{ _("%(num)s learning", num=totals.learn) }}</span>
+    <span>{{ _("%(num)s to review", num=totals.review) }}</span>
+  </div>
+  <a class="mission-go" href="/review/{{ all_decks }}">{{ _("Let's go · ~%(min)s min", min=minutes) }}</a>
+  {% endif %}
 </section>
 
-<div class="actions-grid">
-  <a class="btn btn-primary" href="/notes/new">{{ _("Add card") }}</a>
-  <a class="btn" href="/notes/bible">{{ _("Import Bible text") }}</a>
-  <a class="btn" href="/browse">{{ _("Browse cards") }}</a>
-  <a class="btn" href="/stats">{{ _("Statistics") }}</a>
-  <a class="btn" href="/export">{{ _("Export") }}</a>
-</div>
-
-<details class="card">
-  <summary>{{ _("Create new deck") }}</summary>
-  {% if error %}<p class="alert alert-error">{{ error }}</p>{% endif %}
-  <form method="post" action="/decks" class="row">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <input name="name" class="input" placeholder="{{ _('e.g. Psalms') }}" aria-label="{{ _('Deck name') }}" required maxlength="100">
-    <button class="btn">{{ _("Create") }}</button>
-  </form>
-  <p class="muted small">{{ _("Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>.") }}</p>
+<details class="decks-head"{% if error %} open{% endif %}>
+  <summary><h2>{{ _("Your decks") }}</h2><span class="decks-new">{{ _("+ New deck") }}</span></summary>
+  <div class="card">
+    {% if error %}<p class="alert alert-error">{{ error }}</p>{% endif %}
+    <form method="post" action="/decks" class="row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input name="name" class="input" placeholder="{{ _('e.g. Psalms') }}" aria-label="{{ _('Deck name') }}" required maxlength="100">
+      <button class="btn">{{ _("Create") }}</button>
+    </form>
+    <p class="muted small">{{ _("Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>.") }}</p>
+  </div>
 </details>
+
+<ul class="deck-cards">
+  {% for d in decks %}
+  {% set due = d.new + d.learn + d.review %}
+  <li class="deck-card" style="--depth: {{ d.depth }}">
+    <a class="deck-main" href="/review/{{ d.id }}">
+      <span class="deck-info">
+        <span class="deck-title"><span class="deck-name">{{ d.short_name }}</span>{% if d.group %}<span class="deck-badge">{{ _("GROUP") }}</span>{% endif %}</span>
+        <span class="deck-bar" aria-hidden="true"><span style="width: {{ (100 * d.mature / d.total) | round | int if d.total else 0 }}%"></span></span>
+        <span class="deck-meta">{{ _("%(mature)s of %(total)s memorized", mature=d.mature, total=d.total) }}</span>
+      </span>
+      {% if due %}
+      <span class="deck-chip" title="{{ _('%(new)s new, %(learn)s learning, %(due)s due', new=d.new, learn=d.learn, due=d.review) }}">{{ due }}</span>
+      {% else %}
+      <span class="deck-chip ok" title="{{ _('Nothing due') }}">✓</span>
+      {% endif %}
+    </a>
+    <a class="iconlink" href="/decks/{{ d.id }}/options" aria-label="{{ _('Options for %(deck)s', deck=d.short_name) }}" title="{{ _('Options') }}">⚙</a>
+  </li>
+  {% endfor %}
+</ul>
 {% endblock %}

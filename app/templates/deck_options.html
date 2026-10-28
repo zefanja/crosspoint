@@ -19,6 +19,11 @@
     <input id="desired_retention" name="desired_retention" type="range" min="0.80" max="0.97" step="0.01"
            class="slider" value="{{ "%.2f"|format(opts.desired_retention) }}">
     <p class="muted small">{{ _("Higher = you remember more, but review more often. 0.90 is a good default. The FSRS algorithm is always on.") }}</p>
+    <label class="check"><input type="checkbox" name="bury_new" value="1"{% if opts.bury_new %} checked{% endif %}>
+      {{ _("New cards: introduce sibling cards on different days") }}</label>
+    <label class="check"><input type="checkbox" name="bury_reviews" value="1"{% if opts.bury_reviews %} checked{% endif %}>
+      {{ _("Reviews: show sibling cards on different days") }}</label>
+    <p class="muted small">{{ _("Sibling cards come from the same note, e.g. a verse and its reverse card. On different days, one card does not give away the answer to the other.") }}</p>
     <button type="submit" class="btn btn-primary btn-block">{{ _("Save") }}</button>
   </form>
 </section>

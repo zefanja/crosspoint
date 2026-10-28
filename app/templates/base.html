@@ -6,6 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#001a3f">
   <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <link rel="preload" href="/static/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/static/app.css">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/static/icons/icon.svg" type="image/svg+xml">
@@ -14,17 +15,21 @@
   <script src="/static/app.js" defer></script>
   {% block head %}{% endblock %}
 </head>
-<body class="{% block body_class %}{% endblock %}{% if user and user.is_staff %} user-admin{% endif %}{% if request.url.path.startswith("/admin") %} admin-page{% endif %}"{% if csrf_token %} hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'{% endif %}>
+{% set show_tabs = user and not request.url.path.startswith("/admin") %}
+<body class="{% block body_class %}{% endblock %}{% if user and user.is_staff %} user-admin{% endif %}{% if request.url.path.startswith("/admin") %} admin-page{% endif %}{% if show_tabs %} has-tabs{% endif %}"{% if csrf_token %} hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'{% endif %}>
   <header class="topbar">
     <a href="/" class="brand" aria-label="{{ app_name }}"><img src="/static/icons/icon.svg" alt="" width="28" height="28"><span aria-hidden="true">Cross<span class="brand-point">Point</span></span></a>
     {% if user %}
     <nav class="topnav">
+      {% block topbar_extra %}{% endblock %}
       {% if user.is_staff %}<a href="/admin" class="navlink">{{ _("Admin") }}</a>{% endif %}
+      {% if not show_tabs %}
       <a href="/browse" class="navlink nav-search">{{ _("Search") }}</a>
       <form method="post" action="/logout">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit" class="navlink linkbutton">{{ _("Log out") }}</button>
       </form>
+      {% endif %}
     </nav>
     {% endif %}
   </header>
@@ -41,6 +46,7 @@
   <main class="content">
     {% block content %}{% endblock %}
   </main>
+  {% if show_tabs %}{% include "partials/tabbar.html" %}{% endif %}
   <footer class="footer">
     <span>{{ _("Compatible with Anki") }}</span>
     <span aria-hidden="true">·</span>
