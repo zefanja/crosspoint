@@ -53,8 +53,9 @@ DEFAULT_DECK = N_("My cards")  # created in the user's language
 BASIC = "Basic"
 BIBLE_VERSE = "Bible Verse"
 BIBLE_MEMORIZER = bm_model.MODEL_NAME  # "Bible Memorizer"
-DEFAULT_NEW_PER_DAY = 10
+DEFAULT_NEW_PER_DAY = 5
 DEFAULT_REVIEWS_PER_DAY = 200
+BURY_SIBLINGS_KEY = "crosspointBurySiblings"  # collection config: one-time upgrade done
 DEFAULT_RETENTION = 0.9
 # Collections are created with an English backend so stock names stay "Basic"/"Default"
 # (a German backend would create "Einfach"); afterwards they are opened with a backend in
@@ -204,6 +205,8 @@ class DeckOptions:
     new_per_day: int
     reviews_per_day: int
     desired_retention: float
+    bury_new: bool = True  # sibling cards of new cards on different days
+    bury_reviews: bool = True  # sibling cards of reviews on different days
 
 
 @dataclass
@@ -287,6 +290,7 @@ def _get_col(user_id: str, lang: str) -> Collection:
     col = Collection(str(path), backend=RustBackend(langs=[lang]))
     try:
         _ensure_notetypes(col)
+        _upgrade_bury_siblings(col)
     except Exception:
         col.close()
         raise
@@ -360,9 +364,23 @@ def _setup_new_collection(col: Collection, deck_name: str) -> None:
     conf["new"]["perDay"] = DEFAULT_NEW_PER_DAY
     conf["rev"]["perDay"] = DEFAULT_REVIEWS_PER_DAY
     conf["desiredRetention"] = DEFAULT_RETENTION
+    conf["new"]["bury"] = conf["rev"]["bury"] = True
     col.decks.update_config(conf)
+    col.set_config(BURY_SIBLINGS_KEY, True)
 
     col.decks.select(col.decks.id(deck_name))
+
+
+def _upgrade_bury_siblings(col: Collection) -> None:
+    """One-time upgrade of existing collections: show sibling cards (e.g. a verse and its
+    reverse card) on different days, for new cards and reviews, in every options preset.
+    Runs once per collection (marker in the collection config), so later choices stay."""
+    if col.get_config(BURY_SIBLINGS_KEY, False):
+        return
+    for conf in col.decks.all_config():
+        conf["new"]["bury"] = conf["rev"]["bury"] = True
+        col.decks.update_config(conf)
+    col.set_config(BURY_SIBLINGS_KEY, True)
 
 
 def _ensure_notetypes(col: Collection) -> None:
@@ -879,6 +897,8 @@ def _get_deck_options(col: Collection, deck_id: int) -> DeckOptions:
         new_per_day=conf["new"]["perDay"],
         reviews_per_day=conf["rev"]["perDay"],
         desired_retention=round(conf.get("desiredRetention", DEFAULT_RETENTION), 2),
+        bury_new=bool(conf["new"].get("bury", False)),
+        bury_reviews=bool(conf["rev"].get("bury", False)),
     )
 
 
@@ -904,6 +924,8 @@ def _set_deck_options(col: Collection, deck_id: int, opts: DeckOptions) -> None:
     conf["new"]["perDay"] = opts.new_per_day
     conf["rev"]["perDay"] = opts.reviews_per_day
     conf["desiredRetention"] = opts.desired_retention
+    conf["new"]["bury"] = opts.bury_new
+    conf["rev"]["bury"] = opts.bury_reviews
     col.decks.update_config(conf)
 
 

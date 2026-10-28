@@ -1,14 +1,14 @@
-# Translations template for CrossPoint.
+# Translations template for PROJECT.
 # Copyright (C) 2026 ORGANIZATION
-# This file is distributed under the same license as the CrossPoint project.
+# This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: CrossPoint VERSION\n"
+"Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-27 21:20+0100\n"
+"POT-Creation-Date: 2026-10-28 08:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,52 +21,52 @@ msgstr ""
 msgid "My cards"
 msgstr ""
 
-#: app/anki_service.py:548 app/routes/admin_groups.py:143
+#: app/anki_service.py:566 app/routes/admin_groups.py:143
 #: app/routes/admin_groups.py:156 app/routes/export.py:58
 msgid "Deck not found."
 msgstr ""
 
-#: app/anki_service.py:555
+#: app/anki_service.py:573
 msgid "Please enter a deck name."
 msgstr ""
 
-#: app/anki_service.py:685
+#: app/anki_service.py:703
 msgid "Note not found."
 msgstr ""
 
-#: app/anki_service.py:693
+#: app/anki_service.py:711
 msgid "The first field must not be empty."
 msgstr ""
 
-#: app/anki_service.py:699 app/routes/notes.py:68
+#: app/anki_service.py:717 app/routes/notes.py:69
 msgid "Note type not found."
 msgstr ""
 
-#: app/anki_service.py:726
+#: app/anki_service.py:744
 msgid "Please enter a Bible text."
 msgstr ""
 
-#: app/anki_service.py:736
+#: app/anki_service.py:754
 msgid "[Beginning]"
 msgstr ""
 
-#: app/anki_service.py:786
+#: app/anki_service.py:804
 msgid "Cards from group decks cannot be edited."
 msgstr ""
 
-#: app/anki_service.py:788
+#: app/anki_service.py:806
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr ""
 
-#: app/anki_service.py:808
+#: app/anki_service.py:826
 msgid "Cards from group decks cannot be deleted."
 msgstr ""
 
-#: app/anki_service.py:1215
+#: app/anki_service.py:1237
 msgid "The image is too large (max. 5 MB)."
 msgstr ""
 
-#: app/anki_service.py:1218
+#: app/anki_service.py:1240
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr ""
 
@@ -187,20 +187,20 @@ msgstr ""
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr ""
 
-#: app/routes/decks.py:70
+#: app/routes/decks.py:73
 msgid "New cards per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:72
+#: app/routes/decks.py:75
 msgid "Reviews per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:74
+#: app/routes/decks.py:77
 #, python-format
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr ""
 
-#: app/routes/notes.py:83
+#: app/routes/notes.py:84
 #, python-format
 msgid "Added: %(front)s"
 msgstr ""
@@ -299,36 +299,48 @@ msgstr ""
 msgid "Higher = you remember more, but review more often. 0.90 is a good default. The FSRS algorithm is always on."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:22
+#: app/templates/deck_options.html:23
+msgid "New cards: introduce sibling cards on different days"
+msgstr ""
+
+#: app/templates/deck_options.html:25
+msgid "Reviews: show sibling cards on different days"
+msgstr ""
+
+#: app/templates/deck_options.html:26
+msgid "Sibling cards come from the same note, e.g. a verse and its reverse card. On different days, one card does not give away the answer to the other."
+msgstr ""
+
+#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:27
 #: app/templates/note_edit.html:22
 msgid "Save"
 msgstr ""
 
-#: app/templates/deck_options.html:27
+#: app/templates/deck_options.html:32
 msgid "Optimize FSRS parameters"
 msgstr ""
 
-#: app/templates/deck_options.html:28
+#: app/templates/deck_options.html:33
 #, python-format
 msgid "FSRS can adapt to your memory based on your review history. This makes sense from about %(n)s reviews."
 msgstr ""
 
-#: app/templates/deck_options.html:29
+#: app/templates/deck_options.html:34
 #, python-format
 msgid "This deck has %(num)s review so far."
 msgid_plural "This deck has %(num)s reviews so far."
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/deck_options.html:30
+#: app/templates/deck_options.html:35
 msgid "Parameters optimized. Future intervals use your personal parameters."
 msgstr ""
 
-#: app/templates/deck_options.html:31
+#: app/templates/deck_options.html:36
 msgid "Not enough reviews yet or no improvement found – the parameters stay unchanged."
 msgstr ""
 
-#: app/templates/deck_options.html:34
+#: app/templates/deck_options.html:39
 msgid "Optimize now"
 msgstr ""
 

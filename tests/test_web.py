@@ -159,10 +159,13 @@ def test_deck_options(client, learner):
     _, csrf = learner
     deck = default_deck(client)
     page = client.get(f"/decks/{deck}/options")
-    assert 'value="10"' in page.text and 'value="0.90"' in page.text
+    assert 'value="5"' in page.text and 'value="0.90"' in page.text
+    assert page.text.count(" checked>") == 2  # siblings on different days, new + reviews
     r = client.post(f"/decks/{deck}/options", data={
-        "csrf_token": csrf, "new_per_day": 5, "reviews_per_day": 150, "desired_retention": 0.85})
-    assert "Gespeichert" in r.text and 'value="5"' in r.text and 'value="0.85"' in r.text
+        "csrf_token": csrf, "new_per_day": 7, "reviews_per_day": 150, "desired_retention": 0.85,
+        "bury_reviews": "1"})
+    assert "Gespeichert" in r.text and 'value="7"' in r.text and 'value="0.85"' in r.text
+    assert 'name="bury_new" value="1">' in r.text and 'name="bury_reviews" value="1" checked>' in r.text
     r = client.post(f"/decks/{deck}/options", data={
         "csrf_token": csrf, "new_per_day": 5, "reviews_per_day": 150, "desired_retention": 0.99})
     assert r.status_code == 400 and "0,97" in r.text

@@ -230,9 +230,13 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - Antippen → bearbeiten, löschen (mit Bestätigung), aussetzen.
 
 **Deck-Optionen** (pro Deck, reduziert)
-- Neue Karten pro Tag (Standard 10), max. Wiederholungen pro Tag (Standard 200),
+- Neue Karten pro Tag (Standard 5), max. Wiederholungen pro Tag (Standard 200),
   gewünschte Retention (Slider 0,80–0,97, Standard 0,90).
 - FSRS ist immer an und nicht abschaltbar.
+- Geschwisterkarten (Karten derselben Notiz, z. B. Vers + Umkehrkarte) an verschiedenen Tagen:
+  je ein Schalter für neue Karten und Wiederholungen (Ankis `new.bury`/`rev.bury`), Standard an.
+  Bestehende Collections werden einmalig umgestellt (Marker `crosspointBurySiblings` in der
+  Collection-Konfiguration); das Tageslimit neuer Karten bestehender Decks bleibt unverändert.
 - Phase 2: Button „FSRS-Parameter optimieren“ (ab ca. 400 Reviews sinnvoll).
 
 **Export**

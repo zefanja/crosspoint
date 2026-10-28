@@ -36,7 +36,8 @@ def test_new_collection_setup(run, data_dir):
         assert col.models.by_name("Basic") is not None
         assert col.decks.by_name(DECK) is not None
         conf = col.decks.config_dict_for_deck_id(1)
-        assert conf["new"]["perDay"] == 10
+        assert conf["new"]["perDay"] == 5
+        assert conf["new"]["bury"] is True and conf["rev"]["bury"] is True
     finally:
         col.close()
 
@@ -165,12 +166,37 @@ def test_review_unknown_deck(run):
 
 def test_deck_options_are_per_deck(run, deck):
     other = run(svc.create_deck(U, "Andere"))
-    assert run(svc.get_deck_options(U, deck)) == svc.DeckOptions(10, 200, 0.9)
-    run(svc.set_deck_options(U, deck, svc.DeckOptions(5, 100, 0.85)))
-    assert run(svc.get_deck_options(U, deck)) == svc.DeckOptions(5, 100, 0.85)
-    assert run(svc.get_deck_options(U, other)) == svc.DeckOptions(10, 200, 0.9)
+    assert run(svc.get_deck_options(U, deck)) == svc.DeckOptions(5, 200, 0.9, True, True)
+    run(svc.set_deck_options(U, deck, svc.DeckOptions(5, 100, 0.85, False, True)))
+    assert run(svc.get_deck_options(U, deck)) == svc.DeckOptions(5, 100, 0.85, False, True)
+    assert run(svc.get_deck_options(U, other)) == svc.DeckOptions(5, 200, 0.9, True, True)
     run(svc.set_deck_options(U, deck, svc.DeckOptions(7, 100, 0.85)))
     assert run(svc.get_deck_options(U, deck)).new_per_day == 7
+
+
+def test_bury_siblings_upgrade_runs_once(run, deck):
+    def reset(col):  # an existing collection from before the upgrade
+        for conf in col.decks.all_config():
+            conf["new"]["bury"] = conf["rev"]["bury"] = False
+            col.decks.update_config(conf)
+        col.remove_config(svc.BURY_SIBLINGS_KEY)
+
+    run(svc._run(U, reset))
+    run(svc.close_all())
+    opts = run(svc.get_deck_options(U, deck))  # reopens and upgrades
+    assert (opts.bury_new, opts.bury_reviews) == (True, True)
+    run(svc.set_deck_options(U, deck, svc.DeckOptions(5, 200, 0.9, False, False)))
+    run(svc.close_all())
+    opts = run(svc.get_deck_options(U, deck))  # the user's choice survives reopening
+    assert (opts.bury_new, opts.bury_reviews) == (False, False)
+
+
+def test_bury_new_siblings_on_different_days(run, deck):
+    run(svc.add_note(U, svc.BIBLE_VERSE, deck, {"Reference": "Joh 3,16", "Text": "Denn also",
+                                               "Reverse": "y"}, ()))
+    assert run(svc.review_state(U, deck)).new == 1  # the reverse card waits for tomorrow
+    run(svc.set_deck_options(U, deck, svc.DeckOptions(5, 200, 0.9, False, True)))
+    assert run(svc.review_state(U, deck)).new == 2
 
 
 def _review_all(run, deck, n):
