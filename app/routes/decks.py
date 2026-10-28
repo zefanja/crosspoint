@@ -72,10 +72,13 @@ async def options_save(
     new_per_day: int = Form(...),
     reviews_per_day: int = Form(...),
     desired_retention: float = Form(...),
+    bury_new: str | None = Form(None),  # checkboxes: only sent when checked
+    bury_reviews: str | None = Form(None),
     user: User = Depends(verify_csrf),
     col: str = Depends(current_collection),
 ):
-    opts = anki_service.DeckOptions(new_per_day, reviews_per_day, round(desired_retention, 2))
+    opts = anki_service.DeckOptions(new_per_day, reviews_per_day, round(desired_retention, 2),
+                                    bury_new=bool(bury_new), bury_reviews=bool(bury_reviews))
     errors = []
     if not 0 <= new_per_day <= 9999:
         errors.append(_("New cards per day: 0 to 9999."))

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-28 07:30+0000\n"
+"POT-Creation-Date: 2026-10-28 09:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,56 +21,56 @@ msgstr ""
 msgid "My cards"
 msgstr ""
 
-#: app/anki_service.py:59 app/templates/stats.html:9
+#: app/anki_service.py:60 app/templates/stats.html:9
 msgid "All decks"
 msgstr ""
 
-#: app/anki_service.py:574 app/routes/admin_groups.py:143
+#: app/anki_service.py:592 app/routes/admin_groups.py:143
 #: app/routes/admin_groups.py:156 app/routes/export.py:58
 msgid "Deck not found."
 msgstr ""
 
-#: app/anki_service.py:581
+#: app/anki_service.py:599
 msgid "Please enter a deck name."
 msgstr ""
 
-#: app/anki_service.py:733
+#: app/anki_service.py:755
 msgid "Note not found."
 msgstr ""
 
-#: app/anki_service.py:741
+#: app/anki_service.py:763
 msgid "The first field must not be empty."
 msgstr ""
 
-#: app/anki_service.py:747 app/routes/notes.py:69
+#: app/anki_service.py:769 app/routes/notes.py:69
 msgid "Note type not found."
 msgstr ""
 
-#: app/anki_service.py:774
+#: app/anki_service.py:796
 msgid "Please enter a Bible text."
 msgstr ""
 
-#: app/anki_service.py:784
+#: app/anki_service.py:806
 msgid "[Beginning]"
 msgstr ""
 
-#: app/anki_service.py:834
+#: app/anki_service.py:856
 msgid "Cards from group decks cannot be edited."
 msgstr ""
 
-#: app/anki_service.py:836
+#: app/anki_service.py:858
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr ""
 
-#: app/anki_service.py:856
+#: app/anki_service.py:878
 msgid "Cards from group decks cannot be deleted."
 msgstr ""
 
-#: app/anki_service.py:1263
+#: app/anki_service.py:1289
 msgid "The image is too large (max. 5 MB)."
 msgstr ""
 
-#: app/anki_service.py:1266
+#: app/anki_service.py:1292
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr ""
 
@@ -79,19 +79,19 @@ msgstr ""
 msgid "Distribute “%(deck)s”"
 msgstr ""
 
-#: app/main.py:134
+#: app/main.py:132
 msgid "You don't have permission to do that."
 msgstr ""
 
-#: app/main.py:141
+#: app/main.py:139
 msgid "Your session has expired. Please reload the page and try again."
 msgstr ""
 
-#: app/main.py:180
+#: app/main.py:178
 msgid "CrossPoint – memorize the Bible"
 msgstr ""
 
-#: app/main.py:182
+#: app/main.py:180
 msgid "Memorize Bible verses with spaced repetition – compatible with Anki."
 msgstr ""
 
@@ -191,15 +191,15 @@ msgstr ""
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr ""
 
-#: app/routes/decks.py:81
+#: app/routes/decks.py:84
 msgid "New cards per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:83
+#: app/routes/decks.py:86
 msgid "Reviews per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:85
+#: app/routes/decks.py:88
 #, python-format
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr ""
@@ -213,46 +213,46 @@ msgstr ""
 #: app/templates/admin/home.html:5 app/templates/admin/import.html:4
 #: app/templates/admin/progress.html:4 app/templates/admin/user_detail.html:23
 #: app/templates/admin/users.html:4 app/templates/admin/users.html:26
-#: app/templates/admin/users.html:55 app/templates/base.html:27
+#: app/templates/admin/users.html:55 app/templates/base.html:25
 #: app/templates/me.html:9
 msgid "Admin"
 msgstr ""
 
-#: app/templates/base.html:29 app/templates/browse.html:7
+#: app/templates/base.html:27 app/templates/browse.html:7
 #: app/templates/browse.html:8
 msgid "Search"
 msgstr ""
 
-#: app/templates/base.html:32 app/templates/me.html:12
+#: app/templates/base.html:30 app/templates/me.html:12
 msgid "Log out"
 msgstr ""
 
-#: app/templates/base.html:40
+#: app/templates/base.html:38
 msgid "You are editing the admin collection (group decks)."
 msgstr ""
 
-#: app/templates/admin/home.html:30 app/templates/base.html:44
+#: app/templates/admin/home.html:30 app/templates/base.html:42
 msgid "Back to my cards"
 msgstr ""
 
-#: app/templates/base.html:53 app/templates/me.html:26
+#: app/templates/base.html:51 app/templates/me.html:26
 msgid "Compatible with Anki"
 msgstr ""
 
-#: app/templates/base.html:55 app/templates/me.html:27
+#: app/templates/base.html:53 app/templates/me.html:27
 #: app/templates/privacy.html:2 app/templates/privacy.html:5
 msgid "Privacy"
 msgstr ""
 
-#: app/templates/base.html:57 app/templates/me.html:28
+#: app/templates/base.html:55 app/templates/me.html:28
 msgid "Source code"
 msgstr ""
 
-#: app/templates/base.html:59 app/templates/me.html:29
+#: app/templates/base.html:57 app/templates/me.html:29
 msgid "Version"
 msgstr ""
 
-#: app/templates/base.html:60 app/templates/me.html:17 app/templates/me.html:18
+#: app/templates/base.html:58 app/templates/me.html:17 app/templates/me.html:18
 msgid "Language"
 msgstr ""
 
@@ -304,36 +304,48 @@ msgstr ""
 msgid "Higher = you remember more, but review more often. 0.90 is a good default. The FSRS algorithm is always on."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:22
+#: app/templates/deck_options.html:23
+msgid "New cards: introduce sibling cards on different days"
+msgstr ""
+
+#: app/templates/deck_options.html:25
+msgid "Reviews: show sibling cards on different days"
+msgstr ""
+
+#: app/templates/deck_options.html:26
+msgid "Sibling cards come from the same note, e.g. a verse and its reverse card. On different days, one card does not give away the answer to the other."
+msgstr ""
+
+#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:27
 #: app/templates/note_edit.html:22
 msgid "Save"
 msgstr ""
 
-#: app/templates/deck_options.html:27
+#: app/templates/deck_options.html:32
 msgid "Optimize FSRS parameters"
 msgstr ""
 
-#: app/templates/deck_options.html:28
+#: app/templates/deck_options.html:33
 #, python-format
 msgid "FSRS can adapt to your memory based on your review history. This makes sense from about %(n)s reviews."
 msgstr ""
 
-#: app/templates/deck_options.html:29
+#: app/templates/deck_options.html:34
 #, python-format
 msgid "This deck has %(num)s review so far."
 msgid_plural "This deck has %(num)s reviews so far."
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/deck_options.html:30
+#: app/templates/deck_options.html:35
 msgid "Parameters optimized. Future intervals use your personal parameters."
 msgstr ""
 
-#: app/templates/deck_options.html:31
+#: app/templates/deck_options.html:36
 msgid "Not enough reviews yet or no improvement found – the parameters stay unchanged."
 msgstr ""
 
-#: app/templates/deck_options.html:34
+#: app/templates/deck_options.html:39
 msgid "Optimize now"
 msgstr ""
 
