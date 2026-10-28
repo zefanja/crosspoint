@@ -537,6 +537,13 @@ textarea.input { resize: vertical; line-height: 1.4; }
 }
 
 .cardrow.suspended { opacity: 0.55; }
+.browserow { display: flex; align-items: center; gap: 4px; padding-right: 8px; }
+.browserow .cardrow { flex: 1; min-width: 0; }
+.browserow form { margin: 0; flex: none; }
+.browserow .btn-small { min-height: var(--touch); }
+.browserow .cardmeta { justify-content: flex-start; flex-wrap: wrap; gap: 0 12px; }
+.browserow .cardmeta span { white-space: nowrap; }
+.cardtype { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
 .cardfront { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cardmeta { display: flex; justify-content: space-between; gap: 12px; font-size: 0.82rem; color: var(--muted); }
 

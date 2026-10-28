@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-28 09:44+0000\n"
+"POT-Creation-Date: 2026-10-28 09:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/anki_service.py:52 app/templates/browse.html:13
+#: app/anki_service.py:52 app/templates/browse.html:20
 msgid "My cards"
 msgstr ""
 
@@ -25,52 +25,56 @@ msgstr ""
 msgid "All decks"
 msgstr ""
 
-#: app/anki_service.py:592 app/routes/admin_groups.py:143
+#: app/anki_service.py:605 app/routes/admin_groups.py:143
 #: app/routes/admin_groups.py:156 app/routes/export.py:58
 msgid "Deck not found."
 msgstr ""
 
-#: app/anki_service.py:599
+#: app/anki_service.py:612
 msgid "Please enter a deck name."
 msgstr ""
 
-#: app/anki_service.py:755
+#: app/anki_service.py:768
 msgid "Note not found."
 msgstr ""
 
-#: app/anki_service.py:763
+#: app/anki_service.py:776
 msgid "The first field must not be empty."
 msgstr ""
 
-#: app/anki_service.py:769 app/routes/notes.py:69
+#: app/anki_service.py:782 app/routes/notes.py:69
 msgid "Note type not found."
 msgstr ""
 
-#: app/anki_service.py:796
+#: app/anki_service.py:809
 msgid "Please enter a Bible text."
 msgstr ""
 
-#: app/anki_service.py:806
+#: app/anki_service.py:819
 msgid "[Beginning]"
 msgstr ""
 
-#: app/anki_service.py:856
+#: app/anki_service.py:869
 msgid "Cards from group decks cannot be edited."
 msgstr ""
 
-#: app/anki_service.py:858
+#: app/anki_service.py:871
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr ""
 
-#: app/anki_service.py:878
+#: app/anki_service.py:891
 msgid "Cards from group decks cannot be deleted."
 msgstr ""
 
-#: app/anki_service.py:1289
+#: app/anki_service.py:989
+msgid "Card not found."
+msgstr ""
+
+#: app/anki_service.py:1355
 msgid "The image is too large (max. 5 MB)."
 msgstr ""
 
-#: app/anki_service.py:1292
+#: app/anki_service.py:1358
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr ""
 
@@ -187,7 +191,7 @@ msgstr ""
 msgid "“%(title)s”: %(notes)s steps with %(cards)s cards added."
 msgstr ""
 
-#: app/routes/browse.py:23
+#: app/routes/browse.py:29
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr ""
 
@@ -218,8 +222,8 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: app/templates/base.html:27 app/templates/browse.html:7
-#: app/templates/browse.html:8
+#: app/templates/base.html:27 app/templates/browse.html:14
+#: app/templates/browse.html:15
 msgid "Search"
 msgstr ""
 
@@ -266,11 +270,25 @@ msgstr ""
 msgid "Decks"
 msgstr ""
 
-#: app/templates/browse.html:7
+#: app/templates/admin/progress.html:12 app/templates/browse.html:5
+#: app/templates/stats.html:12
+msgid "Show"
+msgstr ""
+
+#: app/templates/browse.html:6
+msgid "Notes"
+msgstr ""
+
+#: app/templates/browse.html:6 app/templates/note_edit.html:4
+#: app/templates/partials/tabbar.html:10 app/templates/stats.html:48
+msgid "Cards"
+msgstr ""
+
+#: app/templates/browse.html:14
 msgid "Search (Anki search syntax)"
 msgstr ""
 
-#: app/templates/browse.html:13
+#: app/templates/browse.html:20
 msgid "Examples:"
 msgstr ""
 
@@ -638,17 +656,13 @@ msgstr ""
 msgid "Edit card"
 msgstr ""
 
-#: app/templates/note_edit.html:4 app/templates/partials/tabbar.html:10
-#: app/templates/stats.html:48
-msgid "Cards"
-msgstr ""
-
 #: app/templates/note_edit.html:7
 #, python-format
 msgid "Note type: %(type)s"
 msgstr ""
 
-#: app/templates/note_edit.html:7 app/templates/partials/browse_results.html:12
+#: app/templates/note_edit.html:7 app/templates/partials/browse_card_row.html:7
+#: app/templates/partials/browse_results.html:15
 msgid "suspended"
 msgstr ""
 
@@ -661,10 +675,12 @@ msgid "Bible text cards are generated from the text and cannot be edited individ
 msgstr ""
 
 #: app/templates/note_edit.html:30
+#: app/templates/partials/browse_card_row.html:15
 msgid "Unsuspend"
 msgstr ""
 
 #: app/templates/note_edit.html:30
+#: app/templates/partials/browse_card_row.html:15
 msgid "Suspend"
 msgstr ""
 
@@ -730,10 +746,6 @@ msgstr ""
 
 #: app/templates/stats.html:2 app/templates/stats.html:6
 msgid "Statistics"
-msgstr ""
-
-#: app/templates/admin/progress.html:12 app/templates/stats.html:12
-msgid "Show"
 msgstr ""
 
 #: app/templates/stats.html:17
@@ -1009,6 +1021,7 @@ msgstr ""
 #: app/templates/admin/print_sheet.html:12
 #: app/templates/admin/user_detail.html:9
 #: app/templates/partials/browse_results.html:6
+#: app/templates/partials/browse_results.html:14
 #, python-format
 msgid "%(num)s card"
 msgid_plural "%(num)s cards"
@@ -1247,21 +1260,39 @@ msgid_plural "%(num)s verses"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/templates/partials/browse_card_row.html:3
+#: app/templates/partials/browse_results.html:12
+msgid "(empty)"
+msgstr ""
+
+#: app/templates/partials/browse_card_row.html:7
+#: app/templates/partials/browse_results.html:15
+msgid "new"
+msgstr ""
+
+#: app/templates/partials/browse_results.html:4
+msgid "No notes found."
+msgstr ""
+
 #: app/templates/partials/browse_results.html:4
 msgid "No cards found."
 msgstr ""
 
 #: app/templates/partials/browse_results.html:6
 #, python-format
+msgid "%(num)s note"
+msgid_plural "%(num)s notes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/partials/browse_results.html:6
+#, python-format
 msgid "showing the first %(limit)s"
 msgstr ""
 
-#: app/templates/partials/browse_results.html:11
-msgid "(empty)"
-msgstr ""
-
-#: app/templates/partials/browse_results.html:12
-msgid "new"
+#: app/templates/partials/browse_results.html:14
+#, python-format
+msgid "%(num)s suspended"
 msgstr ""
 
 #: app/templates/partials/image_upload.html:2

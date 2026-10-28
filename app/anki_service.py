@@ -204,6 +204,19 @@ class CardRow:
     status: str  # "new" | "suspended" | "scheduled"
     due: date | None
     suspended: bool
+    template: str = ""  # card type, e.g. "Reverse"
+    siblings: int = 1  # cards of the note
+
+
+@dataclass
+class NoteRow:
+    note_id: int
+    front: str
+    deck: str  # deck of the first card ("…" appended if the cards are spread over decks)
+    cards: int
+    suspended_cards: int
+    status: str  # "new" | "suspended" | "scheduled"
+    due: date | None  # earliest due date of the active scheduled cards
 
 
 @dataclass
@@ -910,28 +923,81 @@ def _due(col: Collection, card) -> tuple[str, date | None]:
     return "scheduled", None
 
 
+def _card_row(col: Collection, card) -> CardRow:
+    note = card.note()
+    status, due = _due(col, card)
+    return CardRow(
+        card_id=int(card.id),
+        note_id=int(note.id),
+        front=plain_text(note.fields[0])[:80],
+        deck=col.decks.name(card.did),
+        status=status,
+        due=due,
+        suspended=card.queue == QUEUE_SUSPENDED,
+        template=card.template()["name"],
+        siblings=len(note.card_ids()),
+    )
+
+
 def _search(col: Collection, query: str, limit: int) -> tuple[list[CardRow], int]:
     try:
         card_ids = col.find_cards(query.strip() or "deck:*", order=True)
     except SearchError as exc:
         raise InvalidSearch(str(exc)) from exc
+    return [_card_row(col, col.get_card(cid)) for cid in card_ids[:limit]], len(card_ids)
+
+
+def _search_notes(col: Collection, query: str, limit: int) -> tuple[list[NoteRow], int]:
+    try:
+        note_ids = col.find_notes(query.strip() or "deck:*", order=True)
+    except SearchError as exc:
+        raise InvalidSearch(str(exc)) from exc
     rows = []
-    for cid in card_ids[:limit]:
-        card = col.get_card(cid)
-        note = card.note()
-        status, due = _due(col, card)
+    for nid in note_ids[:limit]:
+        note = col.get_note(nid)
+        cards = note.cards()
+        states = [_due(col, c) for c in cards]
+        active = [(st, due) for st, due in states if st != "suspended"]
+        dues = [due for st, due in active if due is not None]
+        status = ("suspended" if not active
+                  else "new" if all(st == "new" for st, _due_date in active) else "scheduled")
+        decks = {c.did for c in cards}
+        deck = col.decks.name(cards[0].did) if cards else ""
         rows.append(
-            CardRow(
-                card_id=int(card.id),
-                note_id=int(note.id),
+            NoteRow(
+                note_id=int(nid),
                 front=plain_text(note.fields[0])[:80],
-                deck=col.decks.name(card.did),
+                deck=deck + (" …" if len(decks) > 1 else ""),
+                cards=len(cards),
+                suspended_cards=len(states) - len(active),
                 status=status,
-                due=due,
-                suspended=card.queue == QUEUE_SUSPENDED,
+                due=min(dues) if dues else None,
             )
         )
-    return rows, len(card_ids)
+    return rows, len(note_ids)
+
+
+async def search_notes(user_id: str, query: str, limit: int = 200) -> tuple[list[NoteRow], int]:
+    """Notes matching an Anki search (one row per note), with the total number of hits."""
+    return await _run(user_id, _search_notes, query, limit)
+
+
+def _set_card_suspended(col: Collection, card_id: int, suspended: bool) -> CardRow:
+    try:
+        card = col.get_card(card_id)
+    except NotFoundError as exc:
+        raise NotFound(N_("Card not found.")) from exc
+    if suspended:
+        col.sched.suspend_cards([card.id])
+    else:
+        col.sched.unsuspend_cards([card.id])
+    card.load()
+    return _card_row(col, card)
+
+
+async def set_card_suspended(user_id: str, card_id: int, suspended: bool) -> CardRow:
+    """Suspend or unsuspend a single card (e.g. only the reverse card); returns its row."""
+    return await _run(user_id, _set_card_suspended, card_id, suspended)
 
 
 async def search_cards(user_id: str, query: str, limit: int = 200) -> tuple[list[CardRow], int]:
