@@ -226,8 +226,14 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
   aussetzen und löschen geht.
 
 **Kartenliste / Suche**
-- Suchfeld (Anki-Suchsyntax wird durchgereicht), Liste: Vorderseite (gekürzt), Deck, fällig am.
-- Antippen → bearbeiten, löschen (mit Bestätigung), aussetzen.
+- Suchfeld (Anki-Suchsyntax wird durchgereicht), Umschalter **Notizen | Karten** (Standard:
+  Notizen, `?view=cards`). Die Suche bleibt beim Umschalten erhalten.
+- Notizen: eine Zeile pro Notiz – erstes Feld (gekürzt), Deck, Anzahl Karten (davon
+  ausgesetzt), nächste Fälligkeit bzw. „neu“/„ausgesetzt“.
+- Karten: eine Zeile pro Karte mit Kartentyp (z. B. „Text → Reference“, nur bei Notizen mit mehreren
+  Karten), Deck, fällig am; Button „Aussetzen“/„Wieder aktivieren“ pro Karte (htmx, auch für
+  Gruppendeck-Karten).
+- Antippen → Notiz bearbeiten, löschen (mit Bestätigung), alle Karten der Notiz aussetzen.
 
 **Deck-Optionen** (pro Deck, reduziert)
 - Neue Karten pro Tag (Standard 10), max. Wiederholungen pro Tag (Standard 200),

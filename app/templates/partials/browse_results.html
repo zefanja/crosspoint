@@ -1,17 +1,24 @@
 {% if error %}
 <p class="alert alert-error">{{ error }}</p>
 {% elif not rows %}
-<p class="muted">{{ _("No cards found.") }}</p>
+<p class="muted">{{ _("No notes found.") if view == "notes" else _("No cards found.") }}</p>
 {% else %}
-<p class="muted small">{{ ngettext("%(num)s card", "%(num)s cards", total) }}{% if total > limit %} – {{ _("showing the first %(limit)s", limit=limit) }}{% endif %}</p>
+<p class="muted small">{% if view == "notes" %}{{ ngettext("%(num)s note", "%(num)s notes", total) }}{% else %}{{ ngettext("%(num)s card", "%(num)s cards", total) }}{% endif %}{% if total > limit %} – {{ _("showing the first %(limit)s", limit=limit) }}{% endif %}</p>
 <ul class="cardlist card flush">
   {% for r in rows %}
+  {% if view == "notes" %}
   <li>
-    <a href="/notes/{{ r.note_id }}" class="cardrow{% if r.suspended %} suspended{% endif %}">
+    <a href="/notes/{{ r.note_id }}" class="cardrow{% if r.status == 'suspended' %} suspended{% endif %}">
       <span class="cardfront">{{ r.front or _("(empty)") }}</span>
-      <span class="cardmeta"><span>{{ r.deck }}</span><span>{% if r.status == "new" %}{{ _("new") }}{% elif r.status == "suspended" %}{{ _("suspended") }}{% elif r.due %}{{ r.due | date }}{% else %}–{% endif %}</span></span>
+      <span class="cardmeta">
+        <span>{{ r.deck }}{% if r.cards > 1 %} · {{ ngettext("%(num)s card", "%(num)s cards", r.cards) }}{% endif %}{% if r.suspended_cards and r.status != "suspended" %} · {{ _("%(num)s suspended", num=r.suspended_cards) }}{% endif %}</span>
+        <span>{% if r.status == "new" %}{{ _("new") }}{% elif r.status == "suspended" %}{{ _("suspended") }}{% elif r.due %}{{ r.due | date }}{% else %}–{% endif %}</span>
+      </span>
     </a>
   </li>
+  {% else %}
+  {% include "partials/browse_card_row.html" %}
+  {% endif %}
   {% endfor %}
 </ul>
 {% endif %}

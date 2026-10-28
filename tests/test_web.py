@@ -138,8 +138,34 @@ def test_browse_edit_suspend_delete(client, learner):
     assert "ausgesetzt" in r.text and "Wieder aktivieren" in r.text
 
     r = client.post(f"/notes/{note_id}/delete", data={"csrf_token": csrf})
-    assert r.status_code == 200 and "Keine Karten gefunden" in r.text
+    assert r.status_code == 200 and "Keine Notizen gefunden" in r.text
     assert client.get(f"/notes/{note_id}").status_code == 404
+
+
+def test_browse_notes_and_cards_suspend_single_card(client, learner):
+    _, csrf = learner
+    deck = default_deck(client)
+    client.post("/notes/new", data={
+        "csrf_token": csrf, "notetype": "Bible Verse", "deck_id": deck,
+        "field_0": "Joh 3,16", "field_1": "Denn also", "field_2": "", "field_3": "y"})
+    notes = client.get("/browse")
+    assert "1 Notiz" in notes.text and "2 Karten" in notes.text and 'aria-current="page">Notizen<' in notes.text
+
+    cards = client.get("/browse?view=cards&q=Joh")
+    assert "2 Karten" in cards.text and "Text → Reference" in cards.text
+    assert 'name="view" value="cards"' in cards.text
+    card_id = re.findall(r'action="/cards/(\d+)/suspend"', cards.text)[1]
+    r = client.post(f"/cards/{card_id}/suspend", headers=HX,
+                    data={"csrf_token": csrf, "suspended": 1, "q": "Joh"})
+    assert r.text.lstrip().startswith('<li class="browserow">') and "Wieder aktivieren" in r.text
+    assert "1 ausgesetzt" in client.get("/browse").text
+    assert "1 Karte" in client.get("/browse?view=cards&q=is:suspended").text
+
+    r = client.post(f"/cards/{card_id}/suspend", data={"csrf_token": csrf, "suspended": 0, "q": "Joh"},
+                    follow_redirects=False)
+    assert r.status_code == 303 and r.headers["location"] == "/browse?view=cards&q=Joh"
+    assert "ausgesetzt" not in client.get("/browse").text
+    assert client.post("/cards/999/suspend", data={"csrf_token": csrf, "suspended": 1}).status_code == 404
 
 
 def test_group_note_readonly_in_ui(client, learner):
@@ -218,7 +244,7 @@ def test_bible_text_import(client, learner):
     r = client.post("/notes/bible", data={"csrf_token": csrf, "deck_id": deck, "title": "Psalm 23",
                                           "recite": 2, "text": raw})
     assert r.status_code == 200 and "2 Abschnitte mit 6 Karten" in r.text
-    rows = client.get('/browse?q="note:Bible Memorizer"').text
+    rows = client.get('/browse?view=cards&q="note:Bible Memorizer"').text
     assert "6 Karten" in rows
     note_id = int(re.search(r'href="/notes/(\d+)"', rows).group(1))
     edit = client.get(f"/notes/{note_id}")

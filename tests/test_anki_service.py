@@ -123,6 +123,31 @@ def test_suspend_and_search(run, deck):
         run(svc.search_cards(U, "deck:("))
 
 
+def test_search_notes_and_suspend_single_card(run, deck):
+    nid = run(svc.add_note(U, svc.BIBLE_VERSE, deck,
+                           {"Reference": "Joh 3,16", "Text": "Denn also", "Reverse": "y"}, ()))
+    add_verse(run, deck, ref="Ps 23,1", text="Der HERR ist mein Hirte")
+    rows, total = run(svc.search_notes(U, ""))
+    assert total == 2
+    row = next(r for r in rows if r.note_id == nid)
+    assert (row.cards, row.suspended_cards, row.status, row.deck) == (2, 0, "new", DECK)
+
+    cards, _total = run(svc.search_cards(U, "Joh"))
+    reverse = next(c for c in cards if c.template == svc.BIBLE_VERSE_REVERSE_NAME)
+    assert reverse.siblings == 2
+    updated = run(svc.set_card_suspended(U, reverse.card_id, True))
+    assert updated.suspended and updated.status == "suspended"
+    row = run(svc.search_notes(U, "Joh"))[0][0]
+    assert (row.suspended_cards, row.status) == (1, "new")  # the front card stays active
+    run(svc.set_card_suspended(U, cards[0].card_id if cards[0] is not reverse else cards[1].card_id, True))
+    assert run(svc.search_notes(U, "Joh"))[0][0].status == "suspended"
+    assert not run(svc.set_card_suspended(U, reverse.card_id, False)).suspended
+    with pytest.raises(svc.NotFound):
+        run(svc.set_card_suspended(U, 999, True))
+    with pytest.raises(svc.InvalidSearch):
+        run(svc.search_notes(U, "deck:("))
+
+
 def test_review_answer_undo(run, deck):
     for i in range(3):
         add_verse(run, deck, ref=f"Vers {i}")
