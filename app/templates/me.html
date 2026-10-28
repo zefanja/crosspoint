@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Me") }}{% endblock %}
-{% block topbar_extra %}
+{% block topbar_extra %}{% if not leader_workspace %}
 <a class="streak-pill" href="/stats" title="{{ _('Days in a row with reviews') }}"><span class="streak-dot" aria-hidden="true"></span>{{ ngettext("%(num)s day", "%(num)s days", streak) }}</a>
-{% endblock %}
+{% endif %}{% endblock %}
 {% block content %}
 <div class="ui-stack me-page">
   <section class="hero me-hero">

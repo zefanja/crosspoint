@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Group decks") }} – {{ app_name }}{% endblock %}
+{% block body_class %}home-page{% endblock %}
+{% block content %}
+<div class="ui-stack">
+  <section class="panel">
+    <div class="panel-head"><h1 class="panel-title">{{ _("Group decks") }}</h1></div>
+    <p class="hint">{{ _("Here you edit the decks of your groups together with the other group leaders. Members only get the changes when a deck is distributed.") }}</p>
+    <a class="btn-go sm" href="/admin/group-decks">{{ _("Distribute and recent changes") }}</a>
+  </section>
+
+  <details class="decks-head"{% if error %} open{% endif %}>
+    <summary><h2>{{ _("Decks") }}</h2><span class="decks-new">{{ _("+ New deck") }}</span></summary>
+    <div class="panel">
+      {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
+      <form method="post" action="/decks">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input name="name" class="input" placeholder="{{ _('e.g. Psalms') }}" aria-label="{{ _('Deck name') }}" required maxlength="100">
+        {% if groups %}
+        <label class="field">
+          <span class="field-label">{{ _("For group") }}</span>
+          <select name="group_id" class="input">
+            {% for gid, name in groups | dictsort(by="value") %}<option value="{{ gid }}">{{ name }}</option>{% endfor %}
+          </select>
+        </label>
+        {% endif %}
+        <button class="btn-go sm">{{ _("Create") }}</button>
+      </form>
+      <p class="hint">{{ _("Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>. A subdeck of one of your decks goes to the same groups.") }}</p>
+    </div>
+  </details>
+
+  <ul class="deck-cards">
+    {% for d in decks %}
+    {% set can_edit = d.id in editable %}
+    <li class="deck-card" style="--depth: {{ d.depth }}">
+      <a class="deck-main" href="/browse?q={{ searches[d.id] | urlencode }}">
+        <span class="deck-info">
+          <span class="deck-title"><span class="deck-name">{{ d.short_name }}</span>{% if not can_edit %}<span class="deck-badge">{{ _("VIEW ONLY") }}</span>{% endif %}</span>
+          <span class="deck-meta">{{ ngettext("%(num)s card", "%(num)s cards", d.total) }}{% if not can_edit %} · {{ _("also goes to groups you don't lead") }}{% endif %}</span>
+        </span>
+      </a>
+      {% if can_edit %}<a class="iconlink" href="/notes/new?deck_id={{ d.id }}" aria-label="{{ _('Add card to %(deck)s', deck=d.short_name) }}" title="{{ _('Add card') }}">+</a>{% endif %}
+    </li>
+    {% else %}
+    <li class="hint">{{ _("Your groups don't have any decks yet. Create the first one with “+ New deck”.") }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

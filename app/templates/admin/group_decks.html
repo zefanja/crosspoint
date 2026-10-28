@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Group decks") }} – {{ app_name }}{% endblock %}
+{% block content %}
+<p><a href="/admin" class="back">‹ {{ _("Admin") }}</a></p>
+<section class="card">
+  <h1>{{ _("Group decks") }}</h1>
+  <p class="muted small">{{ _("Group decks are edited together in the admin collection. Distributing copies a deck into every member's cards; re-distributing updates changed cards and adds new ones – learning progress is kept.") }}</p>
+  <form method="post" action="/admin/workspace">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    {% if admin_ws %}
+    <input type="hidden" name="ws" value="own">
+    <button class="btn">{{ _("Back to my cards") }}</button>
+    {% else %}
+    <input type="hidden" name="ws" value="admin">
+    <button class="btn btn-primary">{{ _("Edit group decks") }}</button>
+    {% endif %}
+  </form>
+</section>
+
+<section class="card">
+  <h2>{{ _("Distribute") }}</h2>
+  <ul class="cardlist">
+    {% for r in decks %}
+    <li class="deck-assign">
+      <div><strong>{{ r.name }}</strong> <span class="badge">{{ r.group_name }}</span><br>
+        <span class="muted small">
+          {% if not r.exists %}{{ _("The deck no longer exists in the admin collection.") }}
+          {% else %}
+          {% if r.deck.last_distributed_at %}{{ _("Last distributed: %(date)s", date=r.deck.last_distributed_at.date() | date) }}{% else %}{{ _("not distributed yet") }}{% endif %}
+          {% if r.last_edit %} · {{ _("last changed by %(name)s on %(date)s", name=r.last_edit.user_name or _("a deleted user"), date=r.last_edit.created_at | datetime) }}{% endif %}
+          {% if r.pending %} · <strong>{{ ngettext("%(num)s change not distributed yet", "%(num)s changes not distributed yet", r.pending) }}</strong>{% endif %}
+          {% endif %}
+        </span></div>
+      {% if r.exists %}
+      <form method="post" action="/admin/group-decks/{{ r.deck.id }}/distribute">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn btn-small{% if r.pending %} btn-primary{% endif %}">{{ _("Distribute") }}</button>
+      </form>
+      {% endif %}
+    </li>
+    {% else %}<li class="muted">{{ _("No group decks yet.") }}</li>{% endfor %}
+  </ul>
+</section>
+
+<section class="card">
+  <h2>{{ _("Recent changes") }}</h2>
+  <ul class="cardlist">
+    {% for e in recent %}
+    {% set who = e.user_name or _("a deleted user") %}
+    <li>
+      {% if e.action == "add" %}{{ _("%(name)s added “%(front)s”", name=who, front=e.summary) }}
+      {% elif e.action == "delete" %}{{ _("%(name)s deleted “%(front)s”", name=who, front=e.summary) }}
+      {% else %}{{ _("%(name)s changed “%(front)s”", name=who, front=e.summary) }}{% endif %}
+      <br><span class="muted small">{{ e.deck_name }} · {{ e.created_at | datetime }}</span>
+    </li>
+    {% else %}<li class="muted">{{ _("No changes yet.") }}</li>{% endfor %}
+  </ul>
+</section>
+{% endblock %}

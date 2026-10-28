@@ -14,6 +14,7 @@ from app.config import get_settings
 from app.models import User
 from app.templating import render
 from app.i18n import N_
+from app.workspace import DeckAccess, deck_access, no_leader_workspace
 
 router = APIRouter()
 
@@ -37,12 +38,12 @@ def _safe_name(name: str) -> str:
 
 @router.get("/export")
 async def export_page(request: Request, user: User = Depends(require_user),
-    col: str = Depends(current_collection)):
-    decks = await anki_service.deck_names(col)
+    col: str = Depends(current_collection), access: DeckAccess = Depends(deck_access)):
+    decks = access.filter(await anki_service.deck_names(col))
     return render(request, "export.html", {"decks": decks})
 
 
-@router.post("/export/collection")
+@router.post("/export/collection", dependencies=[Depends(no_leader_workspace)])
 async def export_collection(user: User = Depends(verify_csrf),
     col: str = Depends(current_collection)):
     path = _temp_path(".colpkg")
@@ -52,8 +53,8 @@ async def export_collection(user: User = Depends(verify_csrf),
 
 @router.post("/export/deck")
 async def export_deck(deck_id: int = Form(...), user: User = Depends(verify_csrf),
-    col: str = Depends(current_collection)):
-    names = dict(await anki_service.deck_names(col))
+    col: str = Depends(current_collection), access: DeckAccess = Depends(deck_access)):
+    names = dict(access.filter(await anki_service.deck_names(col)))
     if deck_id not in names:
         raise anki_service.NotFound(N_("Deck not found."))
     path = _temp_path(".apkg")

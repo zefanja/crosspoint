@@ -40,7 +40,7 @@ Konsequenzen:
 |---|---|
 | **Lerner** | Eigene Decks lernen, Karten anlegen/bearbeiten, Deck-Optionen, Export |
 | **Admin** | Alles von Lerner + Dashboard: Gruppen, Nutzer, Codes, Gruppendecks verteilen, Fortschritt sehen |
-| *Gruppenleiter* (Phase 3) | Wie Lerner + Fortschritt und neue Codes/Druckblatt nur für Mitglieder der eigenen Gruppen (zugewiesen auf der Gruppenseite, Tabelle `group_leaders`); keine Nutzer-/Gruppenverwaltung, kein Verteilen |
+| *Gruppenleiter* (Phase 3) | Wie Lerner + Fortschritt und neue Codes/Druckblatt nur für Mitglieder der eigenen Gruppen (zugewiesen auf der Gruppenseite, Tabelle `group_leaders`); Gruppendecks der eigenen Gruppen gemeinsam bearbeiten und verteilen (§7.3); keine Nutzer-/Gruppenverwaltung |
 
 ## 4. Anmeldung per Code
 
@@ -88,6 +88,8 @@ login_attempts(ip, ts, success)
 user_stats(user_id, total_cards, due_today, new_today, reviews_today,
            retention_30d, streak_days, last_review_at, updated_at)
 daily_reviews(user_id, day, reviews, again_count, new_count)   # für Diagramme
+group_leaders(group_id, user_id)
+group_deck_edits(id, user_id, note_id, deck_id, action, summary, created_at)  # wer hat was geändert
 ```
 
 `user_stats`/`daily_reviews` sind ein **Cache**: nach jeder Review und jedem Login aktualisiert,
@@ -344,6 +346,31 @@ im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
     (Phase 2: optional aussetzen).
   - Neue Gruppenmitglieder erhalten alle Gruppendecks beim Hinzufügen automatisch.
 - Verteilung läuft als Hintergrundaufgabe mit Fortschrittsanzeige (100 Nutzer × Import).
+
+#### Gemeinsames Bearbeiten (Admins und Gruppenleiter)
+
+- Gruppenleiter schalten wie Admins in die Admin-Collection um („Gruppendecks bearbeiten“) –
+  mit dem eigenen Login, kein geteilter Account.
+- **Sichtbar** ist für einen Gruppenleiter ein Deck, wenn es (oder ein Elterndeck) an mindestens
+  eine seiner Gruppen verteilt wird (`group_decks`). **Bearbeitbar** ist es nur, wenn *alle*
+  Gruppen, die es erhalten, von ihm geleitet werden; sonst nur ansehen. Admins sehen und
+  bearbeiten alles.
+- Die Filterung gilt serverseitig überall: Deckliste, Suche (auf die sichtbaren Decks
+  eingeschränkt), Notiz ansehen/anlegen/bearbeiten/löschen/aussetzen, Bibeltext, Deck-Export.
+- Neues Deck durch einen Gruppenleiter: unter einem bearbeitbaren Deck als Unterdeck, sonst
+  wird es sofort einer gewählten eigenen Gruppe zugewiesen (noch nicht verteilt). Ein schon
+  vorhandener Deckname, den er nicht bearbeiten darf, wird abgelehnt.
+- Im Gruppendeck-Modus für Gruppenleiter gesperrt: Lernen, Statistik, Deck-Optionen,
+  `.apkg`-Import (Import aktualisiert per GUID auch fremde Notizen), Export der ganzen Sammlung.
+- Seite „Gruppendecks“ (`/admin/group-decks`, Admins und Gruppenleiter): Decks der (eigenen)
+  Gruppen mit „zuletzt bearbeitet von …“, Zahl der Änderungen seit dem letzten Verteilen,
+  Button „Verteilen“ und Liste der letzten Änderungen.
+- Jede Änderung an Notizen der Admin-Collection (anlegen, bearbeiten, löschen, Bibeltext) wird in
+  `group_deck_edits` protokolliert (Nutzer, Notiz, Deck, Kurztext der Vorderseite). Die
+  Bearbeiten-Seite zeigt „Zuletzt geändert von …“.
+- Gleichzeitiges Bearbeiten: Das Formular schickt die `mod`-Zeit der Notiz mit. Wurde die Notiz
+  inzwischen von jemand anderem geändert, wird nicht überschrieben, sondern ein Hinweis
+  angezeigt (erneutes Speichern überschreibt bewusst).
 
 ## 8. Oberfläche & Technik
 

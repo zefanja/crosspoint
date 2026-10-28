@@ -135,6 +135,10 @@ class InvalidSearch(AnkiServiceError):
     pass
 
 
+class EditConflict(AnkiServiceError):
+    """The note was changed by someone else since the edit form was loaded."""
+
+
 class NotFound(AnkiServiceError):
     pass
 
@@ -195,6 +199,8 @@ class NoteData:
     readonly: bool
     suspended: bool
     generated: bool = False  # Bible Memorizer notes are generated from a text, not edited
+    deck_ids: list[int] = field(default_factory=list)  # decks of all cards
+    mod: int = 0  # modification time (seconds): detects concurrent edits
 
 
 @dataclass
@@ -869,6 +875,8 @@ def _note_data(col: Collection, note_id: int) -> NoteData:
         readonly=note.has_tag(GROUP_TAG),
         suspended=bool(cards) and all(c.queue == QUEUE_SUSPENDED for c in cards),
         generated=note.note_type()["name"] == BIBLE_MEMORIZER,
+        deck_ids=sorted({int(c.did) for c in cards}),
+        mod=int(note.mod),
     )
 
 
@@ -876,8 +884,12 @@ async def get_note(user_id: str, note_id: int) -> NoteData:
     return await _run(user_id, _note_data, note_id)
 
 
-def _update_note(col: Collection, note_id, fields, deck_id, allow_group: bool) -> None:
+def _update_note(col: Collection, note_id, fields, deck_id, allow_group: bool,
+                 expected_mod: int | None) -> None:
     note = _get_note_obj(col, note_id)
+    if expected_mod is not None and int(note.mod) != expected_mod:
+        raise EditConflict(N_("Someone else changed this note in the meantime. Check the "
+                              "fields and save again to overwrite the other change."))
     if note.has_tag(GROUP_TAG) and not allow_group:
         raise ReadOnlyNote(N_("Cards from group decks cannot be edited."))
     if note.note_type()["name"] == BIBLE_MEMORIZER:
@@ -892,10 +904,13 @@ def _update_note(col: Collection, note_id, fields, deck_id, allow_group: bool) -
 
 
 async def update_note(
-    user_id: str, note_id: int, fields: dict[str, str], deck_id: int, allow_group: bool = False
+    user_id: str, note_id: int, fields: dict[str, str], deck_id: int, allow_group: bool = False,
+    expected_mod: int | None = None,
 ) -> None:
-    """Update fields (already sanitized) and move the cards to `deck_id`."""
-    await _run(user_id, _update_note, note_id, fields, deck_id, allow_group)
+    """Update fields (already sanitized) and move the cards to `deck_id`. With
+    `expected_mod` (NoteData.mod when the form was loaded) a note changed in the meantime
+    raises EditConflict instead of being overwritten."""
+    await _run(user_id, _update_note, note_id, fields, deck_id, allow_group, expected_mod)
 
 
 def _delete_note(col: Collection, note_id: int, allow_group: bool) -> None:
@@ -1011,6 +1026,18 @@ def _set_card_suspended(col: Collection, card_id: int, suspended: bool) -> CardR
 async def set_card_suspended(user_id: str, card_id: int, suspended: bool) -> CardRow:
     """Suspend or unsuspend a single card (e.g. only the reverse card); returns its row."""
     return await _run(user_id, _set_card_suspended, card_id, suspended)
+
+
+def _card_deck_id(col: Collection, card_id: int) -> int:
+    try:
+        return int(col.get_card(card_id).did)
+    except NotFoundError as exc:
+        raise NotFound(N_("Card not found.")) from exc
+
+
+async def card_deck_id(user_id: str, card_id: int) -> int:
+    """The deck a card is in (permission checks before changing it)."""
+    return await _run(user_id, _card_deck_id, card_id)
 
 
 async def search_cards(user_id: str, query: str, limit: int = 200) -> tuple[list[CardRow], int]:

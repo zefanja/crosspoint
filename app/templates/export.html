@@ -19,6 +19,7 @@
     </form>
   </section>
 
+  {% if not leader_workspace %}
   <section class="panel">
     <div class="panel-head"><h2 class="panel-title">{{ _("Everything") }}</h2><span class="panel-note">{{ _("for new Anki users") }}</span></div>
     <p class="warn-note">{{ _("Replaces the collection in Anki when imported – only for empty/new Anki installations.") }}</p>
@@ -27,6 +28,7 @@
       <button class="btn-line strong">{{ _("Download .colpkg") }}</button>
     </form>
   </section>
+  {% endif %}
 
   <ol class="steps" aria-label="{{ _('How to continue in Anki') }}">
     <li><span class="step-num" aria-hidden="true">1</span><div><strong>{{ _("Install Anki") }}</strong>

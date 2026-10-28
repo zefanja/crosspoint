@@ -254,7 +254,6 @@ def test_group_leader_sees_only_own_group(client, login, make_user, db):
     for path in ("/admin/groups", f"/admin/groups/{g1}", f"/admin/users/{anna.id}", "/admin/import"):
         assert client.get(path).status_code == 403, path
     assert client.post("/admin/users", data={"csrf_token": csrf, "names": "X"}).status_code == 403
-    assert client.post("/admin/workspace", data={"csrf_token": csrf, "ws": "admin"}).status_code == 403
     job = wait_job(client, client.post("/admin/progress/refresh", data={"csrf_token": csrf},
                                        follow_redirects=False))
     assert job.done == 1  # only Anna

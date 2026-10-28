@@ -2,10 +2,13 @@
 
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
+from sqlalchemy.orm import Session as DbSession
 
-from app import anki_service
+from app import anki_service, workspace
 from app.auth import current_collection, require_user, verify_csrf
+from app.db import get_db
 from app.models import User
+from app.workspace import DeckAccess, deck_access, no_leader_workspace
 from app.templating import render
 from app.i18n import _, format_decimal
 
@@ -19,7 +22,10 @@ SECONDS_PER_CARD = 15  # rough estimate for the "~N min" hint
 
 @router.get("/")
 async def deck_list(request: Request, user: User = Depends(require_user),
-    col: str = Depends(current_collection), error: str | None = None):
+    col: str = Depends(current_collection), access: DeckAccess = Depends(deck_access),
+    error: str | None = None):
+    if access.restricted:
+        return await _leader_deck_list(request, access, error)
     decks = await anki_service.deck_list(col)
     stats = await anki_service.collection_stats(col, days=1)
     top = [d for d in decks if d.depth == 0]  # parent counts include their subdecks
@@ -37,19 +43,32 @@ async def deck_list(request: Request, user: User = Depends(require_user),
     )
 
 
+async def _leader_deck_list(request: Request, access: DeckAccess, error: str | None):
+    """Group leaders in the admin collection: their groups' decks, to browse and edit."""
+    decks = access.deck_list(await anki_service.deck_list(anki_service.ADMIN_COLLECTION))
+    return render(request, "decks_workspace.html", {
+        "decks": decks, "editable": access.editable, "groups": access.groups,
+        "searches": {d.id: anki_service.deck_search(d.name) for d in decks}, "error": error,
+    }, status_code=400 if error else 200)
+
+
 @router.post("/decks")
 async def create_deck(
-    request: Request, name: str = Form(""), user: User = Depends(verify_csrf),
-    col: str = Depends(current_collection)
+    request: Request, name: str = Form(""), group_id: int | None = Form(None),
+    user: User = Depends(verify_csrf), col: str = Depends(current_collection),
+    access: DeckAccess = Depends(deck_access), db: DbSession = Depends(get_db),
 ):
     try:
-        await anki_service.create_deck(col, name)
+        if access.restricted:
+            await workspace.create_deck(db, access, name, group_id)
+        else:
+            await anki_service.create_deck(col, name)
     except anki_service.AnkiServiceError as exc:
-        return await deck_list(request, user, col, error=_(str(exc)))
+        return await deck_list(request, user, col, access, error=_(str(exc)))
     return RedirectResponse("/", status_code=303)
 
 
-@router.get("/decks/{deck_id}/options")
+@router.get("/decks/{deck_id}/options", dependencies=[Depends(no_leader_workspace)])
 async def options_page(
     request: Request, deck_id: int, user: User = Depends(require_user),
     col: str = Depends(current_collection), saved: int = 0, optimized: str | None = None
@@ -65,7 +84,7 @@ async def options_page(
     )
 
 
-@router.post("/decks/{deck_id}/options")
+@router.post("/decks/{deck_id}/options", dependencies=[Depends(no_leader_workspace)])
 async def options_save(
     request: Request,
     deck_id: int,
@@ -100,7 +119,7 @@ async def options_save(
     return RedirectResponse(f"/decks/{deck_id}/options?saved=1", status_code=303)
 
 
-@router.post("/decks/{deck_id}/optimize")
+@router.post("/decks/{deck_id}/optimize", dependencies=[Depends(no_leader_workspace)])
 async def optimize(deck_id: int, user: User = Depends(verify_csrf),
                    col: str = Depends(current_collection)):
     result = await anki_service.optimize_fsrs(col, deck_id)
