@@ -66,7 +66,6 @@ def test_me_page(client, learner):
     r = client.get("/me")
     assert r.status_code == 200
     assert "Abmelden" in r.text and 'href="/export"' in r.text and "Sprache" in r.text
-    assert 'href="/import"' in r.text
     assert 'aria-current="page"' in r.text
 
 
@@ -412,7 +411,10 @@ def test_image_upload_rejects_non_images(client, learner):
 
 def test_apkg_import_into_own_collection_sanitizes(client, learner, tmp_path):
     user, csrf = learner
-    assert client.get("/import").status_code == 200
+    r = client.get("/import?deck_id=5")
+    assert r.status_code == 200 and 'aria-current="page">Anki-Deck<' in r.text
+    assert 'href="/notes/bible?deck_id=5"' in client.get("/import?deck_id=5").text
+    assert 'href="/import?deck_id=' in client.get("/notes/new").text
     did = client.portal.call(anki_service.create_deck, "SRC", "Johannes")
     client.portal.call(anki_service.add_note, "SRC", "Basic", did,
                        {"Front": "<b>F</b><script>alert(1)</script>", "Back": '<a href="x">B</a>'})

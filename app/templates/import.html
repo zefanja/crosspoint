@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Import Anki deck") }}{% endblock %}
 {% block content %}
-<p><a href="/me" class="back">‹ {{ _("Me") }}</a></p>
+<p><a href="/" class="back">‹ {{ _("Decks") }}</a></p>
 <section class="card">
-  <h1>{{ _("Import Anki deck") }}</h1>
-  <p class="muted">{{ _("A ready-made deck as an .apkg file, e.g. shared from Anki or created by an AI assistant. The cards are added to your collection; learning progress is not imported. Importing the same file again updates the cards.") }}</p>
+  <h1>{{ _("Add card") }}</h1>
+  {% set active_tab = "apkg" %}
+  {% include "partials/add_tabs.html" %}
+  <p class="muted small">{{ _("A ready-made deck as an .apkg file, e.g. shared from Anki or created by an AI assistant. The cards are added to your collection; learning progress is not imported. Importing the same file again updates the cards.") }}</p>
   {% if message %}<p class="alert alert-success" role="status">{{ message }}</p>{% endif %}
   {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
   <form method="post" action="/import" enctype="multipart/form-data" class="stack">

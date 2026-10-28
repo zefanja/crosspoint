@@ -6,7 +6,6 @@
 <div class="me-links">
   <a class="btn btn-block" href="/export">{{ _("Export to Anki") }}</a>
   <a class="btn btn-block" href="/notes/bible">{{ _("Import Bible text") }}</a>
-  <a class="btn btn-block" href="/import">{{ _("Import Anki deck (.apkg)") }}</a>
   {% if user.is_staff %}<a class="btn btn-block" href="/admin">{{ _("Admin") }}</a>{% endif %}
   <form method="post" action="/logout">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

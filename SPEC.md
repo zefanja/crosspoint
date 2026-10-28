@@ -199,7 +199,7 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 **Navigation (Lerner-Seiten)**
 - Untere Leiste: Start · Karten (Suche) · großer „+“-Button (Karte hinzufügen) ·
   Fortschritt (Statistik) · Ich. Nicht in der Lernansicht und im Admin-Bereich.
-- „Ich“ (`/me`): Export, Bibeltext importieren, Anki-Deck importieren, Verwaltung (Staff), Abmelden, Sprache,
+- „Ich“ (`/me`): Export, Bibeltext importieren, Verwaltung (Staff), Abmelden, Sprache,
   Datenschutz/Quellcode/Version (ersetzt auf diesen Seiten den Footer).
 
 **Lernansicht** (wichtigste Seite, mobile-first)
@@ -269,7 +269,7 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - Kurze bebilderte Anleitung: Anki installieren → Datei öffnen/importieren → AnkiWeb-Konto →
   synchronisieren.
 
-**Anki-Deck importieren** (`/import`)
+**Anki-Deck importieren** (`/import`, 4. Reiter „Anki-Deck“ unter „Karte hinzufügen“)
 - Fertiges `.apkg` (z. B. aus Anki geteilt oder von einem LLM mit `genanki` erzeugt) in die
   eigene Collection (bzw. die aktuelle Arbeits-Collection) importieren; max. 100 MB, kein
   `.colpkg`. Ohne Lernstand und Deck-Optionen; erneuter Import aktualisiert per GUID.

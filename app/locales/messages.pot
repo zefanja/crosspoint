@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-28 09:50+0000\n"
+"POT-Creation-Date: 2026-10-28 10:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -208,7 +208,7 @@ msgstr ""
 msgid "The file could not be imported. Is it a valid Anki file?"
 msgstr ""
 
-#: app/routes/imports.py:67
+#: app/routes/imports.py:68
 #, python-format
 msgid "“%(file)s” imported: %(count)s notes new or updated. The decks are now in your deck list."
 msgstr ""
@@ -223,7 +223,7 @@ msgstr ""
 #: app/templates/admin/progress.html:4 app/templates/admin/user_detail.html:23
 #: app/templates/admin/users.html:4 app/templates/admin/users.html:26
 #: app/templates/admin/users.html:55 app/templates/base.html:25
-#: app/templates/me.html:10
+#: app/templates/me.html:9
 msgid "Admin"
 msgstr ""
 
@@ -232,7 +232,7 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: app/templates/base.html:30 app/templates/me.html:13
+#: app/templates/base.html:30 app/templates/me.html:12
 msgid "Log out"
 msgstr ""
 
@@ -244,24 +244,24 @@ msgstr ""
 msgid "Back to my cards"
 msgstr ""
 
-#: app/templates/base.html:51 app/templates/me.html:27
+#: app/templates/base.html:51 app/templates/me.html:26
 msgid "Compatible with Anki"
 msgstr ""
 
-#: app/templates/base.html:53 app/templates/me.html:28
+#: app/templates/base.html:53 app/templates/me.html:27
 #: app/templates/privacy.html:2 app/templates/privacy.html:5
 msgid "Privacy"
 msgstr ""
 
-#: app/templates/base.html:55 app/templates/me.html:29
+#: app/templates/base.html:55 app/templates/me.html:28
 msgid "Source code"
 msgstr ""
 
-#: app/templates/base.html:57 app/templates/me.html:30
+#: app/templates/base.html:57 app/templates/me.html:29
 msgid "Version"
 msgstr ""
 
-#: app/templates/base.html:58 app/templates/me.html:18 app/templates/me.html:19
+#: app/templates/base.html:58 app/templates/me.html:17 app/templates/me.html:18
 msgid "Language"
 msgstr ""
 
@@ -270,8 +270,9 @@ msgid "Browse cards"
 msgstr ""
 
 #: app/templates/browse.html:4 app/templates/deck_options.html:4
-#: app/templates/export.html:4 app/templates/note_add.html:4
-#: app/templates/note_bible.html:4 app/templates/stats.html:4
+#: app/templates/export.html:4 app/templates/import.html:4
+#: app/templates/note_add.html:4 app/templates/note_bible.html:4
+#: app/templates/stats.html:4
 msgid "Decks"
 msgstr ""
 
@@ -586,40 +587,41 @@ msgstr ""
 msgid "Tap <em>Sync</em> in Anki and log in with your AnkiWeb account. Done!"
 msgstr ""
 
-#: app/templates/import.html:2 app/templates/import.html:6
+#: app/templates/import.html:2
 msgid "Import Anki deck"
 msgstr ""
 
-#: app/templates/import.html:4 app/templates/me.html:2
-#: app/templates/partials/tabbar.html:21
-msgid "Me"
+#: app/templates/import.html:6 app/templates/note_add.html:2
+#: app/templates/note_add.html:6 app/templates/note_bible.html:6
+#: app/templates/partials/tabbar.html:12
+msgid "Add card"
 msgstr ""
 
-#: app/templates/import.html:7
+#: app/templates/import.html:9
 msgid "A ready-made deck as an .apkg file, e.g. shared from Anki or created by an AI assistant. The cards are added to your collection; learning progress is not imported. Importing the same file again updates the cards."
 msgstr ""
 
-#: app/templates/admin/import.html:12 app/templates/import.html:12
+#: app/templates/admin/import.html:12 app/templates/import.html:14
 msgid "File"
 msgstr ""
 
-#: app/templates/admin/import.html:14 app/templates/import.html:14
+#: app/templates/admin/import.html:14 app/templates/import.html:16
 msgid "Import"
 msgstr ""
 
-#: app/templates/import.html:19
+#: app/templates/import.html:21
 msgid "Creating a deck with an AI assistant"
 msgstr ""
 
-#: app/templates/import.html:20
+#: app/templates/import.html:22
 msgid "Ask an AI assistant that can create files (e.g. Claude or ChatGPT), for example:"
 msgstr ""
 
-#: app/templates/import.html:21
+#: app/templates/import.html:23
 msgid "“Create an Anki deck as an .apkg file with 20 cards about the Gospel of John. Use the Python library genanki and the note type Basic (fields Front and Back). Deck name: John.”"
 msgstr ""
 
-#: app/templates/import.html:22
+#: app/templates/import.html:24
 msgid "Simple formatting (bold, lists, tables, images) is kept; scripts, styles and links are removed. Audio is not played."
 msgstr ""
 
@@ -636,17 +638,12 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
+#: app/templates/me.html:2 app/templates/partials/tabbar.html:21
+msgid "Me"
+msgstr ""
+
 #: app/templates/me.html:8 app/templates/note_bible.html:2
 msgid "Import Bible text"
-msgstr ""
-
-#: app/templates/me.html:9
-msgid "Import Anki deck (.apkg)"
-msgstr ""
-
-#: app/templates/note_add.html:2 app/templates/note_add.html:6
-#: app/templates/note_bible.html:6 app/templates/partials/tabbar.html:12
-msgid "Add card"
 msgstr ""
 
 #: app/templates/note_add.html:21
@@ -1274,6 +1271,10 @@ msgstr ""
 
 #: app/templates/partials/add_tabs.html:2
 msgid "Question & answer"
+msgstr ""
+
+#: app/templates/partials/add_tabs.html:2
+msgid "Anki deck"
 msgstr ""
 
 #: app/templates/partials/bible_preview.html:2

@@ -56,8 +56,9 @@ async def import_upload(file: UploadFile, col: str, *, sanitize: bool) -> tuple[
 
 
 @router.get("/import")
-def import_page(request: Request, user: User = Depends(require_user)):
-    return render(request, "import.html", {"message": None, "error": None})
+def import_page(request: Request, deck_id: int | None = None, user: User = Depends(require_user)):
+    # deck_id only keeps the selected deck when switching back to the other add tabs
+    return render(request, "import.html", {"message": None, "error": None, "deck_id": deck_id})
 
 
 @router.post("/import")
@@ -66,5 +67,5 @@ async def import_submit(request: Request, file: UploadFile, user: User = Depends
     count, error = await import_upload(file, col, sanitize=True)
     message = None if error else _("“%(file)s” imported: %(count)s notes new or updated. The decks are now in your deck list.",
                                    file=file.filename, count=count)
-    return render(request, "import.html", {"message": message, "error": error},
+    return render(request, "import.html", {"message": message, "error": error, "deck_id": None},
                   status_code=400 if error else 200)
