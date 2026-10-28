@@ -5,6 +5,21 @@
 <h1 class="page-title">{{ deck_name }} <span class="muted">{{ _("options") }}</span></h1>
 <div class="ui-stack">
   {% if saved %}<p class="alert alert-success" role="status">{{ _("Saved.") }}</p>{% endif %}
+  {% if renamed %}<p class="alert alert-success" role="status">{{ _("Deck renamed.") }}</p>{% endif %}
+  {% if rename_error %}<p class="alert alert-error" role="alert">{{ rename_error }}</p>{% endif %}
+  {% if can_rename %}
+  <form method="post" action="/decks/{{ deck_id }}/rename" class="panel">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="field">
+      <label class="field-label" for="deck_name">{{ _("Deck name") }}</label>
+      <div class="rename-row">
+        <input id="deck_name" name="name" class="input" value="{{ deck_name }}" required maxlength="100" autocomplete="off">
+        <button class="btn-line strong fsrs-btn">{{ _("Rename") }}</button>
+      </div>
+    </div>
+    <p class="hint">{{ _("Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>.") }}</p>
+  </form>
+  {% endif %}
   {% for e in errors %}<p class="alert alert-error" role="alert">{{ e }}</p>{% endfor %}
   <form method="post" class="ui-stack">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

@@ -260,6 +260,26 @@ def test_deck_options(client, learner):
     assert r.status_code == 400 and "0,97" in r.text
 
 
+def test_rename_deck(client, learner):
+    user, csrf = learner
+    deck = default_deck(client)
+    page = client.get(f"/decks/{deck}/options")
+    assert f'action="/decks/{deck}/rename"' in page.text
+    r = client.post(f"/decks/{deck}/rename", data={"csrf_token": csrf, "name": "Bibel::Verse"})
+    assert r.status_code == 200 and "Deck umbenannt" in r.text and 'value="Bibel::Verse"' in r.text
+    assert dict(client.portal.call(anki_service.deck_names, user.id))[deck] == "Bibel::Verse"
+    r = client.post(f"/decks/{deck}/rename", data={"csrf_token": csrf, "name": " :: "})
+    assert r.status_code == 400 and "Deckname" in r.text
+    assert client.post(f"/decks/{deck}/rename", data={"name": "X"}).status_code == 403
+
+    group = client.portal.call(anki_service.create_deck, user.id, "Gruppe")
+    client.portal.call(lambda: anki_service.add_note(
+        user.id, "Basic", group, {"Front": "G", "Back": "B"}, (anki_service.GROUP_TAG,)))
+    assert "/rename" not in client.get(f"/decks/{group}/options").text
+    r = client.post(f"/decks/{group}/rename", data={"csrf_token": csrf, "name": "Meins"})
+    assert r.status_code == 400 and "Gruppendecks" in r.text
+
+
 def test_exports_download_and_cleanup(client, learner, data_dir):
     _, csrf = learner
     deck = default_deck(client)

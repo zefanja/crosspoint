@@ -626,6 +626,45 @@ async def create_deck(user_id: str, name: str) -> int:
     return await _run(user_id, _create_deck, name)
 
 
+def _has_group_cards(col: Collection, deck_name: str) -> bool:
+    return bool(col.find_cards(f"{deck_search(deck_name)} tag:{GROUP_TAG}"))
+
+
+def _is_group_deck(col: Collection, deck_id: int) -> bool:
+    return _has_group_cards(col, _require_deck(col, deck_id)["name"])
+
+
+async def is_group_deck(user_id: str, deck_id: int) -> bool:
+    """The deck or one of its subdecks contains group deck cards."""
+    return await _run(user_id, _is_group_deck, deck_id)
+
+
+def _rename_deck(col: Collection, deck_id: int, name: str) -> str:
+    deck = _require_deck(col, deck_id)
+    old = deck["name"]
+    name = "::".join(part.strip() for part in name.split("::") if part.strip())
+    if not name:
+        raise AnkiServiceError(N_("Please enter a deck name."))
+    if name == old:
+        return name
+    # Anki itself would append "+" to a taken name and accepts moving a deck below itself.
+    if name.casefold().startswith(old.casefold() + "::"):
+        raise AnkiServiceError(N_("A deck cannot be moved into its own subdeck."))
+    existing = col.decks.id_for_name(name)
+    if existing and existing != deck_id:
+        raise AnkiServiceError(N_("A deck with this name already exists."))
+    if _has_group_cards(col, old):
+        # Distributing again would put new cards into a deck with the old name.
+        raise AnkiServiceError(N_("Group decks cannot be renamed."))
+    col.decks.rename(deck_id, name)
+    return name
+
+
+async def rename_deck(user_id: str, deck_id: int, name: str) -> str:
+    """Rename a deck (subdecks follow; `::` moves it). Returns the new full name."""
+    return await _run(user_id, _rename_deck, deck_id, name)
+
+
 # --------------------------------------------------------------------------- review
 
 

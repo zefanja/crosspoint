@@ -211,6 +211,9 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 
 **Lernansicht** (wichtigste Seite, mobile-first)
 - Kartenvorderseite füllt den Bildschirm; großer Button „Antwort zeigen“ unten (Daumenzone).
+- Die Lernansicht ist genau eine Bildschirmhöhe (`100dvh`): Die Karte schrumpft und scrollt bei
+  langem Inhalt in ihrem Rahmen, „Antwort zeigen“ und die Bewertungsbuttons sind ohne Scrollen
+  sichtbar (auch als installierte PWA auf kleinen Android-Geräten).
 - Danach vier Buttons **Nochmal / Schwer / Gut / Einfach** mit Intervall-Vorschau darunter
   („<10 min“, „2 T“, …). Farben wie Anki.
 - Desktop: Leertaste = Antwort zeigen / Gut; Tasten 1–4 = Bewertung; `Z` = Rückgängig.
@@ -271,6 +274,10 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - Antippen → Notiz bearbeiten, löschen (mit Bestätigung), alle Karten der Notiz aussetzen.
 
 **Deck-Optionen** (pro Deck, reduziert)
+- Deck umbenennen (oben auf der Seite; `::` verschiebt es, Unterdecks wandern mit). Abgelehnt:
+  leerer oder schon vergebener Name, Verschieben ins eigene Unterdeck und Decks, die (auch in
+  Unterdecks) Gruppendeck-Karten enthalten – erneutes Verteilen legte sonst die neuen Karten
+  im Deck mit dem alten Namen an. In der Admin-Collection (Gruppendecks) kein Umbenennen.
 - Neue Karten pro Tag (Standard 5), max. Wiederholungen pro Tag (Standard 200),
   gewünschte Retention (Slider 0,80–0,97, Standard 0,90).
 - FSRS ist immer an und nicht abschaltbar.
