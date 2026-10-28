@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body_class %}home-page{% endblock %}
 {% block topbar_extra %}
-<span class="streak-pill" title="{{ _('Days in a row with reviews') }}"><span class="streak-dot" aria-hidden="true"></span>{{ ngettext("%(num)s day", "%(num)s days", streak) }}</span>
+<a class="streak-pill" href="/stats" title="{{ _('Days in a row with reviews') }}"><span class="streak-dot" aria-hidden="true"></span>{{ ngettext("%(num)s day", "%(num)s days", streak) }}</a>
 {% endblock %}
 {% block content %}
 {% if first_name %}<h1 class="hello">{{ _("Hey %(name)s.", name=first_name) }}</h1>{% endif %}

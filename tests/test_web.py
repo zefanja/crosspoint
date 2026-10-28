@@ -60,6 +60,7 @@ def test_start_page_mission_and_review_all(client, learner):
     page = client.get("/")
     assert "Fertig<br>für heute" in page.text and "2 Karten wiederholt." in page.text
     assert "1 Tag" in page.text  # streak pill
+    assert re.search(r'<a class="streak-pill" href="/stats"', page.text)
 
 
 def test_me_page(client, learner):
