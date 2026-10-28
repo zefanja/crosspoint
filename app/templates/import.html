@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Import Anki deck") }}{% endblock %}
+{% block content %}
+<p><a href="/" class="back">‹ {{ _("Decks") }}</a></p>
+<section class="card">
+  <h1>{{ _("Add card") }}</h1>
+  {% set active_tab = "apkg" %}
+  {% include "partials/add_tabs.html" %}
+  <p class="muted small">{{ _("A ready-made deck as an .apkg file, e.g. shared from Anki or created by an AI assistant. The cards are added to your collection; learning progress is not imported. Importing the same file again updates the cards.") }}</p>
+  {% if message %}<p class="alert alert-success" role="status">{{ message }}</p>{% endif %}
+  {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
+  <form method="post" action="/import" enctype="multipart/form-data" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="file">{{ _("File") }}</label>
+    <input id="file" name="file" type="file" accept=".apkg" class="input" required>
+    <button class="btn btn-primary btn-block">{{ _("Import") }}</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>{{ _("Creating a deck with an AI assistant") }}</h2>
+  <p>{{ _("Ask an AI assistant that can create files (e.g. Claude or ChatGPT), for example:") }}</p>
+  <blockquote class="muted prompt-example">{{ _("“Create an Anki deck as an .apkg file with 20 cards about the Gospel of John. Use the Python library genanki and the note type Basic (fields Front and Back). Deck name: John.”") }}</blockquote>
+  <p class="muted small">{{ _("Simple formatting (bold, lists, tables, images) is kept; scripts, styles and links are removed. Audio is not played.") }}</p>
+</section>
+{% endblock %}

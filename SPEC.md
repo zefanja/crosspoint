@@ -221,7 +221,8 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 **Karten anlegen / bearbeiten**
 - Formular je Notiztyp; Deck-Auswahl; „Hinzufügen“ hält Formular offen (Serienanlage).
 - Felder: einfaches Textfeld, Zeilenumbrüche → `<br>`. Erlaubtes HTML nach Sanitizing:
-  `b, i, u, br, div, span, sup, sub, ul, ol, li` (Bibliothek `nh3`).
+  `b, i, u, br, div, span, sup, sub, ul, ol, li, p, strong, em, hr, blockquote, code, pre,
+  h1–h4, table, thead, tbody, tr, th, td` (Bibliothek `nh3`; keine Attribute, keine Links).
 - Karten in Gruppendecks sind für Lerner **schreibgeschützt** (Tag `gruppendeck` erkennen).
 - *Bilder* (Phase 3): optionaler Upload pro Karte (Vorder- oder Rückseite), PNG/JPEG/GIF/WebP
   bis 5 MB (Magic Bytes geprüft). Ablage über Ankis Medienordner (`col.media.write_data`,
@@ -267,6 +268,17 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - „Deck exportieren (in bestehendes Anki einfügen)“ → `.apkg` mit Lernstand und Deck-Optionen.
 - Kurze bebilderte Anleitung: Anki installieren → Datei öffnen/importieren → AnkiWeb-Konto →
   synchronisieren.
+
+**Anki-Deck importieren** (`/import`, 4. Reiter „Anki-Deck“ unter „Karte hinzufügen“)
+- Fertiges `.apkg` (z. B. aus Anki geteilt oder von einem LLM mit `genanki` erzeugt) in die
+  eigene Collection (bzw. die aktuelle Arbeits-Collection) importieren; max. 100 MB, kein
+  `.colpkg`. Ohne Lernstand und Deck-Optionen; erneuter Import aktualisiert per GUID.
+- Alle Felder der importierten Notizen laufen danach durch `sanitize.field_from_import`
+  (gleiche Allowlist wie beim Anlegen) – das Paket ist fremde Eingabe. Notiztyp-Vorlagen bleiben
+  unverändert (Darstellung ohnehin im sandboxed iframe). Fremde Notiztypen mit anderer ID
+  kommen als eigener Notiztyp hinzu (z. B. „Basic+“), wie in Anki Desktop.
+- Hinweis auf der Seite mit Beispiel-Prompt für einen KI-Assistenten.
+- Der Admin-Import (7.3) bleibt unsanitized (vertrauenswürdig, z. B. Bible-Memorizer-Tabellen).
 
 ### 7.2 Admin-Dashboard (MVP)
 

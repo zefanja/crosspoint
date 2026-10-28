@@ -1159,7 +1159,8 @@ async def export_deck(
     return await _run(user_id, _export_deck, deck_id, str(out_path), with_scheduling)
 
 
-def _import_package(col: Collection, path: str, with_scheduling: bool) -> int:
+def _import_package(col: Collection, path: str, with_scheduling: bool,
+                    clean_field: Callable[[str], str] | None) -> int:
     log_ = col.import_anki_package(
         ImportAnkiPackageRequest(
             package_path=path,
@@ -1172,12 +1173,31 @@ def _import_package(col: Collection, path: str, with_scheduling: bool) -> int:
             ),
         )
     )
-    return len(log_.log.new) + len(log_.log.updated)
+    imported = [*log_.log.new, *log_.log.updated]
+    if clean_field is not None:
+        _clean_notes(col, [entry.id.nid for entry in imported], clean_field)
+    return len(imported)
 
 
-async def import_package(user_id: str, path: Path, with_scheduling: bool = False) -> int:
-    """Import an .apkg; existing notes are updated by GUID. Returns new+updated count."""
-    return await _run(user_id, _import_package, str(path), with_scheduling)
+def _clean_notes(col: Collection, note_ids: list[int], clean_field: Callable[[str], str]) -> None:
+    changed = []
+    for nid in note_ids:
+        note = col.get_note(nid)
+        cleaned = [clean_field(value) for value in note.fields]
+        if cleaned != note.fields:
+            note.fields = cleaned
+            changed.append(note)
+    if changed:
+        col.update_notes(changed)
+
+
+async def import_package(user_id: str, path: Path, with_scheduling: bool = False,
+                         clean_field: Callable[[str], str] | None = None) -> int:
+    """Import an .apkg; existing notes are updated by GUID. Returns new+updated count.
+
+    `clean_field` (e.g. sanitize.field_from_import) is applied to every field of the
+    imported notes – for packages from untrusted sources."""
+    return await _run(user_id, _import_package, str(path), with_scheduling, clean_field)
 
 
 def _tag_deck_notes(col: Collection, deck_id: int, tag: str) -> int:
