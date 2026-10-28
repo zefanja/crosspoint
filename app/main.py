@@ -28,9 +28,7 @@ HOUSEKEEPING_INTERVAL = 60
 EXPORT_MAX_AGE = 3600
 
 CSP = (
-    "default-src 'self'; script-src 'self'; "
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-    "font-src 'self' https://fonts.gstatic.com; "
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
     "img-src 'self' data:; frame-src 'self'; frame-ancestors 'none'; base-uri 'none'; "
     "form-action 'self'"
 )

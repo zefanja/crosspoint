@@ -306,8 +306,9 @@ im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
 - **Backend:** Python 3.12, FastAPI, uvicorn (1 Worker), SQLAlchemy 2, Alembic, Jinja2.
 - **Frontend:** serverseitig gerenderte Seiten + htmx; minimales eigenes JS nur für
   Tastenkürzel in der Lernansicht. Kein Build-Schritt. htmx lokal ausliefern (kein CDN).
-- **Schrift:** Archivo von Google Fonts (einzige CDN-Ausnahme; CSP erlaubt
-  `fonts.googleapis.com`/`fonts.gstatic.com`), Fallback System-Schrift.
+- **Schrift:** Archivo (variabel, SIL OFL 1.1) selbst gehostet unter `app/static/fonts/`
+  (woff2, Subsets latin + latin-ext, Lizenz `OFL.txt`) und damit Teil des Images; kein CDN.
+  Fallback System-Schrift.
 - **CSS:** eigenes, schlankes Stylesheet mit CSS-Variablen, Hell/Dunkel nach System,
   Touch-Ziele ≥ 48 px, funktioniert ab 360 px Breite.
 - **Karten-Rendering:** Karten-HTML in einem `<iframe sandbox srcdoc=…>` ohne `allow-scripts`
@@ -348,8 +349,6 @@ im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
 - Datenschutzhinweis-Seite `/privacy` (Platzhaltertext) im Footer.
 - Nutzer kann jederzeit exportieren; Admin kann Nutzer samt Daten löschen.
 - Logs ohne Login-Codes (Query-Parameter `c` aus Access-Logs filtern).
-- Die Schrift kommt von Google Fonts: Browser übertragen dabei ihre IP-Adresse an Google.
-  Betreiber müssen das im Datenschutzhinweis nennen (oder Archivo selbst hosten).
 
 ## 10. Hosting: Docker auf eigenem Server (Portainer)
 
