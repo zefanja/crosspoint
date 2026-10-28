@@ -276,6 +276,7 @@ def test_rename_deck(client, learner):
     client.portal.call(lambda: anki_service.add_note(
         user.id, "Basic", group, {"Front": "G", "Back": "B"}, (anki_service.GROUP_TAG,)))
     assert "/rename" not in client.get(f"/decks/{group}/options").text
+    assert "/rename" not in client.get(f"/decks/{group}/rename").text
     r = client.post(f"/decks/{group}/rename", data={"csrf_token": csrf, "name": "Meins"})
     assert r.status_code == 400 and "Gruppendecks" in r.text
 

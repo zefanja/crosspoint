@@ -275,9 +275,9 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 
 **Deck-Optionen** (pro Deck, reduziert)
 - Deck umbenennen (oben auf der Seite; `::` verschiebt es, Unterdecks wandern mit). Abgelehnt:
-  leerer oder schon vergebener Name, Verschieben ins eigene Unterdeck und Decks, die (auch in
-  Unterdecks) Gruppendeck-Karten enthalten – erneutes Verteilen legte sonst die neuen Karten
-  im Deck mit dem alten Namen an. In der Admin-Collection (Gruppendecks) kein Umbenennen.
+  leerer oder schon vergebener Name, Verschieben ins eigene Unterdeck und – für Lerner – Decks,
+  die (auch in Unterdecks) Gruppendeck-Karten enthalten. Gruppendecks benennt nur die
+  Admin-Collection um (§7.3).
 - Neue Karten pro Tag (Standard 5), max. Wiederholungen pro Tag (Standard 200),
   gewünschte Retention (Slider 0,80–0,97, Standard 0,90).
 - FSRS ist immer an und nicht abschaltbar.
@@ -375,6 +375,15 @@ im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
 - Jede Änderung an Notizen der Admin-Collection (anlegen, bearbeiten, löschen, Bibeltext) wird in
   `group_deck_edits` protokolliert (Nutzer, Notiz, Deck, Kurztext der Vorderseite). Die
   Bearbeiten-Seite zeigt „Zuletzt geändert von …“.
+- **Umbenennen** (Admins über die Deck-Optionen, Gruppenleiter über ✎ in ihrer Deckliste, nur
+  bearbeitbare Decks): Der Import ordnet Decks per **Name** zu und lässt vorhandene Karten, wo
+  sie sind – erneutes Verteilen nach einer Umbenennung nur in der Admin-Collection legte also
+  ein zweites Deck mit dem neuen Namen an. Deshalb benennt eine Hintergrundaufgabe das Deck
+  (samt Unterdecks) sofort in allen Collections der Mitglieder der empfangenden Gruppen um
+  (`rename_deck_by_name`; Mitglieder ohne das Deck werden übersprungen, ein dort schon
+  vergebener Name wird als Fehler gemeldet) und `group_decks.deck_name` wird angepasst. Nur der
+  letzte Namensteil ist änderbar (kein Verschieben in ein anderes Elterndeck), damit
+  empfangende Gruppen und Rechte der Gruppenleiter gleich bleiben.
 - Gleichzeitiges Bearbeiten: Das Formular schickt die `mod`-Zeit der Notiz mit. Wurde die Notiz
   inzwischen von jemand anderem geändert, wird nicht überschrieben, sondern ein Hinweis
   angezeigt (erneutes Speichern überschreibt bewusst).

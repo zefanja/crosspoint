@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-28 20:14+0000\n"
+"POT-Creation-Date: 2026-10-28 20:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,77 +27,87 @@ msgstr ""
 
 #: app/anki_service.py:613 app/routes/admin_group_decks.py:71
 #: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
-#: app/routes/decks.py:75 app/routes/export.py:59
+#: app/routes/decks.py:75 app/routes/decks.py:146 app/routes/decks.py:149
+#: app/routes/export.py:59 app/workspace.py:193
 msgid "Deck not found."
 msgstr ""
 
-#: app/anki_service.py:620 app/anki_service.py:647 app/workspace.py:161
+#: app/anki_service.py:620 app/anki_service.py:648 app/workspace.py:161
 msgid "Please enter a deck name."
 msgstr ""
 
-#: app/anki_service.py:652
+#: app/anki_service.py:653
+msgid "Group decks can only be renamed, not moved to another parent deck."
+msgstr ""
+
+#: app/anki_service.py:660
 msgid "A deck cannot be moved into its own subdeck."
 msgstr ""
 
-#: app/anki_service.py:655 app/workspace.py:167
+#: app/anki_service.py:663 app/anki_service.py:684 app/workspace.py:167
 msgid "A deck with this name already exists."
 msgstr ""
 
-#: app/anki_service.py:658 app/routes/decks.py:139
+#: app/anki_service.py:666 app/templates/deck_rename.html:9
 msgid "Group decks cannot be renamed."
 msgstr ""
 
-#: app/anki_service.py:826 app/workspace.py:65
+#: app/anki_service.py:853 app/workspace.py:65
 msgid "Note not found."
 msgstr ""
 
-#: app/anki_service.py:834
+#: app/anki_service.py:861
 msgid "The first field must not be empty."
 msgstr ""
 
-#: app/anki_service.py:840 app/routes/notes.py:79
+#: app/anki_service.py:867 app/routes/notes.py:79
 msgid "Note type not found."
 msgstr ""
 
-#: app/anki_service.py:867
+#: app/anki_service.py:894
 msgid "Please enter a Bible text."
 msgstr ""
 
-#: app/anki_service.py:877
+#: app/anki_service.py:904
 msgid "[Beginning]"
 msgstr ""
 
-#: app/anki_service.py:930
+#: app/anki_service.py:957
 msgid "Someone else changed this note in the meantime. Check the fields and save again to overwrite the other change."
 msgstr ""
 
-#: app/anki_service.py:933
+#: app/anki_service.py:960
 msgid "Cards from group decks cannot be edited."
 msgstr ""
 
-#: app/anki_service.py:935
+#: app/anki_service.py:962
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr ""
 
-#: app/anki_service.py:958
+#: app/anki_service.py:985
 msgid "Cards from group decks cannot be deleted."
 msgstr ""
 
-#: app/anki_service.py:1056 app/anki_service.py:1074
+#: app/anki_service.py:1083 app/anki_service.py:1101
 msgid "Card not found."
 msgstr ""
 
-#: app/anki_service.py:1459
+#: app/anki_service.py:1486
 msgid "The image is too large (max. 5 MB)."
 msgstr ""
 
-#: app/anki_service.py:1462
+#: app/anki_service.py:1489
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr ""
 
 #: app/distribution.py:138
 #, python-format
 msgid "Distribute “%(deck)s”"
+msgstr ""
+
+#: app/distribution.py:171
+#, python-format
+msgid "Rename “%(old)s” to “%(new)s”"
 msgstr ""
 
 #: app/main.py:135
@@ -232,15 +242,15 @@ msgstr ""
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr ""
 
-#: app/routes/decks.py:115
+#: app/routes/decks.py:116
 msgid "New cards per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:117
+#: app/routes/decks.py:118
 msgid "Reviews per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:119
+#: app/routes/decks.py:120
 #, python-format
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr ""
@@ -352,7 +362,8 @@ msgstr ""
 msgid "Options"
 msgstr ""
 
-#: app/templates/deck_options.html:3 app/templates/decks_workspace.html:13
+#: app/templates/deck_options.html:3 app/templates/deck_rename.html:3
+#: app/templates/decks_workspace.html:13
 msgid "Decks"
 msgstr ""
 
@@ -369,88 +380,79 @@ msgstr ""
 msgid "Deck renamed."
 msgstr ""
 
-#: app/templates/deck_options.html:13 app/templates/decks.html:37
-#: app/templates/decks_workspace.html:18
-msgid "Deck name"
-msgstr ""
-
-#: app/templates/admin/group_detail.html:84 app/templates/deck_options.html:16
-msgid "Rename"
-msgstr ""
-
-#: app/templates/deck_options.html:20 app/templates/decks.html:40
-msgid "Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>."
-msgstr ""
-
-#: app/templates/deck_options.html:27
+#: app/templates/deck_options.html:15
 msgid "New cards per day"
 msgstr ""
 
-#: app/templates/deck_options.html:28 app/templates/deck_options.html:35
+#: app/templates/deck_options.html:16 app/templates/deck_options.html:23
 #: app/templates/note_bible.html:34
 msgid "Fewer"
 msgstr ""
 
-#: app/templates/deck_options.html:31 app/templates/deck_options.html:38
+#: app/templates/deck_options.html:19 app/templates/deck_options.html:26
 #: app/templates/me.html:16 app/templates/note_bible.html:36
 msgid "More"
 msgstr ""
 
-#: app/templates/deck_options.html:34
+#: app/templates/deck_options.html:22
 msgid "Max. reviews per day"
 msgstr ""
 
-#: app/templates/deck_options.html:42
+#: app/templates/deck_options.html:30
 msgid "Desired retention"
 msgstr ""
 
-#: app/templates/deck_options.html:48
+#: app/templates/deck_options.html:36
 msgid "Higher = you remember more, but review more often. 0.90 is a good default."
 msgstr ""
 
-#: app/templates/deck_options.html:51
+#: app/templates/deck_options.html:39
 msgid "New cards: introduce sibling cards on different days"
 msgstr ""
 
-#: app/templates/deck_options.html:55
+#: app/templates/deck_options.html:43
 msgid "Reviews: show sibling cards on different days"
 msgstr ""
 
-#: app/templates/deck_options.html:58
+#: app/templates/deck_options.html:46
 msgid "Sibling cards come from the same note, e.g. a verse and its reverse card. On different days, one card does not give away the answer to the other."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:59
+#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:47
 #: app/templates/note_edit.html:28
 msgid "Save"
 msgstr ""
 
-#: app/templates/deck_options.html:62
+#: app/templates/deck_options.html:50
 msgid "Parameters optimized. Future intervals use your personal parameters."
 msgstr ""
 
-#: app/templates/deck_options.html:63
+#: app/templates/deck_options.html:51
 msgid "Not enough reviews yet or no improvement found – the parameters stay unchanged."
 msgstr ""
 
-#: app/templates/deck_options.html:68
+#: app/templates/deck_options.html:56
 msgid "Optimize FSRS"
 msgstr ""
 
-#: app/templates/deck_options.html:69
+#: app/templates/deck_options.html:57
 #, python-format
 msgid "%(num)s review so far"
 msgid_plural "%(num)s reviews so far"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/deck_options.html:71
+#: app/templates/deck_options.html:59
 msgid "Optimize"
 msgstr ""
 
-#: app/templates/deck_options.html:73
+#: app/templates/deck_options.html:61
 #, python-format
 msgid "FSRS can adapt to your memory based on your review history. This makes sense from about %(n)s reviews."
+msgstr ""
+
+#: app/templates/deck_rename.html:2 app/templates/deck_rename.html:5
+msgid "Rename deck"
 msgstr ""
 
 #: app/templates/decks.html:4 app/templates/me.html:4
@@ -534,9 +536,18 @@ msgstr ""
 msgid "e.g. Psalms"
 msgstr ""
 
+#: app/templates/decks.html:37 app/templates/decks_workspace.html:18
+#: app/templates/partials/deck_rename.html:4
+msgid "Deck name"
+msgstr ""
+
 #: app/templates/admin/groups.html:11 app/templates/decks.html:38
 #: app/templates/decks_workspace.html:27
 msgid "Create"
+msgstr ""
+
+#: app/templates/decks.html:40 app/templates/partials/deck_rename.html:13
+msgid "Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>."
 msgstr ""
 
 #: app/templates/decks.html:50
@@ -605,16 +616,27 @@ msgstr ""
 
 #: app/templates/decks_workspace.html:43
 #, python-format
+msgid "Rename %(deck)s"
+msgstr ""
+
+#: app/templates/admin/group_detail.html:84
+#: app/templates/decks_workspace.html:43
+#: app/templates/partials/deck_rename.html:7
+msgid "Rename"
+msgstr ""
+
+#: app/templates/decks_workspace.html:44
+#, python-format
 msgid "Add card to %(deck)s"
 msgstr ""
 
-#: app/templates/decks_workspace.html:43 app/templates/import.html:4
+#: app/templates/decks_workspace.html:44 app/templates/import.html:4
 #: app/templates/note_add.html:2 app/templates/note_add.html:4
 #: app/templates/note_bible.html:4 app/templates/partials/tabbar.html:12
 msgid "Add card"
 msgstr ""
 
-#: app/templates/decks_workspace.html:46
+#: app/templates/decks_workspace.html:47
 msgid "Your groups don't have any decks yet. Create the first one with “+ New deck”."
 msgstr ""
 
@@ -1548,6 +1570,10 @@ msgstr ""
 
 #: app/templates/partials/browse_status.html:3
 msgid "today"
+msgstr ""
+
+#: app/templates/partials/deck_rename.html:11
+msgid "The deck is also renamed for all group members who already received it. Only the last part of the name can be changed."
 msgstr ""
 
 #: app/templates/partials/image_upload.html:2

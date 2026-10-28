@@ -67,11 +67,11 @@ def test_rename_deck(run, deck):
     other = run(svc.create_deck(U, "Andere"))
     child = run(svc.create_deck(U, f"{DECK}::Psalmen"))
     nid = add_verse(run, child)
-    assert run(svc.rename_deck(U, deck, " Bibel :: Karten ")) == "Bibel::Karten"
+    assert run(svc.rename_deck(U, deck, " Bibel :: Karten ")) == (DECK, "Bibel::Karten")
     names = dict(run(svc.deck_names(U)))
     assert names[deck] == "Bibel::Karten" and names[child] == "Bibel::Karten::Psalmen"
     assert run(svc.get_note(U, nid)).deck_id == child  # cards stay in their (renamed) deck
-    assert run(svc.rename_deck(U, other, "andere")) == "andere"  # case only
+    assert run(svc.rename_deck(U, other, "andere")) == ("Andere", "andere")  # case only
     for name in (" :: ", "ANDERE", "Bibel::Karten::Psalmen", "Bibel::Karten::Neu"):
         with pytest.raises(svc.AnkiServiceError):
             run(svc.rename_deck(U, deck, name))
@@ -89,6 +89,25 @@ def test_group_decks_cannot_be_renamed(run, deck):
         with pytest.raises(svc.AnkiServiceError):
             run(svc.rename_deck(U, did, "Neu"))
     assert dict(run(svc.deck_names(U)))[child] == f"{DECK}::Gruppe"
+    # the admin collection renames group decks, but keeps the parent deck
+    assert run(svc.rename_deck(U, child, "Name", allow_group=True, keep_parent=True)) \
+        == (f"{DECK}::Gruppe", f"{DECK}::Name")
+    assert run(svc.rename_deck(U, child, f"{DECK.lower()}::Neu", allow_group=True,
+                               keep_parent=True))[1] == f"{DECK}::Neu"
+    with pytest.raises(svc.AnkiServiceError):
+        run(svc.rename_deck(U, child, "Anderswo::Neu", allow_group=True, keep_parent=True))
+
+
+def test_rename_deck_by_name(run, deck):
+    child = run(svc.create_deck(U, f"{DECK}::Gruppe"))
+    other = run(svc.create_deck(U, "Andere"))
+    assert run(svc.rename_deck_by_name(U, DECK.upper(), "Neu"))
+    names = dict(run(svc.deck_names(U)))
+    assert names[deck] == "Neu" and names[child] == "Neu::Gruppe"
+    assert not run(svc.rename_deck_by_name(U, "Gibt es nicht", "X"))
+    with pytest.raises(svc.AnkiServiceError):
+        run(svc.rename_deck_by_name(U, "Neu", "andere"))
+    assert dict(run(svc.deck_names(U)))[other] == "Andere"
 
 
 def test_deck_list_card_counts(run, deck):
