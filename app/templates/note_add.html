@@ -1,24 +1,25 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Add card") }}{% endblock %}
 {% block content %}
-<p><a href="/" class="back">‹ {{ _("Decks") }}</a></p>
-<section class="card">
-  <h1>{{ _("Add card") }}</h1>
+<h1 class="page-title">{{ _("Add card") }}</h1>
+<div class="ui-stack">
   {% set active_tab = "qa" if notetype.name == "Basic" else "verse" %}
   {% include "partials/add_tabs.html" %}
   {% if message %}<p class="alert alert-success" role="status">{{ message }}</p>{% endif %}
   {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
-  <form method="post" action="/notes/new" class="stack" enctype="multipart/form-data">
+  <form method="post" action="/notes/new" class="ui-stack" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="notetype" value="{{ notetype.name }}">
-    <label for="deck_id">{{ _("Deck") }}</label>
-    <select id="deck_id" name="deck_id" class="input">
-      {% for did, name in decks %}<option value="{{ did }}"{% if did == deck_id %} selected{% endif %}>{{ name }}</option>{% endfor %}
-    </select>
+    <div class="field">
+      <label for="deck_id" class="field-label">{{ _("Deck") }}</label>
+      <select id="deck_id" name="deck_id" class="input">
+        {% for did, name in decks %}<option value="{{ did }}"{% if did == deck_id %} selected{% endif %}>{{ name }}</option>{% endfor %}
+      </select>
+    </div>
     {% set field_names = notetype.fields %}{% set readonly = false %}
     {% include "partials/note_fields.html" %}
     {% include "partials/image_upload.html" %}
-    <button type="submit" class="btn btn-primary btn-block">{{ _("Add") }}</button>
+    <button type="submit" class="btn-go">{{ _("Add") }}</button>
   </form>
-</section>
+</div>
 {% endblock %}

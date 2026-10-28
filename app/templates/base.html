@@ -17,8 +17,9 @@
 </head>
 {% set show_tabs = user and not request.url.path.startswith("/admin") %}
 <body class="{% block body_class %}{% endblock %}{% if user and user.is_staff %} user-admin{% endif %}{% if request.url.path.startswith("/admin") %} admin-page{% endif %}{% if show_tabs %} has-tabs{% endif %}"{% if csrf_token %} hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'{% endif %}>
+  {% block topbar %}
   <header class="topbar">
-    <a href="/" class="brand" aria-label="{{ app_name }}"><img src="/static/icons/icon.svg" alt="" width="28" height="28"><span aria-hidden="true">Cross<span class="brand-point">Point</span></span></a>
+    {% block topbar_left %}<a href="/" class="brand" aria-label="{{ app_name }}"><img src="/static/icons/icon.svg" alt="" width="28" height="28"><span aria-hidden="true">Cross<span class="brand-point">Point</span></span></a>{% endblock %}
     {% if user %}
     <nav class="topnav">
       {% block topbar_extra %}{% endblock %}
@@ -33,6 +34,7 @@
     </nav>
     {% endif %}
   </header>
+  {% endblock %}
   {% if admin_workspace %}
   <div class="ws-banner" role="status">
     <span>{{ _("You are editing the admin collection (group decks).") }}</span>

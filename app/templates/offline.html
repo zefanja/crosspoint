@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block title %}{{ _("No connection") }} – {{ app_name }}{% endblock %}
+{% block body_class %}splash-page{% endblock %}
 {% block content %}
-<section class="card narrow">
-  <h1>{{ _("No connection") }}</h1>
-  <p>{{ _("CrossPoint needs an internet connection. Please check your connection and try again.") }}</p>
-  <a href="/" class="btn btn-primary">{{ _("Try again") }}</a>
+<section class="splash">
+  <h1 class="splash-title">{{ _("No<br>connection") }}</h1>
+  <p class="splash-text">{{ _("CrossPoint needs an internet connection. Please check your connection and try again.") }}</p>
 </section>
+<div class="splash-actions"><a href="/" class="btn-go">{{ _("Try again") }}</a></div>
 {% endblock %}

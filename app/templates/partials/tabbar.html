@@ -1,5 +1,5 @@
 {% set path = request.url.path %}
-{% set active = "start" if path == "/" else "cards" if path.startswith("/browse") or (path.startswith("/notes/") and path not in ("/notes/new", "/notes/bible")) else "add" if path in ("/notes/new", "/notes/bible") else "progress" if path.startswith("/stats") else "me" if path in ("/me", "/export", "/privacy") else "" %}
+{% set active = "start" if path == "/" else "cards" if path.startswith("/browse") or (path.startswith("/notes/") and path not in ("/notes/new", "/notes/bible", "/import")) else "add" if path in ("/notes/new", "/notes/bible", "/import") else "progress" if path.startswith("/stats") else "me" if path in ("/me", "/export", "/privacy") else "" %}
 <nav class="tabbar" aria-label="{{ _('Main navigation') }}">
   <a href="/" class="tab-item{% if active == 'start' %} active{% endif %}"{% if active == 'start' %} aria-current="page"{% endif %}>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/></svg>

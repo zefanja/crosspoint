@@ -117,6 +117,9 @@ async def headers_and_session_refresh(request: Request, call_next):
     response.headers.setdefault("Content-Security-Policy", CSP)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("Referrer-Policy", "same-origin")
+    if request.url.path.startswith("/static/fonts/"):
+        # card frames are sandboxed (opaque origin) and fetch the font cross-origin
+        response.headers.setdefault("Access-Control-Allow-Origin", "*")
     return response
 
 

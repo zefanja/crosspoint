@@ -56,18 +56,44 @@ def test_start_page_mission_and_review_all(client, learner):
         r = client.post("/review/0/answer", headers=HX,
                         data={"csrf_token": csrf, "card_id": card_id, "rating": 4})
         assert r.status_code == 200
-    assert "Fertig für heute" in r.text
+    assert "Fertig<br>für heute" in r.text and "2 Karten wiederholt" not in r.text  # per deck
     page = client.get("/")
     assert "Fertig<br>für heute" in page.text and "2 Karten wiederholt." in page.text
     assert "1 Tag" in page.text  # streak pill
     assert re.search(r'<a class="streak-pill" href="/stats"', page.text)
 
 
-def test_me_page(client, learner):
+def test_me_page(client, learner, db):
+    from app.models import Group, GroupMember
+    user, _csrf = learner
+    group = Group(name="Jugendfreizeit 2026")
+    db.add(group)
+    db.flush()
+    db.add(GroupMember(group_id=group.id, user_id=user.id))
+    db.commit()
     r = client.get("/me")
     assert r.status_code == 200
     assert "Abmelden" in r.text and 'href="/export"' in r.text and "Sprache" in r.text
-    assert 'aria-current="page"' in r.text
+    assert 'aria-current="page"' in r.text and "Jugendfreizeit 2026" in r.text
+    assert 'class="streak-pill"' in r.text and "TEAM" not in r.text  # no admin row for learners
+
+
+def test_done_screen_offers_next_deck(client, learner):
+    _, csrf = learner
+    deck = default_deck(client)
+    client.post("/decks", data={"csrf_token": csrf, "name": "Psalmen"})
+    page = client.get("/")
+    other = int(re.search(r'href="/review/(\d+)">\s*<span class="deck-info">\s*<span class="deck-title"><span class="deck-name">Psalmen<', page.text).group(1))
+    add_verse(client, csrf, other, ref="Ps 23,1")
+    r = client.get(f"/review/{deck}")  # nothing due in "Meine Karten"
+    assert "Fertig<br>für heute" in r.text
+    assert f'href="/review/{other}"' in r.text and "Nächstes Deck: Psalmen · 1" in r.text
+
+
+def test_static_fonts_allow_card_frames(client):
+    r = client.get("/static/fonts/archivo-latin.woff2")
+    assert r.status_code == 200 and r.headers["access-control-allow-origin"] == "*"
+    assert "access-control-allow-origin" not in client.get("/static/app.css").headers
 
 
 def test_create_deck(client, learner):
@@ -132,7 +158,8 @@ def test_review_done_and_banner(client, learner):
     card_id = re.search(r'name="card_id" value="(\d+)"', page.text).group(1)
     r = client.post(f"/review/{deck}/answer", headers=HX,
                     data={"csrf_token": csrf, "card_id": card_id, "rating": 4})
-    assert "Fertig für heute" in r.text
+    assert "Fertig<br>für heute" in r.text and "Karte wiederholt" in r.text
+    assert "Tag in Folge" in r.text and "Nächstes Deck" not in r.text
     assert "Fertig<br>für heute" in client.get("/").text
 
 
@@ -237,7 +264,7 @@ def test_exports_download_and_cleanup(client, learner, data_dir):
     _, csrf = learner
     deck = default_deck(client)
     add_verse(client, csrf, deck)
-    assert "Alles herunterladen" in client.get("/export").text
+    assert ".colpkg herunterladen" in client.get("/export").text
 
     r = client.post("/export/collection", data={"csrf_token": csrf})
     assert r.status_code == 200 and r.content[:2] == b"PK"
@@ -356,8 +383,10 @@ def test_stats_page(client, learner):
     card_id = re.search(r'name="card_id" value="(\d+)"', page.text).group(1)
     client.post(f"/review/{deck}/answer", headers=HX, data={"csrf_token": csrf, "card_id": card_id, "rating": 3})
     r = client.get("/stats")
-    assert r.status_code == 200 and "Statistik" in r.text
-    assert r.text.count('class="hm ') >= 365 and 'class="fc-col"' in r.text
+    assert r.status_code == 200 and "Fortschritt" in r.text
+    assert r.text.count('class="hm2') == 16 * 7 and 'class="fc-col"' in r.text
+    assert 'class="score-num">1<' in r.text and "Tag in Folge." in r.text and "Für heute gesichert" in r.text
+    assert 'class="on"' in r.text  # today in the week strip
     assert client.get(f"/stats?deck={deck}").status_code == 200
     assert client.get("/stats?deck=999").status_code == 200  # unknown deck → all decks
 

@@ -1,0 +1,5 @@
+{%- if r.status == "new" %}<span class="pill pill-new">{{ _("new") }}</span>
+{%- elif r.status == "suspended" %}<span class="pill pill-off">{{ _("suspended") }}</span>
+{%- elif r.due and r.due <= today %}<span class="pill pill-today">{{ _("today") }}</span>
+{%- elif r.due %}<span class="pill">{{ r.due | short_date }}</span>
+{%- endif %}

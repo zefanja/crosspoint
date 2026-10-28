@@ -1,39 +1,41 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Edit note") }}{% endblock %}
+{% block topbar_left %}<a href="/browse" class="topbar-back">‹ {{ _("Cards") }}</a>{% endblock %}
+{% block topbar_extra %}<span class="topbar-badge">{{ note.notetype }}</span>{% endblock %}
 {% block content %}
-<p><a href="/browse" class="back">‹ {{ _("Cards") }}</a></p>
-<section class="card">
-  <h1>{{ _("Edit note") }}</h1>
-  <p class="muted small">{{ _("Note type: %(type)s", type=note.notetype) }}{% if note.suspended %} · <strong>{{ _("suspended") }}</strong>{% endif %}</p>
+<h1 class="page-title">{{ _("Edit note") }}</h1>
+{% set locked = note.readonly or note.generated %}
+<div class="ui-stack">
+  {% if note.suspended %}<p class="alert">{{ _("This note is suspended – its cards are not shown when studying.") }}</p>{% endif %}
   {% if note.readonly %}<p class="alert">{{ _("This card belongs to a group deck and cannot be edited.") }}</p>
   {% elif note.generated %}<p class="alert">{{ _("Bible text cards are generated from the text and cannot be edited individually. To change them, delete and import the passage again.") }}</p>{% endif %}
-  {% set locked = note.readonly or note.generated %}
   {% if saved %}<p class="alert alert-success" role="status">{{ _("Saved.") }}</p>{% endif %}
   {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
-  <form method="post" class="stack" enctype="multipart/form-data">
+  <form method="post" class="ui-stack" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <label for="deck_id">{{ _("Deck") }}</label>
-    <select id="deck_id" name="deck_id" class="input"{% if locked %} disabled{% endif %}>
-      {% for did, name in decks %}<option value="{{ did }}"{% if did == note.deck_id %} selected{% endif %}>{{ name }}</option>{% endfor %}
-    </select>
+    <div class="field">
+      <label for="deck_id" class="field-label">{{ _("Deck") }}</label>
+      <select id="deck_id" name="deck_id" class="input"{% if locked %} disabled{% endif %}>
+        {% for did, name in decks %}<option value="{{ did }}"{% if did == note.deck_id %} selected{% endif %}>{{ name }}</option>{% endfor %}
+      </select>
+    </div>
     {% set field_names = note.fields | map("first") | list %}{% set readonly = locked %}
     {% include "partials/note_fields.html" %}
     {% if not locked %}{% include "partials/image_upload.html" %}{% endif %}
-    {% if not locked %}<button type="submit" class="btn btn-primary btn-block">{{ _("Save") }}</button>{% endif %}
+    {% if not locked %}<button type="submit" class="btn-go">{{ _("Save") }}</button>{% endif %}
   </form>
-</section>
-
-<div class="actions-grid">
-  <form method="post" action="/notes/{{ note.id }}/suspend">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <input type="hidden" name="suspended" value="{{ 0 if note.suspended else 1 }}">
-    <button class="btn btn-block">{{ _("Unsuspend") if note.suspended else _("Suspend") }}</button>
-  </form>
-  {% if not note.readonly %}
-  <form method="post" action="/notes/{{ note.id }}/delete" data-confirm="{{ _('Really delete this card? Its learning progress will be lost.') }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <button class="btn btn-danger btn-block">{{ _("Delete") }}</button>
-  </form>
-  {% endif %}
+  <div class="btn-pair">
+    <form method="post" action="/notes/{{ note.id }}/suspend">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="suspended" value="{{ 0 if note.suspended else 1 }}">
+      <button class="btn-line">{{ _("Unsuspend") if note.suspended else _("Suspend") }}</button>
+    </form>
+    {% if not note.readonly %}
+    <form method="post" action="/notes/{{ note.id }}/delete" data-confirm="{{ _('Really delete this card? Its learning progress will be lost.') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn-line danger">{{ _("Delete") }}</button>
+    </form>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
