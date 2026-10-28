@@ -12,12 +12,13 @@ The current language lives in a context variable set per request (middleware).
 
 import io
 from contextvars import ContextVar
-from datetime import date
+from datetime import date, datetime
 from functools import lru_cache
 from pathlib import Path
 
 from babel import Locale, UnknownLocaleError
 from babel.dates import format_date as _babel_format_date
+from babel.dates import format_datetime as _babel_format_datetime
 from babel.dates import format_skeleton as _babel_format_skeleton
 from babel.messages.mofile import write_mo
 from babel.messages.pofile import read_po
@@ -111,6 +112,11 @@ def N_(message: str) -> str:
 
 def format_date(value: date) -> str:
     return _babel_format_date(value, format="medium", locale=get_language())
+
+
+def format_datetime(value: datetime) -> str:
+    """Date and time, e.g. "28.10.2026, 14:03"."""
+    return _babel_format_datetime(value, format="short", locale=get_language())
 
 
 def format_short_date(value: date) -> str:

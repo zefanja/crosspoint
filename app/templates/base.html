@@ -37,7 +37,7 @@
   {% endblock %}
   {% if admin_workspace %}
   <div class="ws-banner" role="status">
-    <span>{{ _("You are editing the admin collection (group decks).") }}</span>
+    <span>{% if leader_workspace %}{{ _("You are editing the group decks of your groups.") }}{% else %}{{ _("You are editing the admin collection (group decks).") }}{% endif %}</span>
     <form method="post" action="/admin/workspace" class="inline">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <input type="hidden" name="ws" value="own">

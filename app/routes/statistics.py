@@ -9,8 +9,9 @@ from app import anki_service
 from app.auth import current_collection, require_user
 from app.models import User
 from app.templating import render
+from app.workspace import no_leader_workspace
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(no_leader_workspace)])
 
 
 def _heatmap_weeks(days: list[tuple]) -> list[list[dict | None]]:

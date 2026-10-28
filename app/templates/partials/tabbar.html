@@ -12,10 +12,17 @@
   <a href="/notes/new" class="tab-add{% if active == 'add' %} active{% endif %}" aria-label="{{ _('Add card') }}"{% if active == 'add' %} aria-current="page"{% endif %}>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
   </a>
+  {% if leader_workspace %}
+  <a href="/admin/group-decks" class="tab-item">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></svg>
+    <span>{{ _("Distribute") }}</span>
+  </a>
+  {% else %}
   <a href="/stats" class="tab-item{% if active == 'progress' %} active{% endif %}"{% if active == 'progress' %} aria-current="page"{% endif %}>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19v-7M12 19V5M18 19v-4"/></svg>
     <span>{{ _("Progress") }}</span>
   </a>
+  {% endif %}
   <a href="/me" class="tab-item{% if active == 'me' %} active{% endif %}"{% if active == 'me' %} aria-current="page"{% endif %}>
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg>
     <span>{{ _("Me") }}</span>

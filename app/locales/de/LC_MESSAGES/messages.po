@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-28 18:55+0000\n"
+"POT-Creation-Date: 2026-10-28 19:25+0000\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -26,56 +26,61 @@ msgstr "Meine Karten"
 msgid "All decks"
 msgstr "Alle Decks"
 
-#: app/anki_service.py:607 app/routes/admin_groups.py:143
-#: app/routes/admin_groups.py:156 app/routes/export.py:58
+#: app/anki_service.py:613 app/routes/admin_group_decks.py:71
+#: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
+#: app/routes/export.py:59
 msgid "Deck not found."
 msgstr "Deck nicht gefunden."
 
-#: app/anki_service.py:614
+#: app/anki_service.py:620 app/workspace.py:161
 msgid "Please enter a deck name."
 msgstr "Bitte einen Decknamen eingeben."
 
-#: app/anki_service.py:781
+#: app/anki_service.py:787 app/workspace.py:65
 msgid "Note not found."
 msgstr "Notiz nicht gefunden."
 
-#: app/anki_service.py:789
+#: app/anki_service.py:795
 msgid "The first field must not be empty."
 msgstr "Das erste Feld darf nicht leer sein."
 
-#: app/anki_service.py:795 app/routes/notes.py:69
+#: app/anki_service.py:801 app/routes/notes.py:79
 msgid "Note type not found."
 msgstr "Notiztyp nicht gefunden."
 
-#: app/anki_service.py:822
+#: app/anki_service.py:828
 msgid "Please enter a Bible text."
 msgstr "Bitte einen Bibeltext eingeben."
 
-#: app/anki_service.py:832
+#: app/anki_service.py:838
 msgid "[Beginning]"
 msgstr "[Anfang]"
 
-#: app/anki_service.py:882
+#: app/anki_service.py:891
+msgid "Someone else changed this note in the meantime. Check the fields and save again to overwrite the other change."
+msgstr "Jemand anderes hat diese Notiz inzwischen geändert. Prüfe die Felder und speichere erneut, um die andere Änderung zu überschreiben."
+
+#: app/anki_service.py:894
 msgid "Cards from group decks cannot be edited."
 msgstr "Karten aus Gruppendecks können nicht bearbeitet werden."
 
-#: app/anki_service.py:884
+#: app/anki_service.py:896
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr "Bibeltext-Karten werden aus dem Text erzeugt. Zum Ändern bitte löschen und den Abschnitt neu importieren."
 
-#: app/anki_service.py:904
+#: app/anki_service.py:919
 msgid "Cards from group decks cannot be deleted."
 msgstr "Karten aus Gruppendecks können nicht gelöscht werden."
 
-#: app/anki_service.py:1002
+#: app/anki_service.py:1017 app/anki_service.py:1035
 msgid "Card not found."
 msgstr "Karte nicht gefunden."
 
-#: app/anki_service.py:1393
+#: app/anki_service.py:1420
 msgid "The image is too large (max. 5 MB)."
 msgstr "Das Bild ist zu groß (max. 5 MB)."
 
-#: app/anki_service.py:1396
+#: app/anki_service.py:1423
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr "Nur PNG-, JPEG-, GIF- oder WebP-Bilder werden unterstützt."
 
@@ -88,17 +93,33 @@ msgstr "„%(deck)s“ verteilen"
 msgid "You don't have permission to do that."
 msgstr "Dafür fehlen dir die Rechte."
 
-#: app/main.py:142
+#: app/main.py:141
+msgid "Not available while you are editing group decks. Switch back to your own cards first."
+msgstr "Nicht verfügbar, während du Gruppendecks bearbeitest. Wechsle zuerst zurück zu deinen eigenen Karten."
+
+#: app/main.py:148
 msgid "Your session has expired. Please reload the page and try again."
 msgstr "Die Sitzung ist abgelaufen. Bitte lade die Seite neu und versuche es noch einmal."
 
-#: app/main.py:181
+#: app/main.py:187
 msgid "CrossPoint – memorize the Bible"
 msgstr "CrossPoint – Bibelverse lernen"
 
-#: app/main.py:183
+#: app/main.py:189
 msgid "Memorize Bible verses with spaced repetition – compatible with Anki."
 msgstr "Bibelverse lernen mit Spaced Repetition – kompatibel mit Anki."
+
+#: app/workspace.py:167
+msgid "A deck with this name already exists."
+msgstr "Ein Deck mit diesem Namen gibt es schon."
+
+#: app/workspace.py:171
+msgid "This deck would also be distributed to groups you don't lead. Please choose another name."
+msgstr "Dieses Deck würde auch an Gruppen verteilt, die du nicht leitest. Bitte wähle einen anderen Namen."
+
+#: app/workspace.py:175
+msgid "Please choose the group the deck is for."
+msgstr "Bitte wähle die Gruppe, für die das Deck ist."
 
 #: app/routes/admin.py:53
 #, python-format
@@ -171,76 +192,80 @@ msgstr "Dieser Code ist ungültig. Bitte prüfe die Eingabe."
 msgid "Please try again."
 msgstr "Bitte versuche es noch einmal."
 
-#: app/routes/bible.py:72
+#: app/routes/bible.py:35 app/routes/notes.py:53
+msgid "There is no deck you can add cards to yet. Create one on the start page."
+msgstr "Es gibt noch kein Deck, zu dem du Karten hinzufügen kannst. Lege eines auf der Startseite an."
+
+#: app/routes/bible.py:82
 msgid "Please enter a title, e.g. “Psalm 23”."
 msgstr "Bitte einen Titel eingeben, z. B. „Psalm 23“."
 
-#: app/routes/bible.py:80
+#: app/routes/bible.py:92
 #, python-format
 msgid "“%(title)s”: %(notes)s steps with %(cards)s cards added."
 msgstr "„%(title)s“: %(notes)s Abschnitte mit %(cards)s Karten hinzugefügt."
 
-#: app/routes/browse.py:23
+#: app/routes/browse.py:27
 msgid "All"
 msgstr "Alle"
 
-#: app/routes/browse.py:23 app/templates/admin/progress.html:26
+#: app/routes/browse.py:27 app/templates/admin/progress.html:26
 msgid "Due"
 msgstr "Fällig"
 
-#: app/routes/browse.py:23 app/templates/stats.html:58
+#: app/routes/browse.py:27 app/templates/stats.html:58
 msgid "New"
 msgstr "Neu"
 
-#: app/routes/browse.py:24 app/templates/stats.html:62
+#: app/routes/browse.py:28 app/templates/stats.html:62
 msgid "Suspended"
 msgstr "Ausgesetzt"
 
-#: app/routes/browse.py:38
+#: app/routes/browse.py:45
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr "Die Suche ist ungültig. Beispiele: Joh, is:due, is:new"
 
-#: app/routes/decks.py:84
+#: app/routes/decks.py:103
 msgid "New cards per day: 0 to 9999."
 msgstr "Neue Karten pro Tag: 0 bis 9999."
 
-#: app/routes/decks.py:86
+#: app/routes/decks.py:105
 msgid "Reviews per day: 0 to 9999."
 msgstr "Wiederholungen pro Tag: 0 bis 9999."
 
-#: app/routes/decks.py:88
+#: app/routes/decks.py:107
 #, python-format
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr "Gewünschte Behaltensquote: %(min)s bis %(max)s."
 
-#: app/routes/imports.py:25
+#: app/routes/imports.py:26
 msgid "Please choose an .apkg file."
 msgstr "Bitte eine .apkg-Datei auswählen."
 
-#: app/routes/imports.py:34
+#: app/routes/imports.py:35
 msgid "The file is too large (max. 100 MB)."
 msgstr "Die Datei ist zu groß (max. 100 MB)."
 
-#: app/routes/imports.py:52
+#: app/routes/imports.py:53
 msgid "The file could not be imported. Is it a valid Anki file?"
 msgstr "Die Datei konnte nicht importiert werden. Ist es eine gültige Anki-Datei?"
 
-#: app/routes/imports.py:68
+#: app/routes/imports.py:71
 #, python-format
 msgid "“%(file)s” imported: %(count)s notes new or updated. The decks are now in your deck list."
 msgstr "„%(file)s“ importiert: %(count)s Notizen neu oder aktualisiert. Die Decks stehen jetzt in deiner Deckliste."
 
-#: app/routes/notes.py:84
+#: app/routes/notes.py:95
 #, python-format
 msgid "Added: %(front)s"
 msgstr "Hinzugefügt: %(front)s"
 
-#: app/templates/admin/groups.html:4 app/templates/admin/home.html:2
-#: app/templates/admin/home.html:5 app/templates/admin/import.html:4
-#: app/templates/admin/progress.html:4 app/templates/admin/user_detail.html:23
-#: app/templates/admin/users.html:4 app/templates/admin/users.html:26
-#: app/templates/admin/users.html:55 app/templates/base.html:26
-#: app/templates/me.html:19
+#: app/templates/admin/group_decks.html:4 app/templates/admin/groups.html:4
+#: app/templates/admin/home.html:2 app/templates/admin/home.html:5
+#: app/templates/admin/import.html:4 app/templates/admin/progress.html:4
+#: app/templates/admin/user_detail.html:23 app/templates/admin/users.html:4
+#: app/templates/admin/users.html:26 app/templates/admin/users.html:55
+#: app/templates/base.html:26 app/templates/me.html:19
 msgid "Admin"
 msgstr "Verwaltung"
 
@@ -253,10 +278,15 @@ msgid "Log out"
 msgstr "Abmelden"
 
 #: app/templates/base.html:40
+msgid "You are editing the group decks of your groups."
+msgstr "Du bearbeitest die Gruppendecks deiner Gruppen."
+
+#: app/templates/base.html:40
 msgid "You are editing the admin collection (group decks)."
 msgstr "Du bearbeitest die Admin-Sammlung (Gruppendecks)."
 
-#: app/templates/admin/home.html:30 app/templates/base.html:44
+#: app/templates/admin/group_decks.html:12 app/templates/admin/home.html:32
+#: app/templates/base.html:44
 msgid "Back to my cards"
 msgstr "Zurück zu meinen Karten"
 
@@ -315,7 +345,7 @@ msgstr "Filtern"
 msgid "Options"
 msgstr "Optionen"
 
-#: app/templates/deck_options.html:3
+#: app/templates/deck_options.html:3 app/templates/decks_workspace.html:13
 msgid "Decks"
 msgstr "Decks"
 
@@ -324,7 +354,7 @@ msgid "options"
 msgstr "Optionen"
 
 #: app/templates/admin/user_detail.html:12 app/templates/deck_options.html:7
-#: app/templates/note_edit.html:12
+#: app/templates/note_edit.html:13
 msgid "Saved."
 msgstr "Gespeichert."
 
@@ -367,7 +397,7 @@ msgid "Sibling cards come from the same note, e.g. a verse and its reverse card.
 msgstr "Geschwisterkarten stammen aus derselben Notiz, z. B. ein Vers und seine Umkehrkarte. An verschiedenen Tagen verrät die eine Karte nicht die Antwort der anderen."
 
 #: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:44
-#: app/templates/note_edit.html:25
+#: app/templates/note_edit.html:28
 msgid "Save"
 msgstr "Speichern"
 
@@ -472,19 +502,20 @@ msgstr "Los geht's · ~%(min)s Min."
 msgid "Your decks"
 msgstr "Deine Decks"
 
-#: app/templates/decks.html:32
+#: app/templates/decks.html:32 app/templates/decks_workspace.html:13
 msgid "+ New deck"
 msgstr "+ Neues Deck"
 
-#: app/templates/decks.html:37
+#: app/templates/decks.html:37 app/templates/decks_workspace.html:18
 msgid "e.g. Psalms"
 msgstr "z. B. Psalmen"
 
-#: app/templates/decks.html:37
+#: app/templates/decks.html:37 app/templates/decks_workspace.html:18
 msgid "Deck name"
 msgstr "Deckname"
 
 #: app/templates/admin/groups.html:11 app/templates/decks.html:38
+#: app/templates/decks_workspace.html:27
 msgid "Create"
 msgstr "Anlegen"
 
@@ -515,6 +546,62 @@ msgstr "Nichts fällig"
 msgid "Options for %(deck)s"
 msgstr "Optionen für %(deck)s"
 
+#: app/templates/admin/group_decks.html:2
+#: app/templates/admin/group_decks.html:6
+#: app/templates/admin/group_detail.html:15 app/templates/admin/home.html:21
+#: app/templates/decks_workspace.html:2 app/templates/decks_workspace.html:7
+msgid "Group decks"
+msgstr "Gruppendecks"
+
+#: app/templates/decks_workspace.html:8
+msgid "Here you edit the decks of your groups together with the other group leaders. Members only get the changes when a deck is distributed."
+msgstr "Hier bearbeitest du die Decks deiner Gruppen gemeinsam mit den anderen Gruppenleitern. Die Mitglieder bekommen Änderungen erst, wenn ein Deck verteilt wird."
+
+#: app/templates/admin/home.html:38 app/templates/decks_workspace.html:9
+msgid "Distribute and recent changes"
+msgstr "Verteilen und letzte Änderungen"
+
+#: app/templates/decks_workspace.html:21
+msgid "For group"
+msgstr "Für Gruppe"
+
+#: app/templates/decks_workspace.html:29
+msgid "Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>. A subdeck of one of your decks goes to the same groups."
+msgstr "Unterdecks mit <code>::</code>, z. B. <code>Bibel::Psalmen</code>. Ein Unterdeck eines deiner Decks geht an dieselben Gruppen."
+
+#: app/templates/decks_workspace.html:39
+msgid "VIEW ONLY"
+msgstr "NUR ANSEHEN"
+
+#: app/templates/admin/print_sheet.html:12
+#: app/templates/admin/user_detail.html:9 app/templates/decks_workspace.html:40
+#: app/templates/partials/browse_results.html:6
+#: app/templates/partials/browse_results.html:14
+#, python-format
+msgid "%(num)s card"
+msgid_plural "%(num)s cards"
+msgstr[0] "%(num)s Karte"
+msgstr[1] "%(num)s Karten"
+
+#: app/templates/decks_workspace.html:40
+msgid "also goes to groups you don't lead"
+msgstr "geht auch an Gruppen, die du nicht leitest"
+
+#: app/templates/decks_workspace.html:43
+#, python-format
+msgid "Add card to %(deck)s"
+msgstr "Karte zu %(deck)s hinzufügen"
+
+#: app/templates/decks_workspace.html:43 app/templates/import.html:4
+#: app/templates/note_add.html:2 app/templates/note_add.html:4
+#: app/templates/note_bible.html:4 app/templates/partials/tabbar.html:12
+msgid "Add card"
+msgstr "Karte hinzufügen"
+
+#: app/templates/decks_workspace.html:46
+msgid "Your groups don't have any decks yet. Create the first one with “+ New deck”."
+msgstr "Deine Gruppen haben noch keine Decks. Lege das erste mit „+ Neues Deck“ an."
+
 #: app/templates/error.html:2
 msgid "Notice"
 msgstr "Hinweis"
@@ -532,7 +619,7 @@ msgid "Export"
 msgstr "Export"
 
 #: app/templates/export.html:3 app/templates/me.html:2
-#: app/templates/partials/tabbar.html:21
+#: app/templates/partials/tabbar.html:28
 msgid "Me"
 msgstr "Ich"
 
@@ -553,7 +640,7 @@ msgid "add to existing Anki"
 msgstr "in bestehendes Anki einfügen"
 
 #: app/templates/export.html:15 app/templates/note_add.html:14
-#: app/templates/note_bible.html:15 app/templates/note_edit.html:17
+#: app/templates/note_bible.html:15 app/templates/note_edit.html:20
 #: app/templates/stats.html:6
 msgid "Deck"
 msgstr "Deck"
@@ -562,67 +649,61 @@ msgstr "Deck"
 msgid "Download .apkg"
 msgstr ".apkg herunterladen"
 
-#: app/templates/export.html:23
+#: app/templates/export.html:24
 msgid "Everything"
 msgstr "Alles"
 
-#: app/templates/export.html:23
+#: app/templates/export.html:24
 msgid "for new Anki users"
 msgstr "für neue Anki-Nutzer"
 
-#: app/templates/export.html:24
+#: app/templates/export.html:25
 msgid "Replaces the collection in Anki when imported – only for empty/new Anki installations."
 msgstr "Ersetzt beim Import die Sammlung in Anki – nur für leere/neue Anki-Installationen."
 
-#: app/templates/export.html:27
+#: app/templates/export.html:28
 msgid "Download .colpkg"
 msgstr ".colpkg herunterladen"
 
-#: app/templates/export.html:31
+#: app/templates/export.html:33
 msgid "How to continue in Anki"
 msgstr "So geht's weiter in Anki"
 
-#: app/templates/export.html:32
+#: app/templates/export.html:34
 msgid "Install Anki"
 msgstr "Anki installieren"
 
-#: app/templates/export.html:33
+#: app/templates/export.html:35
 msgid "<a href=\"https://apps.ankiweb.net\">Computer</a>, AnkiDroid or AnkiMobile"
 msgstr "<a href=\"https://apps.ankiweb.net\">Computer</a>, AnkiDroid oder AnkiMobile"
 
-#: app/templates/export.html:34
+#: app/templates/export.html:36
 msgid "Open the file"
 msgstr "Datei öffnen"
 
-#: app/templates/export.html:35
+#: app/templates/export.html:37
 msgid "Double-click, or ⋮ → Import in AnkiDroid"
 msgstr "Doppelklick, oder in AnkiDroid ⋮ → Importieren"
 
-#: app/templates/export.html:36
+#: app/templates/export.html:38
 msgid "Create an AnkiWeb account"
 msgstr "AnkiWeb-Konto anlegen"
 
-#: app/templates/export.html:37
+#: app/templates/export.html:39
 msgid "Free at <a href=\"https://ankiweb.net\">ankiweb.net</a>"
 msgstr "Kostenlos auf <a href=\"https://ankiweb.net\">ankiweb.net</a>"
 
-#: app/templates/export.html:38
+#: app/templates/export.html:40
 msgid "Sync"
 msgstr "Synchronisieren"
 
-#: app/templates/export.html:39
+#: app/templates/export.html:41
 msgid "Tap Sync and log in. Done!"
 msgstr "Auf Synchronisieren tippen und anmelden. Fertig!"
 
 #: app/templates/import.html:2
 msgid "Import Anki deck"
 msgstr "Anki-Deck importieren"
-
-#: app/templates/import.html:4 app/templates/note_add.html:2
-#: app/templates/note_add.html:4 app/templates/note_bible.html:4
-#: app/templates/partials/tabbar.html:12
-msgid "Add card"
-msgstr "Karte hinzufügen"
 
 #: app/templates/import.html:8
 msgid "A ready-made deck as an .apkg file, e.g. shared from Anki or created by an AI assistant. The cards are added to your collection; learning progress is not imported. Importing the same file again updates the cards."
@@ -738,28 +819,42 @@ msgid "This note is suspended – its cards are not shown when studying."
 msgstr "Diese Notiz ist ausgesetzt – ihre Karten kommen beim Lernen nicht dran."
 
 #: app/templates/note_edit.html:10
+msgid "This deck also goes to groups you don't lead – you can only view it."
+msgstr "Dieses Deck geht auch an Gruppen, die du nicht leitest – du kannst es nur ansehen."
+
+#: app/templates/note_edit.html:11
 msgid "This card belongs to a group deck and cannot be edited."
 msgstr "Diese Karte gehört zu einem Gruppendeck und kann nicht bearbeitet werden."
 
-#: app/templates/note_edit.html:11
+#: app/templates/note_edit.html:12
 msgid "Bible text cards are generated from the text and cannot be edited individually. To change them, delete and import the passage again."
 msgstr "Bibeltext-Karten werden aus dem Text erzeugt und können nicht einzeln bearbeitet werden. Zum Ändern löschen und den Abschnitt neu importieren."
 
-#: app/templates/note_edit.html:31
-#: app/templates/partials/browse_card_row.html:14
+#: app/templates/note_edit.html:15
+#, python-format
+msgid "Last changed by %(name)s on %(date)s"
+msgstr "Zuletzt geändert von %(name)s am %(date)s"
+
+#: app/templates/admin/group_decks.html:30
+#: app/templates/admin/group_decks.html:49 app/templates/note_edit.html:15
+msgid "a deleted user"
+msgstr "einem gelöschten Nutzer"
+
+#: app/templates/note_edit.html:35
+#: app/templates/partials/browse_card_row.html:15
 msgid "Unsuspend"
 msgstr "Wieder aktivieren"
 
-#: app/templates/note_edit.html:31
-#: app/templates/partials/browse_card_row.html:14
+#: app/templates/note_edit.html:35
+#: app/templates/partials/browse_card_row.html:15
 msgid "Suspend"
 msgstr "Aussetzen"
 
-#: app/templates/note_edit.html:34
+#: app/templates/note_edit.html:38
 msgid "Really delete this card? Its learning progress will be lost."
 msgstr "Diese Karte wirklich löschen? Der Lernstand geht verloren."
 
-#: app/templates/note_edit.html:36
+#: app/templates/note_edit.html:40
 msgid "Delete"
 msgstr "Löschen"
 
@@ -821,7 +916,7 @@ msgstr "Lernen"
 
 #: app/templates/admin/group_detail.html:8 app/templates/admin/home.html:10
 #: app/templates/admin/home.html:15 app/templates/admin/progress.html:2
-#: app/templates/admin/progress.html:6 app/templates/partials/tabbar.html:17
+#: app/templates/admin/progress.html:6 app/templates/partials/tabbar.html:23
 #: app/templates/stats.html:2 app/templates/stats.html:3
 msgid "Progress"
 msgstr "Fortschritt"
@@ -928,6 +1023,76 @@ msgstr "Ausgereift"
 msgid "Young: interval under 21 days. Mature: 21 days or more."
 msgstr "Jung: Intervall unter 21 Tagen. Ausgereift: ab 21 Tagen."
 
+#: app/templates/admin/group_decks.html:7
+msgid "Group decks are edited together in the admin collection. Distributing copies a deck into every member's cards; re-distributing updates changed cards and adds new ones – learning progress is kept."
+msgstr "Gruppendecks werden gemeinsam in der Admin-Sammlung bearbeitet. Verteilen kopiert ein Deck zu allen Mitgliedern; erneutes Verteilen aktualisiert geänderte Karten und fügt neue hinzu – der Lernstand bleibt erhalten."
+
+#: app/templates/admin/group_decks.html:15 app/templates/admin/home.html:35
+msgid "Edit group decks"
+msgstr "Gruppendecks bearbeiten"
+
+#: app/templates/admin/group_decks.html:21
+#: app/templates/admin/group_decks.html:37
+#: app/templates/admin/group_detail.html:25
+#: app/templates/partials/tabbar.html:18
+msgid "Distribute"
+msgstr "Verteilen"
+
+#: app/templates/admin/group_decks.html:27
+msgid "The deck no longer exists in the admin collection."
+msgstr "Das Deck gibt es in der Admin-Sammlung nicht mehr."
+
+#: app/templates/admin/group_decks.html:29
+#: app/templates/admin/group_detail.html:21
+#, python-format
+msgid "Last distributed: %(date)s"
+msgstr "Zuletzt verteilt: %(date)s"
+
+#: app/templates/admin/group_decks.html:29
+#: app/templates/admin/group_detail.html:21
+msgid "not distributed yet"
+msgstr "noch nicht verteilt"
+
+#: app/templates/admin/group_decks.html:30
+#, python-format
+msgid "last changed by %(name)s on %(date)s"
+msgstr "zuletzt geändert von %(name)s am %(date)s"
+
+#: app/templates/admin/group_decks.html:31
+#, python-format
+msgid "%(num)s change not distributed yet"
+msgid_plural "%(num)s changes not distributed yet"
+msgstr[0] "%(num)s Änderung noch nicht verteilt"
+msgstr[1] "%(num)s Änderungen noch nicht verteilt"
+
+#: app/templates/admin/group_decks.html:41
+#: app/templates/admin/group_detail.html:34
+msgid "No group decks yet."
+msgstr "Noch keine Gruppendecks."
+
+#: app/templates/admin/group_decks.html:46
+msgid "Recent changes"
+msgstr "Letzte Änderungen"
+
+#: app/templates/admin/group_decks.html:51
+#, python-format
+msgid "%(name)s added “%(front)s”"
+msgstr "%(name)s hat „%(front)s“ hinzugefügt"
+
+#: app/templates/admin/group_decks.html:52
+#, python-format
+msgid "%(name)s deleted “%(front)s”"
+msgstr "%(name)s hat „%(front)s“ gelöscht"
+
+#: app/templates/admin/group_decks.html:53
+#, python-format
+msgid "%(name)s changed “%(front)s”"
+msgstr "%(name)s hat „%(front)s“ geändert"
+
+#: app/templates/admin/group_decks.html:56
+msgid "No changes yet."
+msgstr "Noch keine Änderungen."
+
 #: app/templates/admin/group_detail.html:4 app/templates/admin/groups.html:2
 #: app/templates/admin/groups.html:6 app/templates/admin/home.html:9
 #: app/templates/admin/user_detail.html:26
@@ -942,26 +1107,9 @@ msgstr "Codes / Druckblatt"
 msgid "The name does not match. The group was not deleted."
 msgstr "Der Name stimmt nicht überein. Die Gruppe wurde nicht gelöscht."
 
-#: app/templates/admin/group_detail.html:15 app/templates/admin/home.html:23
-msgid "Group decks"
-msgstr "Gruppendecks"
-
 #: app/templates/admin/group_detail.html:16
 msgid "Distributing copies the deck from the admin collection into every member's cards. Re-distributing updates changed cards and adds new ones – learning progress is kept. Cards deleted in the admin deck are not deleted for members."
 msgstr "Verteilen kopiert das Deck aus der Admin-Sammlung zu allen Mitgliedern. Erneutes Verteilen aktualisiert geänderte Karten und fügt neue hinzu – der Lernstand bleibt erhalten. Im Admin-Deck gelöschte Karten werden bei den Mitgliedern nicht gelöscht."
-
-#: app/templates/admin/group_detail.html:21
-#, python-format
-msgid "Last distributed: %(date)s"
-msgstr "Zuletzt verteilt: %(date)s"
-
-#: app/templates/admin/group_detail.html:21
-msgid "not distributed yet"
-msgstr "noch nicht verteilt"
-
-#: app/templates/admin/group_detail.html:25
-msgid "Distribute"
-msgstr "Verteilen"
 
 #: app/templates/admin/group_detail.html:28
 msgid "Remove this deck from the group? Members keep their cards."
@@ -970,10 +1118,6 @@ msgstr "Dieses Deck aus der Gruppe entfernen? Die Mitglieder behalten ihre Karte
 #: app/templates/admin/group_detail.html:30
 msgid "Remove"
 msgstr "Entfernen"
-
-#: app/templates/admin/group_detail.html:34
-msgid "No group decks yet."
-msgstr "Noch keine Gruppendecks."
 
 #: app/templates/admin/group_detail.html:39
 msgid "Add deck from the admin collection"
@@ -1071,18 +1215,22 @@ msgid "Users"
 msgstr "Nutzer"
 
 #: app/templates/admin/home.html:13
-msgid "As a group leader you see the progress of your groups and can print new codes for their members."
-msgstr "Als Gruppenleiter*in siehst du den Fortschritt deiner Gruppen und kannst neue Codes für ihre Mitglieder drucken."
+msgid "As a group leader you see the progress of your groups, can print new codes for their members and edit their group decks."
+msgstr "Als Gruppenleiter*in siehst du den Fortschritt deiner Gruppen, kannst neue Codes für ihre Mitglieder drucken und ihre Gruppendecks bearbeiten."
 
-#: app/templates/admin/home.html:24
+#: app/templates/admin/home.html:23
 msgid "Group decks are maintained in the admin collection – with the same screens as your own cards. Then assign them to a group and distribute them."
 msgstr "Gruppendecks werden in der Admin-Sammlung gepflegt – mit denselben Seiten wie deine eigenen Karten. Danach einer Gruppe zuweisen und verteilen."
 
-#: app/templates/admin/home.html:33
+#: app/templates/admin/home.html:25
+msgid "Edit your groups' decks together with the other group leaders and distribute them to the members."
+msgstr "Bearbeite die Decks deiner Gruppen gemeinsam mit den anderen Gruppenleitern und verteile sie an die Mitglieder."
+
+#: app/templates/admin/home.html:35
 msgid "Edit admin collection"
 msgstr "Admin-Sammlung bearbeiten"
 
-#: app/templates/admin/home.html:36 app/templates/admin/import.html:2
+#: app/templates/admin/home.html:39 app/templates/admin/import.html:2
 msgid "Import .apkg"
 msgstr ".apkg importieren"
 
@@ -1119,16 +1267,6 @@ msgstr "Drucken"
 #: app/templates/admin/print_sheet.html:10
 msgid "Done"
 msgstr "Fertig"
-
-#: app/templates/admin/print_sheet.html:12
-#: app/templates/admin/user_detail.html:9
-#: app/templates/partials/browse_results.html:6
-#: app/templates/partials/browse_results.html:14
-#, python-format
-msgid "%(num)s card"
-msgid_plural "%(num)s cards"
-msgstr[0] "%(num)s Karte"
-msgstr[1] "%(num)s Karten"
 
 #: app/templates/admin/print_sheet.html:12
 msgid "8 per A4 page, cut along the lines."

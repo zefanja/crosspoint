@@ -10,18 +10,20 @@
     <a class="btn" href="/admin/progress">{{ _("Progress") }}</a>
   </div>
   {% else %}
-  <p class="muted">{{ _("As a group leader you see the progress of your groups and can print new codes for their members.") }}</p>
+  <p class="muted">{{ _("As a group leader you see the progress of your groups, can print new codes for their members and edit their group decks.") }}</p>
   <div class="actions-grid">
     <a class="btn" href="/admin/progress">{{ _("Progress") }}</a>
     <a class="btn" href="/admin/users">{{ _("Codes / print sheet") }}</a>
   </div>
   {% endif %}
 </section>
-{% if user.is_admin %}
-
 <section class="card">
   <h2>{{ _("Group decks") }}</h2>
+  {% if user.is_admin %}
   <p class="muted">{{ _("Group decks are maintained in the admin collection – with the same screens as your own cards. Then assign them to a group and distribute them.") }}</p>
+  {% else %}
+  <p class="muted">{{ _("Edit your groups' decks together with the other group leaders and distribute them to the members.") }}</p>
+  {% endif %}
   <div class="actions-grid">
     <form method="post" action="/admin/workspace">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
@@ -30,11 +32,11 @@
       <button class="btn btn-block">{{ _("Back to my cards") }}</button>
       {% else %}
       <input type="hidden" name="ws" value="admin">
-      <button class="btn btn-primary btn-block">{{ _("Edit admin collection") }}</button>
+      <button class="btn btn-primary btn-block">{{ _("Edit admin collection") if user.is_admin else _("Edit group decks") }}</button>
       {% endif %}
     </form>
-    <a class="btn" href="/admin/import">{{ _("Import .apkg") }}</a>
+    <a class="btn" href="/admin/group-decks">{{ _("Distribute and recent changes") }}</a>
+    {% if user.is_admin %}<a class="btn" href="/admin/import">{{ _("Import .apkg") }}</a>{% endif %}
   </div>
 </section>
-{% endif %}
 {% endblock %}

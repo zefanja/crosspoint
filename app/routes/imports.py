@@ -12,6 +12,7 @@ from app.i18n import _
 from app.models import User
 from app.sanitize import field_from_import
 from app.templating import render
+from app.workspace import no_leader_workspace
 
 router = APIRouter()
 
@@ -55,13 +56,15 @@ async def import_upload(file: UploadFile, col: str, *, sanitize: bool) -> tuple[
     return count, None
 
 
-@router.get("/import")
+# Importing updates notes by GUID, also in decks of other groups – admins only in the
+# admin collection (via /admin/import).
+@router.get("/import", dependencies=[Depends(no_leader_workspace)])
 def import_page(request: Request, deck_id: int | None = None, user: User = Depends(require_user)):
     # deck_id only keeps the selected deck when switching back to the other add tabs
     return render(request, "import.html", {"message": None, "error": None, "deck_id": deck_id})
 
 
-@router.post("/import")
+@router.post("/import", dependencies=[Depends(no_leader_workspace)])
 async def import_submit(request: Request, file: UploadFile, user: User = Depends(verify_csrf),
                         col: str = Depends(current_collection)):
     count, error = await import_upload(file, col, sanitize=True)

@@ -131,3 +131,19 @@ class GroupLeader(Base):
     user_id: Mapped[str] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), primary_key=True, index=True
     )
+
+
+class GroupDeckEdit(Base):
+    """Who changed which note of the admin collection (shared editing of group decks)."""
+
+    __tablename__ = "group_deck_edits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), index=True
+    )
+    note_id: Mapped[int] = mapped_column(Integer, index=True)
+    deck_id: Mapped[int] = mapped_column(Integer)
+    action: Mapped[str] = mapped_column(String(10))  # add|edit|delete
+    summary: Mapped[str] = mapped_column(String(100), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, index=True)

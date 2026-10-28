@@ -6,6 +6,7 @@
     </span>
     {% if not r.suspended %}{% include "partials/browse_status.html" %}{% endif %}
   </a>
+  {% if editable_names is none or r.deck in editable_names %}
   <form method="post" action="/cards/{{ r.card_id }}/suspend" hx-post="/cards/{{ r.card_id }}/suspend"
         hx-target="closest li" hx-swap="outerHTML" hx-disabled-elt="find button">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
@@ -13,4 +14,5 @@
     <input type="hidden" name="q" value="{{ q }}">
     <button class="row-action">{{ _("Unsuspend") if r.suspended else _("Suspend") }}</button>
   </form>
+  {% endif %}
 </li>

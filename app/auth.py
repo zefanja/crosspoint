@@ -22,7 +22,7 @@ USER_CODE_LEN = 8
 ADMIN_CODE_LEN = 16
 SESSION_COOKIE = "vf_session"
 LOGIN_CSRF_COOKIE = "vf_login_csrf"
-WORKSPACE_COOKIE = "vf_ws"  # "admin" = admin edits the admin collection (group decks)
+WORKSPACE_COOKIE = "vf_ws"  # "admin" = staff edit the admin collection (group decks)
 SESSION_DAYS = 180
 MAX_FAILURES = 10
 FAILURE_WINDOW = timedelta(minutes=15)
@@ -242,10 +242,12 @@ def visible_user_ids(db: DbSession, user: User) -> set[str] | None:
 
 
 def current_collection(request: Request, user: User = Depends(require_user)) -> str:
-    """Collection the learner UI works on: own, or the admin collection for admins
-    who switched to it (cookie)."""
-    admin_ws = user.is_admin and request.cookies.get(WORKSPACE_COOKIE) == "admin"
+    """Collection the learner UI works on: own, or the admin collection for staff who
+    switched to it (cookie). Group leaders only reach their groups' decks there
+    (app.workspace)."""
+    admin_ws = user.is_staff and request.cookies.get(WORKSPACE_COOKIE) == "admin"
     request.state.admin_workspace = admin_ws
+    request.state.leader_workspace = admin_ws and not user.is_admin
     request.state.collection_id = ADMIN_COLLECTION if admin_ws else user.id
     return request.state.collection_id
 

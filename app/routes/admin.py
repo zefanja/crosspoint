@@ -25,10 +25,10 @@ def home(request: Request, admin: User = Depends(require_staff), db: DbSession =
 
 
 @router.post("/workspace")
-async def workspace(request: Request, admin: User = Depends(require_admin),
+async def workspace(request: Request, admin: User = Depends(require_staff),
                     _csrf: User = Depends(verify_csrf)):
     form = await request.form()
-    response = RedirectResponse("/", status_code=303)
+    response = RedirectResponse("/", status_code=303)  # leaders: only their groups' decks
     if form.get("ws") == "admin":
         await anki_service.ensure_collection(anki_service.ADMIN_COLLECTION)
         response.set_cookie(WORKSPACE_COOKIE, "admin", httponly=True, secure=cookie_secure(),

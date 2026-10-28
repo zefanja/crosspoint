@@ -57,6 +57,7 @@ templates.env.add_extension("jinja2.ext.i18n")
 templates.env.install_gettext_callables(i18n.gettext, i18n.ngettext, newstyle=True)
 templates.env.filters["card_document"] = card_document
 templates.env.filters["date"] = i18n.format_date
+templates.env.filters["datetime"] = i18n.format_datetime
 templates.env.filters["short_date"] = i18n.format_short_date
 templates.env.filters["decimal"] = i18n.format_decimal
 templates.env.globals.update(
@@ -77,6 +78,7 @@ def render(request: Request, name: str, context: dict | None = None, status_code
         "user": getattr(request.state, "user", None),
         "csrf_token": getattr(request.state, "csrf_token", ""),
         "admin_workspace": getattr(request.state, "admin_workspace", False),
+        "leader_workspace": getattr(request.state, "leader_workspace", False),
     }
     ctx.update(context or {})
     return templates.TemplateResponse(request, name, ctx, status_code=status_code, headers=headers)

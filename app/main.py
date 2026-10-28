@@ -13,11 +13,11 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Resp
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
-from app import anki_service, auth, backup, i18n
+from app import anki_service, auth, backup, i18n, workspace
 from app.config import get_settings
 from app.db import get_engine, get_sessionmaker
 from app.routes import auth as auth_routes
-from app.routes import admin, admin_groups, admin_progress, admin_users
+from app.routes import admin, admin_group_decks, admin_groups, admin_progress, admin_users
 from app.routes import bible, browse, decks, export, imports, notes, pages, review, statistics
 from app.templating import BASE_DIR, is_htmx, render, templates
 from app.i18n import _
@@ -96,7 +96,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 for module in (auth_routes, decks, review, bible, notes, browse, export, imports, pages,
-               statistics, admin, admin_users, admin_groups, admin_progress):
+               statistics, admin, admin_users, admin_groups, admin_group_decks, admin_progress):
     app.include_router(module.router)
 
 
@@ -133,6 +133,12 @@ async def login_required(request: Request, exc):
 @app.exception_handler(auth.Forbidden)
 async def forbidden(request: Request, exc):
     return render(request, "error.html", {"message": _("You don't have permission to do that.")}, 403)
+
+
+@app.exception_handler(workspace.LeaderWorkspaceBlocked)
+async def leader_workspace_blocked(request: Request, exc):
+    return render(request, "error.html", {"message": _(
+        "Not available while you are editing group decks. Switch back to your own cards first.")}, 403)
 
 
 @app.exception_handler(auth.CsrfError)

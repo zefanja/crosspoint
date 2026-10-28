@@ -147,6 +147,14 @@ async def group_add_deck(request: Request, group_id: int, admin_deck_id: int = F
     return _job_redirect(group_id, distribution.distribute_group_deck(gd))
 
 
+async def start_distribution(db: DbSession, gd: GroupDeck) -> distribution.Job:
+    names = dict(await anki_service.deck_names(anki_service.ADMIN_COLLECTION))
+    if gd.admin_deck_id in names and names[gd.admin_deck_id] != gd.deck_name:
+        gd.deck_name = names[gd.admin_deck_id]  # renamed in the admin collection
+        db.commit()
+    return distribution.distribute_group_deck(gd)
+
+
 @router.post("/{group_id}/decks/{group_deck_id}/distribute")
 async def group_distribute(request: Request, group_id: int, group_deck_id: int,
                            admin: User = Depends(require_admin), _csrf: User = Depends(verify_csrf),
@@ -154,11 +162,7 @@ async def group_distribute(request: Request, group_id: int, group_deck_id: int,
     gd = db.get(GroupDeck, group_deck_id)
     if gd is None or gd.group_id != group_id:
         raise anki_service.NotFound(_("Deck not found."))
-    names = dict(await anki_service.deck_names(anki_service.ADMIN_COLLECTION))
-    if gd.admin_deck_id in names and names[gd.admin_deck_id] != gd.deck_name:
-        gd.deck_name = names[gd.admin_deck_id]  # renamed in the admin collection
-        db.commit()
-    return _job_redirect(group_id, distribution.distribute_group_deck(gd))
+    return _job_redirect(group_id, await start_distribution(db, gd))
 
 
 @router.post("/{group_id}/decks/{group_deck_id}/remove")

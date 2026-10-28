@@ -13,8 +13,11 @@ from app.auth import cookie_secure, current_collection, media_base, require_user
 from app.models import User
 from app.templating import is_htmx, render
 from app.i18n import _
+from app.workspace import no_leader_workspace
 
-router = APIRouter()
+# Group leaders don't study in the shared admin collection (it would change everyone's
+# scheduling there and include other groups' decks).
+router = APIRouter(dependencies=[Depends(no_leader_workspace)])
 
 MAX_TAKEN_SECS = 3600  # anki caps further via the deck's maxTaken
 

@@ -139,6 +139,30 @@ def test_add_get_update_delete_note(run, deck):
         run(svc.get_note(U, nid))
 
 
+def test_update_note_detects_concurrent_edit(run, deck):
+    nid = add_verse(run, deck)
+    other = run(svc.create_deck(U, "Psalmen"))
+    run(svc.add_note(U, svc.BASIC, other, {"Front": "F", "Back": "B"}))
+    note = run(svc.get_note(U, nid))
+    assert note.deck_ids == [deck] and note.mod > 0
+    time.sleep(1.1)  # mod has a resolution of seconds
+    run(svc.update_note(U, nid, {"Text": "first"}, deck, expected_mod=note.mod))
+    with pytest.raises(svc.EditConflict):  # second editor still has the old form
+        run(svc.update_note(U, nid, {"Text": "second"}, deck, expected_mod=note.mod))
+    current = run(svc.get_note(U, nid))
+    assert dict(current.fields)["Text"] == "first" and current.mod > note.mod
+    run(svc.update_note(U, nid, {"Text": "second"}, other, expected_mod=current.mod))
+    assert run(svc.get_note(U, nid)).deck_ids == [other]
+
+
+def test_card_deck_id(run, deck):
+    nid = add_verse(run, deck)
+    rows, _total = run(svc.search_cards(U, f"nid:{nid}"))
+    assert run(svc.card_deck_id(U, rows[0].card_id)) == deck
+    with pytest.raises(svc.NotFound):
+        run(svc.card_deck_id(U, 12345))
+
+
 def test_add_note_empty_first_field(run, deck):
     with pytest.raises(svc.EmptyNote):
         run(svc.add_note(U, svc.BASIC, deck, {"Front": "", "Back": "x"}))

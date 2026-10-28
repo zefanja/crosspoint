@@ -85,6 +85,8 @@ Abnahmen (Portainer, Import in Anki Desktop/AnkiDroid, eine Woche Lernen am Hand
   lassen), `model.py` (Notiztyp 1:1), `formatter.py` (Port des Web-Formatters)
 - `app/routes/statistics.py`, `admin.py` (Hub, Workspace, Import, Jobs)
 - `app/distribution.py` – Hintergrundjobs (Verteilen, Werte aktualisieren) mit Fortschritt
+- `app/workspace.py` – gemeinsames Bearbeiten der Gruppendecks: `DeckAccess` (sichtbar/bearbeitbar pro Deck für Gruppenleiter), Deck-Anlage, Änderungsprotokoll; Routen nutzen `Depends(deck_access)` bzw. `no_leader_workspace`
+- `app/routes/admin_group_decks.py` – Seite „Gruppendecks“ (Verteilen, letzte Änderungen) für Admins und Gruppenleiter
 
 ## Anki-Fallstricke (verifiziert mit anki 26.9.3)
 - Neue Collections mit `RustBackend(langs=["en"])` anlegen (sonst heißt Basic „Einfach“),
