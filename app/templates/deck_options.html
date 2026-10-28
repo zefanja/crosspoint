@@ -1,42 +1,61 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Options") }} – {{ deck_name }}{% endblock %}
+{% block topbar_left %}<a href="/" class="topbar-back">‹ {{ _("Decks") }}</a>{% endblock %}
 {% block content %}
-<p><a href="/" class="back">‹ {{ _("Decks") }}</a></p>
-<section class="card">
-  <h1>{{ _("Options: %(deck)s", deck=deck_name) }}</h1>
-  {% if saved %}<p class="alert alert-success">{{ _("Saved.") }}</p>{% endif %}
-  {% for e in errors %}<p class="alert alert-error">{{ e }}</p>{% endfor %}
-  <form method="post" class="stack">
+<h1 class="page-title">{{ deck_name }} <span class="muted">{{ _("options") }}</span></h1>
+<div class="ui-stack">
+  {% if saved %}<p class="alert alert-success" role="status">{{ _("Saved.") }}</p>{% endif %}
+  {% for e in errors %}<p class="alert alert-error" role="alert">{{ e }}</p>{% endfor %}
+  <form method="post" class="ui-stack">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <label for="new_per_day">{{ _("New cards per day") }}</label>
-    <input id="new_per_day" name="new_per_day" type="number" min="0" max="9999" inputmode="numeric"
-           class="input" value="{{ opts.new_per_day }}" required>
-    <label for="reviews_per_day">{{ _("Maximum reviews per day") }}</label>
-    <input id="reviews_per_day" name="reviews_per_day" type="number" min="0" max="9999" inputmode="numeric"
-           class="input" value="{{ opts.reviews_per_day }}" required>
-    <label for="desired_retention">{{ _("Desired retention:") }}
-      <output id="retention_out" for="desired_retention">{{ opts.desired_retention | decimal }}</output></label>
-    <input id="desired_retention" name="desired_retention" type="range" min="0.80" max="0.97" step="0.01"
-           class="slider" value="{{ "%.2f"|format(opts.desired_retention) }}">
-    <p class="muted small">{{ _("Higher = you remember more, but review more often. 0.90 is a good default. The FSRS algorithm is always on.") }}</p>
-    <label class="check"><input type="checkbox" name="bury_new" value="1"{% if opts.bury_new %} checked{% endif %}>
-      {{ _("New cards: introduce sibling cards on different days") }}</label>
-    <label class="check"><input type="checkbox" name="bury_reviews" value="1"{% if opts.bury_reviews %} checked{% endif %}>
-      {{ _("Reviews: show sibling cards on different days") }}</label>
-    <p class="muted small">{{ _("Sibling cards come from the same note, e.g. a verse and its reverse card. On different days, one card does not give away the answer to the other.") }}</p>
-    <button type="submit" class="btn btn-primary btn-block">{{ _("Save") }}</button>
+    <div class="option-row stepper">
+      <label for="new_per_day">{{ _("New cards per day") }}</label>
+      <button type="button" class="step-btn" data-step="down" aria-label="{{ _('Fewer') }}">−</button>
+      <input id="new_per_day" name="new_per_day" type="number" min="0" max="9999" inputmode="numeric"
+             class="step-value" value="{{ opts.new_per_day }}" required>
+      <button type="button" class="step-btn plus" data-step="up" aria-label="{{ _('More') }}">+</button>
+    </div>
+    <div class="option-row stepper">
+      <label for="reviews_per_day">{{ _("Max. reviews per day") }}</label>
+      <button type="button" class="step-btn" data-step="down" aria-label="{{ _('Fewer') }}">−</button>
+      <input id="reviews_per_day" name="reviews_per_day" type="number" min="0" max="9999" step="10" inputmode="numeric"
+             class="step-value" value="{{ opts.reviews_per_day }}" required>
+      <button type="button" class="step-btn plus" data-step="up" aria-label="{{ _('More') }}">+</button>
+    </div>
+    <div class="panel retention">
+      <div class="panel-head">
+        <label for="desired_retention" class="retention-label">{{ _("Desired retention") }}</label>
+        <output id="retention_out" for="desired_retention" class="retention-value">{{ opts.desired_retention | decimal }}</output>
+      </div>
+      <input id="desired_retention" name="desired_retention" type="range" min="0.80" max="0.97" step="0.01"
+             class="slider" value="{{ "%.2f"|format(opts.desired_retention) }}"
+             style="--pct: {{ ((opts.desired_retention - 0.80) / 0.17 * 100) | round(1) }}%">
+      <p class="hint">{{ _("Higher = you remember more, but review more often. 0.90 is a good default.") }}</p>
+    </div>
+    <label class="option-row" for="bury_new">
+      <span>{{ _("New cards: introduce sibling cards on different days") }}</span>
+      <input type="checkbox" class="switch" id="bury_new" name="bury_new" value="1"{% if opts.bury_new %} checked{% endif %}>
+    </label>
+    <label class="option-row" for="bury_reviews">
+      <span>{{ _("Reviews: show sibling cards on different days") }}</span>
+      <input type="checkbox" class="switch" id="bury_reviews" name="bury_reviews" value="1"{% if opts.bury_reviews %} checked{% endif %}>
+    </label>
+    <p class="hint">{{ _("Sibling cards come from the same note, e.g. a verse and its reverse card. On different days, one card does not give away the answer to the other.") }}</p>
+    <button type="submit" class="btn-go">{{ _("Save") }}</button>
   </form>
-</section>
 
-<section class="card">
-  <h2>{{ _("Optimize FSRS parameters") }}</h2>
-  <p class="muted">{{ _("FSRS can adapt to your memory based on your review history. This makes sense from about %(n)s reviews.", n=min_reviews) }}
-    {{ ngettext("This deck has %(num)s review so far.", "This deck has %(num)s reviews so far.", reviews) }}</p>
   {% if optimized == "changed" %}<p class="alert alert-success">{{ _("Parameters optimized. Future intervals use your personal parameters.") }}</p>
   {% elif optimized == "unchanged" %}<p class="alert">{{ _("Not enough reviews yet or no improvement found – the parameters stay unchanged.") }}</p>{% endif %}
-  <form method="post" action="/decks/{{ deck_id }}/optimize">
+  <form method="post" action="/decks/{{ deck_id }}/optimize" class="panel fsrs">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <button class="btn btn-block"{% if reviews == 0 %} disabled{% endif %}>{{ _("Optimize now") }}</button>
+    <div class="fsrs-row">
+      <span class="fsrs-text">
+        <span class="panel-title">{{ _("Optimize FSRS") }}</span>
+        <span class="panel-note">{{ ngettext("%(num)s review so far", "%(num)s reviews so far", reviews) }}</span>
+      </span>
+      <button class="btn-line strong fsrs-btn"{% if reviews == 0 %} disabled{% endif %}>{{ _("Optimize") }}</button>
+    </div>
+    <p class="hint">{{ _("FSRS can adapt to your memory based on your review history. This makes sense from about %(n)s reviews.", n=min_reviews) }}</p>
   </form>
-</section>
+</div>
 {% endblock %}

@@ -3,21 +3,23 @@
 {% set hints = {"Reference": _("e.g. John 3:16"), "Translation": _("e.g. ESV"), "Front": _("e.g. Who led Israel through the Red Sea?"), "Back": _("e.g. Moses (Exodus 14)")} %}
 {% for name in field_names %}
 {% if name == "Reverse" %}
-<label class="check">
-  <input type="checkbox" id="field_{{ loop.index0 }}" name="field_{{ loop.index0 }}" value="y"
-         {% if values.get(loop.index0) %}checked{% endif %}{% if readonly %} disabled{% endif %}>
+<label class="option-row" for="field_{{ loop.index0 }}">
   <span>{{ _("Also learn in reverse (text → reference)") }}</span>
+  <input type="checkbox" class="switch" id="field_{{ loop.index0 }}" name="field_{{ loop.index0 }}" value="y"
+         {% if values.get(loop.index0) %}checked{% endif %}{% if readonly %} disabled{% endif %}>
 </label>
 {% else %}
-<label for="field_{{ loop.index0 }}">{{ labels.get(name, name) }}</label>
-{% if name in ("Reference", "Translation") %}
-<input id="field_{{ loop.index0 }}" name="field_{{ loop.index0 }}" class="input"
-       value="{{ values.get(loop.index0, '') }}" placeholder="{{ hints.get(name, '') }}"
-       {% if loop.first %}autofocus required{% endif %}{% if readonly %} readonly{% endif %}>
-{% else %}
-<textarea id="field_{{ loop.index0 }}" name="field_{{ loop.index0 }}" class="input" rows="{{ 5 if name == 'Text' else 3 }}" placeholder="{{ hints.get(name, '') }}"
-          {% if loop.first %}autofocus required{% endif %}{% if readonly %} readonly{% endif %}>{{ values.get(loop.index0, '') }}</textarea>
-{% endif %}
+<div class="field">
+  <label for="field_{{ loop.index0 }}" class="field-label">{{ labels.get(name, name) }}</label>
+  {% if name in ("Reference", "Translation") %}
+  <input id="field_{{ loop.index0 }}" name="field_{{ loop.index0 }}" class="input"
+         value="{{ values.get(loop.index0, '') }}" placeholder="{{ hints.get(name, '') }}"
+         {% if loop.first %}autofocus required{% endif %}{% if readonly %} readonly{% endif %}>
+  {% else %}
+  <textarea id="field_{{ loop.index0 }}" name="field_{{ loop.index0 }}" class="input" rows="{{ 4 if name == 'Text' else 3 }}" placeholder="{{ hints.get(name, '') }}"
+            {% if loop.first %}autofocus required{% endif %}{% if readonly %} readonly{% endif %}>{{ values.get(loop.index0, '') }}</textarea>
+  {% endif %}
+</div>
 {% endif %}
 {% endfor %}
-<p class="muted small">{{ _("Line breaks are kept. Simple formatting like &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt; is allowed.") }}</p>
+{% if not readonly %}<p class="hint">{{ _("Line breaks are kept. Simple formatting like &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt; is allowed.") }}</p>{% endif %}

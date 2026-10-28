@@ -1,21 +1,27 @@
 {% extends "base.html" %}
-{% block title %}{{ _("Browse cards") }}{% endblock %}
+{% block title %}{{ _("Cards") }}{% endblock %}
 {% block content %}
-<p><a href="/" class="back">‹ {{ _("Decks") }}</a></p>
-<nav class="tabs" aria-label="{{ _('Show') }}">
-  {% for key, label in [("notes", _("Notes")), ("cards", _("Cards"))] %}
-  <a href="/browse?{{ {'view': key, 'q': q} | urlencode }}" class="tab{% if key == view %} active{% endif %}"
-     {% if key == view %}aria-current="page"{% endif %}>{{ label }}</a>
-  {% endfor %}
-</nav>
-<form method="get" action="/browse" class="row search-row" role="search"
-      hx-get="/browse" hx-target="#results" hx-trigger="input changed delay:300ms from:#q, submit" hx-push-url="true">
-  <input type="hidden" name="view" value="{{ view }}">
-  <input type="search" id="q" name="q" class="input" value="{{ q }}" placeholder="{{ _('Search (Anki search syntax)') }}" aria-label="{{ _('Search') }}" autocomplete="off">
-  <button class="btn">{{ _("Search") }}</button>
-</form>
-<div id="results">
-  {% include "partials/browse_results.html" %}
+<h1 class="page-title">{{ _("Cards") }}</h1>
+<div class="ui-stack">
+  <nav class="segmented" aria-label="{{ _('Show') }}">
+    {% for key, label in [("notes", _("Notes")), ("cards", _("Cards"))] %}
+    <a href="/browse?{{ {'view': key, 'q': q} | urlencode }}"{% if key == view %} class="active" aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
+  <form method="get" action="/browse" class="searchbox" role="search"
+        hx-get="/browse" hx-target="#results" hx-trigger="input changed delay:300ms from:#q, submit" hx-push-url="true">
+    <input type="hidden" name="view" value="{{ view }}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+    <input type="search" id="q" name="q" value="{{ q }}" placeholder="{{ _('Search cards') }}" aria-label="{{ _('Search (Anki search syntax)') }}"
+           title="{{ _('Anki search syntax, e.g. John, is:due, is:new') }}" autocomplete="off">
+  </form>
+  <nav class="chips filters" aria-label="{{ _('Filter') }}">
+    {% for label, query in filters %}
+    <a class="chip{% if query == q %} active{% endif %}" href="/browse?{{ {'view': view, 'q': query} | urlencode }}"{% if query == q %} aria-current="true"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
+  <div id="results">
+    {% include "partials/browse_results.html" %}
+  </div>
 </div>
-<p class="muted small">{{ _("Examples:") }} <code>John</code>, <code>deck:"{{ _("My cards") }}"</code>, <code>is:due</code>, <code>is:new</code>, <code>is:suspended</code></p>
 {% endblock %}

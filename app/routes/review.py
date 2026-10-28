@@ -22,13 +22,27 @@ MAX_TAKEN_SECS = 3600  # anki caps further via the deck's maxTaken
 TYPE_COOKIE = "vf_type"
 
 
-def _render_state(request: Request, state, full_page: bool, undone: bool = False,
-                  typed_diff=None, shown_at: str | None = None):
+async def _done_context(col: str, deck_id: int) -> dict:
+    """Streak and the next deck with due cards, for the "done for today" screen."""
+    stats = await anki_service.collection_stats(col, days=1)
+    next_deck = None
+    if deck_id != anki_service.ALL_DECKS:
+        decks = await anki_service.deck_list(col)
+        current = next((d.name for d in decks if d.id == deck_id), "")
+        next_deck = next((d for d in decks if d.depth == 0 and d.new + d.learn + d.review
+                          and d.name != current and not current.startswith(d.name + "::")), None)
+    return {"streak": stats.streak_days, "next_deck": next_deck}
+
+
+async def _render_state(request: Request, state, full_page: bool, undone: bool = False,
+                        typed_diff=None, shown_at: str | None = None):
     col = request.state.collection_id
     if state.deck_id == anki_service.ALL_DECKS:
         state.deck_name = _(anki_service.ALL_DECKS_NAME)
     ctx = {"state": state, "media_base": media_base(col), "shown_at": shown_at or f"{time.time():.3f}", "undone": undone,
            "typing": request.cookies.get(TYPE_COOKIE) == "1", "typed_diff": typed_diff}
+    if state.card is None:
+        ctx.update(await _done_context(col, state.deck_id))
     return render(request, "review.html" if full_page else "partials/review_card.html", ctx)
 
 
@@ -36,7 +50,7 @@ def _render_state(request: Request, state, full_page: bool, undone: bool = False
 async def review_page(request: Request, deck_id: int, user: User = Depends(require_user),
     col: str = Depends(current_collection)):
     state = await anki_service.review_state(col, deck_id)
-    return _render_state(request, state, full_page=True)
+    return await _render_state(request, state, full_page=True)
 
 
 @router.post("/review/{deck_id}/answer")
@@ -56,7 +70,7 @@ async def answer(
         tasks.add_task(stats.update_after_review, user.id)
     if not is_htmx(request):
         return RedirectResponse(f"/review/{deck_id}", status_code=303)
-    return _render_state(request, state, full_page=False)
+    return await _render_state(request, state, full_page=False)
 
 
 @router.post("/review/{deck_id}/undo")
@@ -69,7 +83,7 @@ async def undo(
         tasks.add_task(stats.update_after_review, user.id)
     if not is_htmx(request):
         return RedirectResponse(f"/review/{deck_id}", status_code=303)
-    return _render_state(request, state, full_page=False, undone=undone)
+    return await _render_state(request, state, full_page=False, undone=undone)
 
 
 @router.post("/review/{deck_id}/check")
@@ -80,7 +94,7 @@ async def check(request: Request, deck_id: int, card_id: int = Form(...), typed:
     diff = Markup(nh3.clean(diff, tags={"code", "span", "br"}, attributes={"*": {"class", "id"}})) if diff else None
     if not is_htmx(request):
         return RedirectResponse(f"/review/{deck_id}", status_code=303)
-    return _render_state(request, state, full_page=False, typed_diff=diff,
+    return await _render_state(request, state, full_page=False, typed_diff=diff,
                          shown_at=shown_at if re.fullmatch(r"\d+(\.\d+)?", shown_at) else None)
 
 

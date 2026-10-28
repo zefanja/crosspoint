@@ -1,58 +1,67 @@
 {% extends "base.html" %}
-{% block title %}{{ _("Statistics") }} – {{ app_name }}{% endblock %}
+{% block title %}{{ _("Progress") }} – {{ app_name }}{% endblock %}
+{% block topbar_extra %}<span class="topbar-label">{{ _("Progress") }}</span>{% endblock %}
 {% block content %}
-<p><a href="/" class="back">‹ {{ _("Decks") }}</a></p>
-<section class="card">
-  <h1>{{ _("Statistics") }}</h1>
-  <form method="get" class="row">
-    <select name="deck" class="input" aria-label="{{ _('Deck') }}">
-      <option value="">{{ _("All decks") }}</option>
-      {% for did, name in decks %}<option value="{{ did }}"{% if did == deck %} selected{% endif %}>{{ name }}</option>{% endfor %}
-    </select>
-    <button class="btn">{{ _("Show") }}</button>
-  </form>
-</section>
-
-<div class="stat-tiles">
-  <div class="stat-tile"><span class="stat-value">{{ s.today_answered }}</span><span class="stat-label">{{ _("Reviews today") }}</span></div>
-  <div class="stat-tile"><span class="stat-value">{{ s.streak_days }}</span><span class="stat-label">{{ _("Day streak") }}</span></div>
-  <div class="stat-tile"><span class="stat-value">{% if s.retention_month is not none %}{{ (s.retention_month * 100) | round | int }}&nbsp;%{% else %}–{% endif %}</span><span class="stat-label">{{ _("Retention (30 days)") }}</span></div>
-  <div class="stat-tile"><span class="stat-value">{{ tomorrow }}</span><span class="stat-label">{{ _("Due tomorrow") }}</span></div>
-</div>
-
-<section class="card">
-  <h2>{{ _("Activity") }}</h2>
-  <p class="muted small">{{ ngettext("%(num)s review in the last 12 months", "%(num)s reviews in the last 12 months", s.total_reviews) }}</p>
-  <div class="heatmap-scroll">
-    <div class="heatmap" role="img" aria-label="{{ ngettext('%(num)s review in the last 12 months', '%(num)s reviews in the last 12 months', s.total_reviews) }}">
-      {% for week in weeks %}{% for c in week %}{% if c %}<span class="hm l{{ c.level }}" title="{{ c.day | date }}: {{ c.count }}"></span>{% else %}<span class="hm empty"></span>{% endif %}{% endfor %}{% endfor %}
-    </div>
-  </div>
-  <div class="hm-legend muted small" aria-hidden="true">{{ _("Less") }} <span class="hm l0"></span><span class="hm l1"></span><span class="hm l2"></span><span class="hm l3"></span><span class="hm l4"></span> {{ _("More") }}</div>
-</section>
-
-<section class="card">
-  <h2>{{ _("Forecast") }}</h2>
-  <p class="muted small">{{ _("Cards due in the next 7 days: %(n)s", n=next_week) }}</p>
-  <div class="forecast" role="img" aria-label="{{ _('Cards due in the next 7 days: %(n)s', n=next_week) }}">
-    {% for f in forecast %}
-    <div class="fc-col" title="{{ f.day | date }}: {{ f.count }}">
-      <span class="fc-bar" style="height: {{ f.pct }}%"></span>
-      <span class="fc-label">{% if loop.index0 % 7 == 0 and loop.index0 < 28 %}{{ f.day | short_date }}{% endif %}</span>
-    </div>
+<div class="ui-stack">
+  <nav class="chips" aria-label="{{ _('Deck') }}">
+    <a class="chip{% if deck is none %} active{% endif %}" href="/stats"{% if deck is none %} aria-current="true"{% endif %}>{{ _("All decks") }}</a>
+    {% for did, name in decks %}
+    <a class="chip{% if did == deck %} active{% endif %}" href="/stats?deck={{ did }}"{% if did == deck %} aria-current="true"{% endif %}>{{ name }}</a>
     {% endfor %}
-  </div>
-</section>
+  </nav>
 
-<section class="card">
-  <h2>{{ _("Cards") }}</h2>
-  <dl class="card-counts">
-    <div><dt class="c-new">{{ _("New") }}</dt><dd>{{ s.new }}</dd></div>
-    <div><dt class="c-learn">{{ _("Learning") }}</dt><dd>{{ s.learning }}</dd></div>
-    <div><dt class="c-rev">{{ _("Young") }}</dt><dd>{{ s.young }}</dd></div>
-    <div><dt class="c-rev">{{ _("Mature") }}</dt><dd>{{ s.mature }}</dd></div>
-    <div><dt class="muted">{{ _("Suspended") }}</dt><dd>{{ s.suspended }}</dd></div>
-  </dl>
-  <p class="muted small">{{ _("Young: interval under 21 days. Mature: 21 days or more.") }}</p>
-</section>
+  <section class="hero score-hero">
+    <div class="score-streak">
+      <span class="score-num">{{ s.streak_days }}</span>
+      <span class="score-label">{{ ngettext("day in a row.", "days in a row.", s.streak_days) }}<br>{{ _("Locked in for today") if s.today_answered else _("Review today to keep it") }}</span>
+    </div>
+    <ol class="score-week" aria-label="{{ _('This week') }}">
+      {% set names = [_("Mon"), _("Tue"), _("Wed"), _("Thu"), _("Fri"), _("Sat"), _("Sun")] %}
+      {% for c in this_week %}
+      {% set is_today = not c.future and loop.index0 == (this_week | rejectattr("future") | list | length) - 1 %}
+      <li class="{% if c.count %}on{% elif is_today %}today{% endif %}" title="{{ c.day | date if c.day }}{% if c.count %}: {{ c.count }}{% endif %}">
+        <span class="score-day" aria-hidden="true"></span><small>{{ names[loop.index0] }}</small>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+
+  <div class="score-tiles">
+    <div class="panel score-tile"><span>{{ s.today_answered }}</span><small>{{ _("reviews today") }}</small></div>
+    <div class="panel score-tile"><span>{% if s.retention_month is not none %}{{ (s.retention_month * 100) | round | int }}&nbsp;%{% else %}–{% endif %}</span><small>{{ _("remembered (30 days)") }}</small></div>
+    <div class="panel score-tile"><span>{{ tomorrow }}</span><small>{{ _("due tomorrow") }}</small></div>
+    <div class="panel score-tile"><span>{{ s.mature }}</span><small>{{ _("cards locked in") }}</small></div>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head"><h2 class="panel-title">{{ _("Last 16 weeks") }}</h2><span class="panel-note">{{ ngettext("%(num)s review in the last 12 months", "%(num)s reviews in the last 12 months", s.total_reviews) }}</span></div>
+    <div class="score-heat" role="img" aria-label="{{ _('Reviews per day in the last 16 weeks') }}">
+      {% for week in weeks %}{% for c in week %}{% if c is none %}<span class="hm2 empty"></span>{% elif c.future %}<span class="hm2 future"></span>{% else %}<span class="hm2 l{{ c.level }}" title="{{ c.day | date }}: {{ c.count }}"></span>{% endif %}{% endfor %}{% endfor %}
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2 class="panel-title">{{ _("Forecast") }}</h2><span class="panel-note">{{ _("Cards due in the next 7 days: %(n)s", n=next_week) }}</span></div>
+    <div class="forecast" role="img" aria-label="{{ _('Cards due in the next 7 days: %(n)s', n=next_week) }}">
+      {% for f in forecast %}
+      <div class="fc-col" title="{{ f.day | date }}: {{ f.count }}">
+        <span class="fc-bar{% if loop.first %} today{% endif %}" style="height: {{ f.pct }}%"></span>
+        <span class="fc-label">{% if loop.index0 % 7 == 0 and loop.index0 < 28 %}{{ f.day | short_date }}{% endif %}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">{{ _("Cards") }}</h2>
+    <dl class="card-counts">
+      <div><dt>{{ _("New") }}</dt><dd>{{ s.new }}</dd></div>
+      <div><dt>{{ _("Learning") }}</dt><dd>{{ s.learning }}</dd></div>
+      <div><dt>{{ _("Young") }}</dt><dd>{{ s.young }}</dd></div>
+      <div><dt>{{ _("Mature") }}</dt><dd>{{ s.mature }}</dd></div>
+      <div><dt>{{ _("Suspended") }}</dt><dd>{{ s.suspended }}</dd></div>
+    </dl>
+    <p class="hint">{{ _("Young: interval under 21 days. Mature: 21 days or more.") }}</p>
+  </section>
+</div>
 {% endblock %}

@@ -1,45 +1,63 @@
-<div id="review" class="review">
-  <div class="review-top">
-    <a href="/" class="back" aria-label="{{ _('Back to decks') }}">‹ {{ state.deck_name }}</a>
-    <span class="counts" aria-label="{{ _('Remaining: %(new)s new, %(learn)s learning, %(due)s due', new=state.new, learn=state.learn, due=state.review) }}">
-      <span class="c-new{% if state.card and state.card.queue == 0 %} current{% endif %}">{{ state.new }}</span>
-      <span class="c-learn{% if state.card and state.card.queue in (1, 3) %} current{% endif %}">{{ state.learn }}</span>
-      <span class="c-rev{% if state.card and state.card.queue == 2 %} current{% endif %}">{{ state.review }}</span>
-    </span>
-    <a href="/review/{{ state.deck_id }}/typing?on={{ 0 if typing else 1 }}" class="btn btn-small{% if typing %} active{% endif %}"
-       title="{{ _('Typing mode: off') if typing else _('Typing mode: on') }}" aria-pressed="{{ 'true' if typing else 'false' }}"
-       aria-label="{{ _('Typing mode') }}">⌨</a>
-    {% if state.can_undo %}
-    <form hx-post="/review/{{ state.deck_id }}/undo" hx-target="#review" hx-swap="outerHTML"
-          method="post" action="/review/{{ state.deck_id }}/undo" class="inline">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-      <button id="undo-btn" class="btn btn-small" title="{{ _('Undo (Z)') }}"><span aria-hidden="true">↶</span><span class="undo-text">{{ _("Undo") }}</span></button>
-    </form>
+{% set remaining = state.new + state.learn + state.review %}
+{% set position = state.done_today + 1 %}
+{% set total = state.done_today + remaining %}
+<div id="review" class="review{% if not state.card %} is-done{% endif %}">
+  <header class="study-top">
+    <div class="study-bar">
+      <a href="/" class="study-back" aria-label="{{ _('Back to decks') }}">‹ {{ state.deck_name }}</a>
+      {% if state.card %}
+      {% set q = state.card.queue %}
+      <span class="study-counts" aria-label="{{ _('Remaining: %(new)s new, %(learn)s learning, %(due)s due', new=state.new, learn=state.learn, due=state.review) }}">
+        <span class="sc sc-new{% if q == 0 %} current{% endif %}">{{ state.new }}</span>
+        <span class="sc sc-learn{% if q in (1, 3) %} current{% endif %}">{{ state.learn }}</span>
+        <span class="sc sc-rev{% if q == 2 %} current{% endif %}">{{ state.review }}</span>
+      </span>
+      <a href="/review/{{ state.deck_id }}/typing?on={{ 0 if typing else 1 }}" class="study-icon{% if typing %} active{% endif %}"
+         title="{{ _('Typing mode: off') if typing else _('Typing mode: on') }}" aria-pressed="{{ 'true' if typing else 'false' }}"
+         aria-label="{{ _('Typing mode') }}">⌨</a>
+      {% endif %}
+      {% if state.can_undo %}
+      <form hx-post="/review/{{ state.deck_id }}/undo" hx-target="#review" hx-swap="outerHTML"
+            method="post" action="/review/{{ state.deck_id }}/undo" class="inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button id="undo-btn" class="study-icon" title="{{ _('Undo (Z)') }}" aria-label="{{ _('Undo') }}">↶</button>
+      </form>
+      {% endif %}
+    </div>
+    {% if state.card %}
+    <div class="study-progress" aria-hidden="true"><span style="width: {{ (100 * state.done_today / total) | round(1) if total else 0 }}%"></span></div>
     {% endif %}
-  </div>
+  </header>
 
   {% if state.card %}
   <input type="checkbox" id="show-answer" class="show-toggle" aria-hidden="true" tabindex="-1"{% if typed_diff %} checked{% endif %}>
-  <div class="card-stage">
-    <iframe class="card-frame card-q" sandbox title="{{ _('Front') }}"
-            srcdoc="{{ state.card.question | card_document(media_base) }}"></iframe>
-    <iframe class="card-frame card-a" sandbox title="{{ _('Back') }}"
-            srcdoc="{{ state.card.answer | card_document(media_base) }}"></iframe>
+  <div class="study-body">
+    <div class="study-meta">
+      <span class="study-kind">{% if q == 0 %}{{ _("NEW CARD") }}{% elif q == 2 %}{{ _("REVIEW") }}{% else %}{{ _("LEARNING") }}{% endif %}</span>
+      <span>{{ _("%(pos)s of %(total)s", pos=position, total=total) }}</span>
+    </div>
+    <div class="card-stage">
+      <iframe class="card-frame card-q" sandbox title="{{ _('Front') }}"
+              srcdoc="{{ state.card.question | card_document(media_base) }}"></iframe>
+      <iframe class="card-frame card-a" sandbox title="{{ _('Back') }}"
+              srcdoc="{{ state.card.answer | card_document(media_base) }}"></iframe>
+    </div>
+    {% if typed_diff %}<div class="typed-diff" aria-label="{{ _('Your answer compared') }}">{{ typed_diff }}</div>
+    {% elif typing and state.card.can_type %}
+    <form class="type-form" hx-post="/review/{{ state.deck_id }}/check" hx-target="#review" hx-swap="outerHTML"
+          method="post" action="/review/{{ state.deck_id }}/check">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="card_id" value="{{ state.card.card_id }}">
+      <input type="hidden" name="shown_at" value="{{ shown_at }}">
+      <textarea name="typed" id="typed" class="input" rows="2" autocomplete="off" autocapitalize="sentences"
+                placeholder="{{ _('Type the answer …') }}" aria-label="{{ _('Your answer') }}"></textarea>
+      <button class="btn-line strong">{{ _("Check") }}</button>
+    </form>
+    {% endif %}
+    <p class="rate-question">{{ _("How well did you know it?") }}</p>
   </div>
-  {% if typed_diff %}<div class="typed-diff" aria-label="{{ _('Your answer compared') }}">{{ typed_diff }}</div>
-  {% elif typing and state.card.can_type %}
-  <form class="type-form" hx-post="/review/{{ state.deck_id }}/check" hx-target="#review" hx-swap="outerHTML"
-        method="post" action="/review/{{ state.deck_id }}/check">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <input type="hidden" name="card_id" value="{{ state.card.card_id }}">
-    <input type="hidden" name="shown_at" value="{{ shown_at }}">
-    <textarea name="typed" id="typed" class="input" rows="3" autocomplete="off" autocapitalize="sentences"
-              placeholder="{{ _('Type the answer …') }}" aria-label="{{ _('Your answer') }}"></textarea>
-    <button class="btn btn-primary btn-block">{{ _("Check") }}</button>
-  </form>
-  {% endif %}
   <div class="answer-bar">
-    <label for="show-answer" id="show-btn" class="btn btn-primary btn-block show-btn" role="button">{{ _("Show answer") }}</label>
+    <label for="show-answer" id="show-btn" class="btn-go show-btn" role="button">{{ _("Show answer") }}</label>
     <form class="ratings" method="post" action="/review/{{ state.deck_id }}/answer"
           hx-post="/review/{{ state.deck_id }}/answer" hx-target="#review" hx-swap="outerHTML"
           hx-disabled-elt="find button">
@@ -49,18 +67,24 @@
       {% set names = [_("Again"), _("Hard"), _("Good"), _("Easy")] %}
       {% set classes = ["r-again", "r-hard", "r-good", "r-easy"] %}
       {% for i in range(4) %}
-      <button type="submit" name="rating" value="{{ i + 1 }}" class="btn rating {{ classes[i] }}" data-rating="{{ i + 1 }}">
+      <button type="submit" name="rating" value="{{ i + 1 }}" class="rating {{ classes[i] }}" data-rating="{{ i + 1 }}">
         <span>{{ names[i] }}</span><small>{{ state.card.labels[i] }}</small>
       </button>
       {% endfor %}
     </form>
   </div>
   {% else %}
-  <div class="done">
-    <p class="done-emoji" aria-hidden="true">🎉</p>
-    <h2>{{ _("Done for today!") }}</h2>
-    <p class="muted">{{ _("Nothing else is due in this deck right now. More cards tomorrow.") }}</p>
-    <a href="/" class="btn btn-primary">{{ _("Back to decks") }}</a>
+  <section class="splash study-done">
+    <h1 class="splash-title done-title">{{ _("Done<br>for today") }}</h1>
+    <p class="splash-text">{{ _("Nothing else is due in this deck right now. More cards tomorrow.") }}</p>
+    <div class="done-tiles">
+      <div class="done-tile"><span>{{ state.done_today }}</span><small>{{ ngettext("card reviewed", "cards reviewed", state.done_today) }}</small></div>
+      <div class="done-tile hot"><span>{{ streak }}</span><small>{{ ngettext("day streak", "day streak", streak) }}</small></div>
+    </div>
+  </section>
+  <div class="splash-actions">
+    <a href="/" class="btn-go">{{ _("Back to decks") }}</a>
+    {% if next_deck %}<a href="/review/{{ next_deck.id }}" class="btn-line">{{ _("Next deck: %(deck)s · %(num)s", deck=next_deck.short_name, num=next_deck.new + next_deck.learn + next_deck.review) }}</a>{% endif %}
   </div>
   {% endif %}
 </div>

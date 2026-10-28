@@ -5,10 +5,13 @@ from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import FileResponse, RedirectResponse, Response
+from sqlalchemy import select
+from sqlalchemy.orm import Session as DbSession
 
 from app import anki_service, i18n
-from app.auth import cookie_secure, media_token, require_user
-from app.models import User
+from app.auth import cookie_secure, current_collection, media_token, require_user
+from app.db import get_db
+from app.models import Group, GroupMember, User
 
 from app.templating import render
 
@@ -21,9 +24,15 @@ def privacy(request: Request):
 
 
 @router.get("/me")
-def me(request: Request, user: User = Depends(require_user)):
-    """Account page (tab "Me"): export, language, log out."""
-    return render(request, "me.html")
+async def me(request: Request, user: User = Depends(require_user),
+             col: str = Depends(current_collection), db: DbSession = Depends(get_db)):
+    """Account page (tab "Me"): groups, export, language, log out."""
+    groups = db.scalars(
+        select(Group.name).join(GroupMember, GroupMember.group_id == Group.id)
+        .where(GroupMember.user_id == user.id).order_by(Group.name)
+    ).all()
+    stats = await anki_service.collection_stats(col, days=1)
+    return render(request, "me.html", {"groups": groups, "streak": stats.streak_days})
 
 
 @router.get("/media/{collection_id}/{token}/{filename}")

@@ -1,9 +1,12 @@
-<fieldset class="image-upload">
-  <legend>{{ _("Image (optional)") }}</legend>
-  <input type="file" name="image" accept="image/png,image/jpeg,image/gif,image/webp" class="input" aria-label="{{ _('Image (optional)') }}">
-  <div class="row-radio">
-    <label class="check"><input type="radio" name="image_side" value="front"><span>{{ _("on the front") }}</span></label>
-    <label class="check"><input type="radio" name="image_side" value="back" checked><span>{{ _("on the back") }}</span></label>
-  </div>
-  <p class="muted small">{{ _("PNG, JPEG, GIF or WebP, max. 5 MB. Exported to Anki together with the cards.") }}</p>
-</fieldset>
+<details class="image-add">
+  <summary>{{ _("+ Add image") }}</summary>
+  <fieldset class="panel">
+    <legend class="sr-only">{{ _("Image (optional)") }}</legend>
+    <input type="file" name="image" accept="image/png,image/jpeg,image/gif,image/webp" class="input" aria-label="{{ _('Image (optional)') }}">
+    <div class="row-radio">
+      <label class="check"><input type="radio" name="image_side" value="front"><span>{{ _("on the front") }}</span></label>
+      <label class="check"><input type="radio" name="image_side" value="back" checked><span>{{ _("on the back") }}</span></label>
+    </div>
+    <p class="hint">{{ _("PNG, JPEG, GIF or WebP, max. 5 MB. Exported to Anki together with the cards.") }}</p>
+  </fieldset>
+</details>

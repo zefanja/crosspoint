@@ -199,8 +199,13 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 **Navigation (Lerner-Seiten)**
 - Untere Leiste: Start · Karten (Suche) · großer „+“-Button (Karte hinzufügen) ·
   Fortschritt (Statistik) · Ich. Nicht in der Lernansicht und im Admin-Bereich.
-- „Ich“ (`/me`): Export, Bibeltext importieren, Verwaltung (Staff), Abmelden, Sprache,
-  Datenschutz/Quellcode/Version (ersetzt auf diesen Seiten den Footer).
+- „Ich“ (`/me`, Entwurf 3d): Kopfkarte mit Initiale, Name und Gruppen; Bibeltext importieren,
+  Export, Verwaltung (Staff); Sprache als Umschalter; Abmelden; Datenschutz/Quellcode/Version
+  (ersetzt auf diesen Seiten den Footer). Serie oben rechts.
+- Gemeinsamer Stil der Lerner-Seiten (Entwürfe 2a, 3a–d, 4a–j): navy Kopfzeile mit gelber Linie
+  (Logo oder „‹ Zurück“), weiße Feldkarten mit Großbuchstaben-Label, Schalter statt Checkboxen,
+  −/+-Stepper für Zahlen, gelber Hauptbutton. Login, „Keine Verbindung“, Fehler und
+  „Fertig für heute“ sind ganzseitig navy.
 
 **Lernansicht** (wichtigste Seite, mobile-first)
 - Kartenvorderseite füllt den Bildschirm; großer Button „Antwort zeigen“ unten (Daumenzone).
@@ -211,7 +216,16 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - *Tippmodus* (Phase 3, Schalter ⌨ in der Lernansicht, Cookie): Antwort eintippen → „Prüfen“
   zeigt Ankis Diff (`col.compare_answer`) und die Rückseite, danach bewerten. Für Bible Verse
   (Text bzw. Referenz), Basic (Rückseite) und Bible Memorizer Karte 1–3 (`answer`).
-- Fortschrittszeile oben: verbleibende Karten (neu/Lernen/fällig).
+- Kopfzeile (Entwurf 3a/3b): „‹ Deck“, verbleibende Karten (neu/Lernen/fällig, die Art der
+  aktuellen Karte hervorgehoben), ⌨, ↶ und ein Fortschrittsbalken. Darüber der Kartenart
+  („NEUE KARTE“ …) und „X von Y“ = heutige Antworten im Deck + 1 von heutigen Antworten +
+  verbleibenden Karten (`ReviewState.done_today`).
+- Kartenrahmen: weiße abgerundete Karte; im iframe wird nach dem Notiztyp-CSS Archivo gesetzt
+  und der Inhalt vertikal zentriert (`card_document`). Die Notiztypen selbst bleiben unverändert;
+  `/static/fonts/` sendet `Access-Control-Allow-Origin: *`, weil das sandboxed iframe die Schrift
+  ohne Origin lädt.
+- „Fertig für heute“ (3c): heutige Antworten im Deck, Serie, „Zurück zu den Decks“ und
+  „Nächstes Deck: X · N“ (erstes andere Hauptdeck mit fälligen Karten; nicht bei „Alle Decks“).
 - Kein Seiten-Reload: htmx tauscht nur den Kartenbereich aus. Nächste Karte wird nach
   der Bewertung direkt mitgeliefert (eine Anfrage pro Bewertung).
 - Umsetzung: Vorder- und Rückseite kommen in derselben Antwort; „Antwort zeigen“ schaltet
@@ -245,6 +259,8 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 **Kartenliste / Suche**
 - Suchfeld (Anki-Suchsyntax wird durchgereicht), Umschalter **Notizen | Karten** (Standard:
   Notizen, `?view=cards`). Die Suche bleibt beim Umschalten erhalten.
+- Schnellfilter (Entwurf 4b): Alle · Fällig (`is:due`) · Neu · Ausgesetzt · je Hauptdeck
+  (`anki_service.deck_search`). Status als Pille: neu, heute (fällig), Datum, ausgesetzt.
 - Notizen: eine Zeile pro Notiz – erstes Feld (gekürzt), Deck, Anzahl Karten (davon
   ausgesetzt), nächste Fälligkeit bzw. „neu“/„ausgesetzt“.
 - Karten: eine Zeile pro Karte mit Kartentyp (z. B. „Text → Reference“, nur bei Notizen mit mehreren
@@ -261,6 +277,12 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
   Bestehende Collections werden einmalig umgestellt (Marker `crosspointBurySiblings` in der
   Collection-Konfiguration); das Tageslimit neuer Karten bestehender Decks bleibt unverändert.
 - Phase 2: Button „FSRS-Parameter optimieren“ (ab ca. 400 Reviews sinnvoll).
+
+**Fortschritt** (`/stats`, Entwurf 2a)
+- Deck-Chips (Alle Decks + jedes Deck), Serie groß mit Wochenleiste (Mo–So, heute gestrichelt,
+  solange noch nicht gelernt), vier Kacheln: Wiederholungen heute, behalten (30 Tage),
+  morgen fällig, sicher gelernt (reif); Aktivität der letzten 16 Wochen.
+- Darunter wie bisher: 30-Tage-Vorschau und Kartenzahlen (neu/lernen/jung/reif/ausgesetzt).
 
 **Export**
 - „Alles exportieren (für neue Anki-Nutzer)“ → `.colpkg`

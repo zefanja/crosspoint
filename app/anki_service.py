@@ -35,6 +35,7 @@ from anki.errors import NotFoundError, SearchError
 from anki.import_export_pb2 import ImportAnkiPackageUpdateCondition
 from anki.notes import NoteFieldsCheckResult
 from anki.scheduler.v3 import CardAnswer
+from anki.utils import ids2str
 from starlette.concurrency import run_in_threadpool
 
 from app.bible_memorizer import gen_notes as bm_gen
@@ -174,6 +175,7 @@ class ReviewState:
     learn: int
     review: int
     can_undo: bool
+    done_today: int = 0  # answers given today in this deck (incl. subdecks) – progress bar
 
 
 @dataclass
@@ -651,6 +653,16 @@ def _queue(col: Collection, deck_id: int):
     return ALL_DECKS_NAME, None, counts
 
 
+def _answers_today(col: Collection, deck_id: int) -> int:
+    since = (col.sched.day_cutoff - 86_400) * 1000
+    if deck_id == ALL_DECKS:
+        return col.db.scalar("select count() from revlog where id >= ? and ease > 0", since)
+    dids = ids2str(col.decks.deck_and_child_ids(deck_id))
+    return col.db.scalar(
+        "select count() from revlog where id >= ? and ease > 0 and cid in "
+        f"(select id from cards where did in {dids} or odid in {dids})", since)
+
+
 def _review_state(col: Collection, deck_id: int) -> ReviewState:
     deck_name, qc, (new, learn, review) = _queue(col, deck_id)
     card_data = None
@@ -672,6 +684,7 @@ def _review_state(col: Collection, deck_id: int) -> ReviewState:
         learn=learn,
         review=review,
         can_undo=_can_undo_review(col),
+        done_today=_answers_today(col, deck_id),
     )
 
 
@@ -1206,6 +1219,11 @@ def _tag_deck_notes(col: Collection, deck_id: int, tag: str) -> int:
     if note_ids:
         col.tags.bulk_add(note_ids, tag)
     return len(note_ids)
+
+
+def deck_search(deck_name: str) -> str:
+    """Anki search for all cards of a deck (and its subdecks), e.g. for filter chips."""
+    return f'"deck:{_escape_search(deck_name)}"'
 
 
 def _escape_search(text: str) -> str:

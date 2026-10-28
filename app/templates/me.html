@@ -1,31 +1,43 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Me") }}{% endblock %}
+{% block topbar_extra %}
+<a class="streak-pill" href="/stats" title="{{ _('Days in a row with reviews') }}"><span class="streak-dot" aria-hidden="true"></span>{{ ngettext("%(num)s day", "%(num)s days", streak) }}</a>
+{% endblock %}
 {% block content %}
-<h1 class="hello">{{ user.display_name }}</h1>
+<div class="ui-stack me-page">
+  <section class="hero me-hero">
+    <span class="me-avatar" aria-hidden="true">{{ (user.display_name or "?")[0] | upper }}</span>
+    <div class="me-who">
+      <h1 class="me-name">{{ user.display_name }}</h1>
+      {% if groups %}<span class="hero-text">{{ groups | join(" · ") }}</span>{% endif %}
+    </div>
+  </section>
 
-<div class="me-links">
-  <a class="btn btn-block" href="/export">{{ _("Export to Anki") }}</a>
-  <a class="btn btn-block" href="/notes/bible">{{ _("Import Bible text") }}</a>
-  {% if user.is_staff %}<a class="btn btn-block" href="/admin">{{ _("Admin") }}</a>{% endif %}
+  <nav class="rowlist me-links" aria-label="{{ _('More') }}">
+    <a href="/notes/bible" class="me-link"><span>{{ _("Import Bible text") }}</span><span aria-hidden="true">›</span></a>
+    <a href="/export" class="me-link"><span>{{ _("Export to Anki") }}</span><span aria-hidden="true">›</span></a>
+    {% if user.is_staff %}<a href="/admin" class="me-link"><span>{{ _("Admin") }}</span><span class="deck-badge">{{ _("STAFF") }}</span></a>{% endif %}
+  </nav>
+
+  <section class="field">
+    <h2 class="field-label me-section">{{ _("Language") }}</h2>
+    <nav class="segmented me-langs" aria-label="{{ _('Language') }}">
+      {% for code, name in available_languages().items() %}
+      {% if code == get_language() %}<strong class="active" lang="{{ code }}" aria-current="true">{{ name }}</strong>{% else %}<a href="/lang/{{ code }}" lang="{{ code }}" hreflang="{{ code }}">{{ name }}</a>{% endif %}
+      {% endfor %}
+    </nav>
+  </section>
+
   <form method="post" action="/logout">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <button type="submit" class="btn btn-block btn-danger">{{ _("Log out") }}</button>
+    <button type="submit" class="btn-line danger">{{ _("Log out") }}</button>
   </form>
+
+  <p class="me-about">
+    <span>{{ _("Compatible with Anki") }}</span>
+    <a href="/privacy">{{ _("Privacy") }}</a>
+    <a href="{{ source_url }}">{{ _("Source code") }}</a>
+    <span class="version" title="{{ _('Version') }}">{{ app_version }}</span>
+  </p>
 </div>
-
-<section class="card">
-  <h2>{{ _("Language") }}</h2>
-  <nav class="me-langs" aria-label="{{ _('Language') }}">
-    {% for code, name in available_languages().items() %}
-    {% if code == get_language() %}<strong class="btn btn-primary" lang="{{ code }}" aria-current="true">{{ name }}</strong>{% else %}<a class="btn" href="/lang/{{ code }}" lang="{{ code }}" hreflang="{{ code }}">{{ name }}</a>{% endif %}
-    {% endfor %}
-  </nav>
-</section>
-
-<p class="muted small me-about">
-  {{ _("Compatible with Anki") }} ·
-  <a href="/privacy">{{ _("Privacy") }}</a> ·
-  <a href="{{ source_url }}">{{ _("Source code") }}</a> ·
-  <span class="version" title="{{ _('Version') }}">{{ app_version }}</span>
-</p>
 {% endblock %}

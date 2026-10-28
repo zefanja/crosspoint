@@ -1,49 +1,42 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Export") }}{% endblock %}
+{% block topbar_left %}<a href="/me" class="topbar-back">‹ {{ _("Me") }}</a>{% endblock %}
 {% block content %}
-<p><a href="/" class="back">‹ {{ _("Decks") }}</a></p>
-<section class="card">
-  <h1>{{ _("Export to Anki") }}</h1>
-  <p>{{ _("Your cards belong to you. You can download them <strong>with your learning progress</strong> at any time and continue in Anki (computer, AnkiDroid, AnkiMobile).") }}</p>
-</section>
+<div class="ui-stack">
+  <section class="hero export-hero">
+    <h1 class="hero-title">{{ _("Your cards<br>belong to you") }}</h1>
+    <p class="hero-text">{{ _("Download them with your learning progress at any time and continue in Anki.") }}</p>
+  </section>
 
-<section class="card">
-  <h2>{{ _("Export everything") }} <span class="muted">{{ _("(for new Anki users)") }}</span></h2>
-  <p class="alert">{{ _("Replaces the collection in Anki when imported – only for empty/new Anki installations.") }}</p>
-  <form method="post" action="/export/collection">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <button class="btn btn-primary btn-block">{{ _("Download everything (.colpkg)") }}</button>
-  </form>
-</section>
+  <section class="panel">
+    <div class="panel-head"><h2 class="panel-title">{{ _("One deck") }}</h2><span class="panel-note">{{ _("add to existing Anki") }}</span></div>
+    <form method="post" action="/export/deck">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <select id="deck_id" name="deck_id" class="input" aria-label="{{ _('Deck') }}">
+        {% for did, name in decks %}<option value="{{ did }}">{{ name }}</option>{% endfor %}
+      </select>
+      <button class="btn-go sm">{{ _("Download .apkg") }}</button>
+    </form>
+  </section>
 
-<section class="card">
-  <h2>{{ _("Export deck") }} <span class="muted">{{ _("(add to an existing Anki)") }}</span></h2>
-  <p class="muted">{{ _("One deck with learning progress and deck options. Existing cards in Anki are kept.") }}</p>
-  <form method="post" action="/export/deck" class="stack">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <label for="deck_id">{{ _("Deck") }}</label>
-    <select id="deck_id" name="deck_id" class="input">
-      {% for did, name in decks %}<option value="{{ did }}">{{ name }}</option>{% endfor %}
-    </select>
-    <button class="btn btn-block">{{ _("Download deck (.apkg)") }}</button>
-  </form>
-</section>
+  <section class="panel">
+    <div class="panel-head"><h2 class="panel-title">{{ _("Everything") }}</h2><span class="panel-note">{{ _("for new Anki users") }}</span></div>
+    <p class="warn-note">{{ _("Replaces the collection in Anki when imported – only for empty/new Anki installations.") }}</p>
+    <form method="post" action="/export/collection">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn-line strong">{{ _("Download .colpkg") }}</button>
+    </form>
+  </section>
 
-<section class="card">
-  <h2>{{ _("How to continue in Anki") }}</h2>
-  <ol class="steps">
-    <li><span class="step-icon" aria-hidden="true">⬇️</span>
-      <div><strong>{{ _("Install Anki") }}</strong><br>
-      {{ _("Computer: <a href=\"https://apps.ankiweb.net\">apps.ankiweb.net</a> (free) · Android: “AnkiDroid” in the Play Store (free) · iPhone: “AnkiMobile” in the App Store.") }}</div></li>
-    <li><span class="step-icon" aria-hidden="true">📂</span>
-      <div><strong>{{ _("Open the file") }}</strong><br>
-      {{ _("Computer: double-click the file or use <em>File → Import</em> in Anki. AnkiDroid: menu <em>⋮ → Import</em> and choose the downloaded file.") }}</div></li>
-    <li><span class="step-icon" aria-hidden="true">👤</span>
-      <div><strong>{{ _("Create an AnkiWeb account") }}</strong><br>
-      {{ _("Free at <a href=\"https://ankiweb.net\">ankiweb.net</a> – keeps your phone and computer in sync.") }}</div></li>
-    <li><span class="step-icon" aria-hidden="true">🔄</span>
-      <div><strong>{{ _("Sync") }}</strong><br>
-      {{ _("Tap <em>Sync</em> in Anki and log in with your AnkiWeb account. Done!") }}</div></li>
+  <ol class="steps" aria-label="{{ _('How to continue in Anki') }}">
+    <li><span class="step-num" aria-hidden="true">1</span><div><strong>{{ _("Install Anki") }}</strong>
+      <span>{{ _("<a href=\"https://apps.ankiweb.net\">Computer</a>, AnkiDroid or AnkiMobile") }}</span></div></li>
+    <li><span class="step-num" aria-hidden="true">2</span><div><strong>{{ _("Open the file") }}</strong>
+      <span>{{ _("Double-click, or ⋮ → Import in AnkiDroid") }}</span></div></li>
+    <li><span class="step-num" aria-hidden="true">3</span><div><strong>{{ _("Create an AnkiWeb account") }}</strong>
+      <span>{{ _("Free at <a href=\"https://ankiweb.net\">ankiweb.net</a>") }}</span></div></li>
+    <li><span class="step-num" aria-hidden="true">4</span><div><strong>{{ _("Sync") }}</strong>
+      <span>{{ _("Tap Sync and log in. Done!") }}</span></div></li>
   </ol>
-</section>
+</div>
 {% endblock %}

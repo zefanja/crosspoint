@@ -1,8 +1,10 @@
 {% if rows %}
-<p class="muted small" aria-live="polite">{{ _("Preview:") }} {{ ngettext("%(num)s step", "%(num)s steps", rows | length) }} · {{ ngettext("%(num)s verse", "%(num)s verses", verses) }}</p>
-<ol class="verse-preview">
-  {% for r in rows %}
-  <li><span class="verse-ref">{{ r.verse }}{{ r.part }}</span><span>{{ r.text }}</span></li>
-  {% endfor %}
-</ol>
+<details class="preview">
+  <summary aria-live="polite"><span>{{ _("Preview") }}</span><span><strong>{{ ngettext("%(num)s step", "%(num)s steps", rows | length) }}</strong> · {{ ngettext("%(num)s verse", "%(num)s verses", verses) }}</span></summary>
+  <ol class="verse-preview">
+    {% for r in rows %}
+    <li><span class="verse-ref">{{ r.verse }}{{ r.part }}</span><span>{{ r.text }}</span></li>
+    {% endfor %}
+  </ol>
+</details>
 {% endif %}

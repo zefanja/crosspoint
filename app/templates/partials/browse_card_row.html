@@ -1,17 +1,16 @@
 <li class="browserow">
-  <a href="/notes/{{ r.note_id }}" class="cardrow{% if r.suspended %} suspended{% endif %}">
-    <span class="cardfront">{{ r.front or _("(empty)") }}</span>
-    {% if r.siblings > 1 %}<span class="cardtype">{{ r.template }}</span>{% endif %}
-    <span class="cardmeta">
-      <span>{{ r.deck }}</span>
-      <span>{% if r.status == "new" %}{{ _("new") }}{% elif r.status == "suspended" %}{{ _("suspended") }}{% elif r.due %}{{ r.due | date }}{% else %}–{% endif %}</span>
+  <a href="/notes/{{ r.note_id }}" class="rowlink{% if r.suspended %} off{% endif %}">
+    <span class="row-main">
+      <span class="row-title">{{ r.front or _("(empty)") }}</span>
+      <span class="row-meta">{{ r.deck }}{% if r.siblings > 1 %} · {{ r.template }}{% endif %}</span>
     </span>
+    {% if not r.suspended %}{% include "partials/browse_status.html" %}{% endif %}
   </a>
   <form method="post" action="/cards/{{ r.card_id }}/suspend" hx-post="/cards/{{ r.card_id }}/suspend"
         hx-target="closest li" hx-swap="outerHTML" hx-disabled-elt="find button">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="suspended" value="{{ 0 if r.suspended else 1 }}">
     <input type="hidden" name="q" value="{{ q }}">
-    <button class="btn btn-small">{{ _("Unsuspend") if r.suspended else _("Suspend") }}</button>
+    <button class="row-action">{{ _("Unsuspend") if r.suspended else _("Suspend") }}</button>
   </form>
 </li>

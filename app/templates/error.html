@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Notice") }} – {{ app_name }}{% endblock %}
+{% block body_class %}splash-page{% endblock %}
 {% block content %}
-<section class="card narrow">
-  <h1>{{ _("Oops") }}</h1>
-  <p>{{ message }}</p>
-  <a href="/" class="btn btn-primary">{{ _("Home") }}</a>
+<section class="splash">
+  <h1 class="splash-title">{{ _("Oops") }}</h1>
+  <p class="splash-text">{{ message }}</p>
 </section>
+<div class="splash-actions"><a href="/" class="btn-go">{{ _("Home") }}</a></div>
 {% endblock %}

@@ -1,35 +1,46 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Import Bible text") }}{% endblock %}
 {% block content %}
-<p><a href="/" class="back">‹ {{ _("Decks") }}</a></p>
-<section class="card">
-  <h1>{{ _("Add card") }}</h1>
+<h1 class="page-title">{{ _("Add card") }}</h1>
+<div class="ui-stack">
   {% set active_tab = "text" %}
   {% include "partials/add_tabs.html" %}
-  <p class="muted small">{{ _("Memorize a whole passage: every line becomes a step with first-letter, gap and context cards (like the Anki add-on <a href=\"https://github.com/zefanja/bible-memorizer\">Bible Memorizer</a>).") }}</p>
+  <p class="hint">{{ _("Memorize a whole passage: every line becomes a step with first-letter, gap and context cards (like the Anki add-on <a href=\"https://github.com/zefanja/bible-memorizer\">Bible Memorizer</a>).") }}</p>
   {% if message %}<p class="alert alert-success" role="status">{{ message }}</p>{% endif %}
   {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
-  <form method="post" action="/notes/bible" class="stack">
+  <form method="post" action="/notes/bible" class="ui-stack">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <label for="deck_id">{{ _("Deck") }}</label>
-    <select id="deck_id" name="deck_id" class="input">
-      {% for did, name in decks %}<option value="{{ did }}"{% if did == deck_id %} selected{% endif %}>{{ name }}</option>{% endfor %}
-    </select>
-    <label for="title">{{ _("Title") }}</label>
-    <input id="title" name="title" class="input" value="{{ title }}" placeholder="{{ _('e.g. Psalm 23') }}" required maxlength="200">
-    <label for="text">{{ _("Bible text") }}</label>
-    <textarea id="text" name="text" class="input" rows="10" required
-              placeholder="{{ _('1 The LORD is my shepherd; I shall not want.') }}&#10;{{ _('2 He makes me lie down in green pastures …') }}"
-              hx-post="/notes/bible/preview" hx-trigger="input changed delay:400ms" hx-target="#bible-preview">{{ text }}</textarea>
-    <p class="muted small">{{ _("Best pasted with verse numbers – they are detected automatically, also as superscripts (¹ ² ³). Every line becomes its own step; split long verses with line breaks.") }}</p>
-    <label for="recite">{{ _("Lines of context (before/after)") }}</label>
-    <input id="recite" name="recite" type="number" min="1" max="10" inputmode="numeric" class="input" value="{{ recite }}">
-    <label class="check">
-      <input type="checkbox" name="table" value="true"{% if table %} checked{% endif %}>
+    <div class="field-row">
+      <div class="field">
+        <label for="deck_id" class="field-label">{{ _("Deck") }}</label>
+        <select id="deck_id" name="deck_id" class="input">
+          {% for did, name in decks %}<option value="{{ did }}"{% if did == deck_id %} selected{% endif %}>{{ name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="title" class="field-label">{{ _("Title") }}</label>
+        <input id="title" name="title" class="input" value="{{ title }}" placeholder="{{ _('e.g. Psalm 23') }}" required maxlength="200">
+      </div>
+    </div>
+    <div class="field">
+      <label for="text" class="field-label">{{ _("Bible text") }}</label>
+      <textarea id="text" name="text" class="input" rows="7" required
+                placeholder="{{ _('1 The LORD is my shepherd; I shall not want.') }}&#10;{{ _('2 He makes me lie down in green pastures …') }}"
+                hx-post="/notes/bible/preview" hx-trigger="input changed delay:400ms" hx-target="#bible-preview">{{ text }}</textarea>
+      <p class="hint">{{ _("Best pasted with verse numbers – they are detected automatically, also as superscripts (¹ ² ³). Every line becomes its own step; split long verses with line breaks.") }}</p>
+    </div>
+    <div class="option-row stepper">
+      <label for="recite">{{ _("Lines of context") }}</label>
+      <button type="button" class="step-btn" data-step="down" aria-label="{{ _('Fewer') }}">−</button>
+      <input id="recite" name="recite" type="number" min="1" max="10" inputmode="numeric" class="step-value" value="{{ recite }}">
+      <button type="button" class="step-btn plus" data-step="up" aria-label="{{ _('More') }}">+</button>
+    </div>
+    <label class="option-row" for="table">
       <span>{{ _("Create overview table (from %(n)s verses)", n=table_min) }}</span>
+      <input type="checkbox" class="switch" id="table" name="table" value="true"{% if table %} checked{% endif %}>
     </label>
     <div id="bible-preview">{% include "partials/bible_preview.html" %}</div>
-    <button type="submit" class="btn btn-primary btn-block">{{ _("Create cards") }}</button>
+    <button type="submit" class="btn-go">{{ _("Create cards") }}</button>
   </form>
-</section>
+</div>
 {% endblock %}

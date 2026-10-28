@@ -79,6 +79,26 @@ def test_deck_list_card_counts(run, deck):
     assert (rows[child].total, rows[child].mature, rows[child].group) == (2, 1, True)
 
 
+def test_review_progress_counts_answers_today(run, deck):
+    other = run(svc.create_deck(U, "Psalmen"))
+    add_verse(run, deck, ref="Joh 3,16")
+    add_verse(run, other, ref="Ps 23,1")
+    state = run(svc.review_state(U, deck))
+    assert state.done_today == 0
+    state, _answered = run(svc.answer_card(U, deck, state.card.card_id, 4, 3.0))
+    assert state.done_today == 1
+    assert run(svc.review_state(U, other)).done_today == 0  # per deck
+    assert run(svc.review_state(U, svc.ALL_DECKS)).done_today == 1
+
+
+def test_deck_search_matches_deck_and_subdecks(run, deck):
+    child = run(svc.create_deck(U, 'Bibel "AT"::Psalmen_1'))
+    add_verse(run, child, ref="Ps 1,1")
+    add_verse(run, deck, ref="Joh 3,16")
+    assert run(svc.search_cards(U, svc.deck_search('Bibel "AT"')))[1] == 1
+    assert run(svc.search_cards(U, svc.deck_search('Bibel "AT"::Psalmen_1')))[1] == 1
+
+
 def test_review_all_decks(run, deck):
     other = run(svc.create_deck(U, "Psalmen"))
     add_verse(run, deck, ref="Joh 3,16")
