@@ -26,6 +26,7 @@
   --r-easy: #1f6feb;
   --radius: 12px;
   --touch: 48px;
+  --tab-active: var(--brand-navy);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -51,6 +52,7 @@
     --r-hard: #e3b341;
     --r-good: #56d364;
     --r-easy: #6aa7ff;
+    --tab-active: var(--text);
   }
 }
 
@@ -64,7 +66,7 @@ body {
   flex-direction: column;
   background: var(--bg);
   color: var(--text);
-  font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 17px/1.5 "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -269,7 +271,7 @@ textarea.input { resize: vertical; line-height: 1.4; }
 
 .tab.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
 
-/* ---------- deck list ---------- */
+/* ---------- deck counts (review screen) ---------- */
 
 .counts { display: inline-flex; gap: 4px; font-variant-numeric: tabular-nums; }
 .counts > span { min-width: 2.5rem; text-align: right; font-weight: 600; }
@@ -277,39 +279,6 @@ textarea.input { resize: vertical; line-height: 1.4; }
 .c-learn { color: var(--c-learn); }
 .c-rev { color: var(--c-rev); }
 .counts .zero { opacity: 0.35; font-weight: 400; }
-
-.decklist-head {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px var(--touch) 8px 16px;
-  font-size: 0.8rem;
-  color: var(--muted);
-  border-bottom: 1px solid var(--border);
-}
-
-.decklist-head .counts > span { font-weight: 400; }
-.decklist { list-style: none; margin: 0; padding: 0; }
-
-.deckrow {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-}
-
-.deckrow:last-child { border-bottom: 0; }
-
-.deckname {
-  flex: 1;
-  min-width: 0;
-  min-height: 56px;
-  display: flex;
-  align-items: center;
-  padding: 0 8px 0 calc(16px + var(--depth, 0) * 18px);
-  color: var(--text);
-  text-decoration: none;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
 
 .iconlink {
   display: inline-flex;
@@ -320,6 +289,196 @@ textarea.input { resize: vertical; line-height: 1.4; }
   color: var(--muted);
   text-decoration: none;
   font-size: 1.2rem;
+}
+
+/* ---------- start page ---------- */
+
+.streak-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--brand-yellow);
+  color: var(--brand-navy);
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.streak-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand-navy); }
+
+.hello { margin: 0 0 14px; font-size: 26px; font-weight: 800; line-height: 1.1; }
+
+.mission {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--brand-navy);
+  color: #ffffff;
+}
+.mission p { margin: 0; }
+.mission-count { display: flex; align-items: flex-end; gap: 12px; }
+.mission-num {
+  flex: none;
+  font-size: 76px;
+  line-height: 0.85;
+  font-weight: 900;
+  font-style: italic;
+  font-stretch: 100%;
+  color: var(--brand-cyan);
+  font-variant-numeric: tabular-nums;
+}
+.mission-label { flex: 1; min-width: 0; padding-bottom: 4px; font-size: 17px; line-height: 1.25; color: #cfe0f2; }
+.mission-chips { display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; font-weight: 600; }
+.mission-chips span { flex: none; padding: 5px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); white-space: nowrap; }
+.mission-go, .mission-alt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  text-align: center;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.mission-go {
+  min-height: 54px;
+  padding: 6px 12px;
+  background: var(--brand-yellow);
+  color: var(--brand-navy);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  font-size: 20px;
+  line-height: 1.1;
+}
+.mission-go:active, .mission-alt:active { transform: translateY(2px); }
+.mission-alt { min-height: 52px; border: 2px solid rgba(255, 255, 255, 0.25); color: #ffffff; font-weight: 700; font-size: 16px; }
+.mission-done { font-size: 44px; line-height: 0.95; font-weight: 900; font-style: italic; text-transform: uppercase; color: var(--brand-cyan); }
+.mission-text { font-size: 16px; color: #cfe0f2; }
+
+.decks-head { margin-bottom: 8px; }
+.decks-head summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: var(--touch);
+  list-style: none;
+  cursor: pointer;
+}
+.decks-head summary::-webkit-details-marker { display: none; }
+.decks-head h2 { margin: 0; font-size: 18px; font-weight: 800; }
+.decks-new { font-size: 14px; font-weight: 600; color: var(--accent); }
+.decks-head[open] .card { margin: 4px 0 8px; }
+
+.deck-cards { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.deck-card {
+  display: flex;
+  align-items: stretch;
+  margin-left: calc(var(--depth, 0) * 16px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+.deck-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0 10px 16px;
+  color: var(--text);
+  text-decoration: none;
+}
+.deck-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.deck-title { display: flex; align-items: center; gap: 8px; }
+.deck-name { font-weight: 700; font-size: 16px; line-height: 1.25; overflow-wrap: anywhere; }
+.deck-badge { flex: none; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); color: var(--muted); font-size: 11px; font-weight: 700; }
+.deck-bar { display: block; height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+.deck-bar span { display: block; height: 100%; border-radius: 3px; background: var(--brand-cyan); }
+.deck-meta { font-size: 12px; line-height: 1.3; color: var(--muted); }
+.deck-chip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--brand-navy);
+  color: var(--brand-yellow);
+  font-weight: 900;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.deck-chip.ok { background: var(--success-bg); color: var(--success-text); }
+.deck-card .iconlink { height: auto; flex: none; }
+
+/* ---------- tab bar ---------- */
+
+.tabbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  padding: 6px 4px;
+  padding-bottom: calc(6px + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  min-height: 52px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-item.active { color: var(--tab-active); }
+.tabbar svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tab-add {
+  justify-self: center;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin-top: -18px;
+  border-radius: 20px;
+  background: var(--brand-navy);
+  color: var(--brand-yellow);
+  box-shadow: 0 10px 20px -8px rgba(0, 26, 63, 0.55);
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-add:active { transform: translateY(1px); }
+.tabbar .tab-add svg { width: 30px; height: 30px; stroke-width: 2.6; }
+.has-tabs .footer, .review-page .tabbar { display: none; }
+
+/* ---------- me ---------- */
+
+.me-links { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.me-links form { margin: 0; }
+.me-langs { display: flex; flex-wrap: wrap; gap: 8px; }
+.me-about { text-align: center; }
+
+@media (prefers-color-scheme: dark) {
+  .mission { border: 1px solid var(--border); }
+  .deck-chip:not(.ok), .tab-add { background: var(--brand-yellow); color: var(--brand-navy); }
 }
 
 /* ---------- browse ---------- */

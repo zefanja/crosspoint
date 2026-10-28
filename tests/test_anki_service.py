@@ -62,6 +62,39 @@ def test_create_deck_and_names(run, deck):
         run(svc.create_deck(U, " :: "))
 
 
+def test_deck_list_card_counts(run, deck):
+    child = run(svc.create_deck(U, f"{DECK}::Psalmen"))
+    add_verse(run, deck, ref="Joh 3,16")
+    nid = add_verse(run, child, ref="Ps 23,1", tags=(svc.GROUP_TAG,))
+    add_verse(run, child, ref="Ps 23,2")
+
+    def mature_one(col):
+        cid = col.card_ids_of_note(nid)[0]
+        col.db.execute("update cards set type = 2, queue = 2, ivl = 30 where id = ?", cid)
+
+    run(svc._run(U, mature_one))
+    rows = {d.id: d for d in run(svc.deck_list(U))}
+    assert (rows[deck].total, rows[deck].mature, rows[deck].group) == (3, 1, False)
+    assert (rows[child].total, rows[child].mature, rows[child].group) == (2, 1, True)
+
+
+def test_review_all_decks(run, deck):
+    other = run(svc.create_deck(U, "Psalmen"))
+    add_verse(run, deck, ref="Joh 3,16")
+    add_verse(run, other, ref="Ps 23,1")
+    state = run(svc.review_state(U, svc.ALL_DECKS))
+    assert (state.new, state.learn, state.review) == (2, 0, 0)
+    assert state.deck_name == svc.ALL_DECKS_NAME and state.card is not None
+    seen = set()
+    while state.card is not None:
+        seen.add(state.card.card_id)
+        state, answered = run(svc.answer_card(U, svc.ALL_DECKS, state.card.card_id, 4, 3.0))
+        assert answered and state.can_undo  # also right after switching decks
+    assert len(seen) == 2 and (state.new, state.learn, state.review) == (0, 0, 0)
+    state, undone = run(svc.undo_review(U, svc.ALL_DECKS))
+    assert undone and state.card is not None and state.new == 1
+
+
 def test_notetypes_for_adding(run):
     nts = run(svc.notetypes_for_adding(U))
     assert [n.name for n in nts] == ["Bible Verse", "Basic"]

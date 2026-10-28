@@ -181,10 +181,26 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 
 ### 7.1 Lerner (MVP)
 
-**Startseite / Deckliste**
-- Liste der Decks mit drei Zahlen: neu (blau), Lernen (rot), fällig (grün) – wie Anki.
-- Antippen → Lernansicht. Unten: „Karte hinzufügen“, „Karten durchsuchen“, „Export“.
-- Hinweis-Banner, wenn heute alles erledigt ist („Fertig für heute 🎉 – nächste Karten morgen“).
+**Startseite / Deckliste** (Entwurf „1a Mission“, Zielgruppe Jugendliche)
+- Kopfzeile mit Serie („N Tage“, aus `collection_stats`), Begrüßung „Hey <Vorname>.“
+- Große „Heute“-Karte: Summe aller fälligen Karten, Chips neu/lernen/wiederholen und
+  Button „Los geht's · ~N Min.“ (Schätzung 15 s pro Karte) → Lernansicht **aller Decks**
+  (`/review/0`, `anki_service.ALL_DECKS`). Erledigt: „Fertig für heute“ mit Anzahl der
+  heutigen Wiederholungen und „Neuen Vers hinzufügen“; ohne Karten: „Erste Karte anlegen“.
+- Darunter die Decks als Karten (Unterdecks eingerückt): Name, Badge „GRUPPE“ (Deck enthält
+  Gruppendeck-Karten), Balken „X von Y gelernt“ (gelernt = *mature*, Intervall ≥ 21 Tage;
+  ausgesetzte Karten zählen nicht, Unterdecks zählen mit), Chip mit der Zahl fälliger Karten
+  (✓ wenn nichts fällig) und ⚙ zu den Deck-Optionen. „+ Neues Deck“ klappt das Formular auf.
+- *Alle Decks lernen*: Die v3-Queue gilt nur fürs aktuelle Deck, daher werden die
+  Hauptdecks nacheinander abgearbeitet (das aktuelle zuerst); Zähler = ganzer Deckbaum.
+  Der Deckwechsel ist in Anki ein eigener Undo-Schritt und wird in den Undo-Schritt der
+  Bewertung gemergt (`merge_undo_entries`), damit „Rückgängig“ verfügbar bleibt.
+
+**Navigation (Lerner-Seiten)**
+- Untere Leiste: Start · Karten (Suche) · großer „+“-Button (Karte hinzufügen) ·
+  Fortschritt (Statistik) · Ich. Nicht in der Lernansicht und im Admin-Bereich.
+- „Ich“ (`/me`): Export, Bibeltext importieren, Verwaltung (Staff), Abmelden, Sprache,
+  Datenschutz/Quellcode/Version (ersetzt auf diesen Seiten den Footer).
 
 **Lernansicht** (wichtigste Seite, mobile-first)
 - Kartenvorderseite füllt den Bildschirm; großer Button „Antwort zeigen“ unten (Daumenzone).
@@ -290,6 +306,8 @@ im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
 - **Backend:** Python 3.12, FastAPI, uvicorn (1 Worker), SQLAlchemy 2, Alembic, Jinja2.
 - **Frontend:** serverseitig gerenderte Seiten + htmx; minimales eigenes JS nur für
   Tastenkürzel in der Lernansicht. Kein Build-Schritt. htmx lokal ausliefern (kein CDN).
+- **Schrift:** Archivo von Google Fonts (einzige CDN-Ausnahme; CSP erlaubt
+  `fonts.googleapis.com`/`fonts.gstatic.com`), Fallback System-Schrift.
 - **CSS:** eigenes, schlankes Stylesheet mit CSS-Variablen, Hell/Dunkel nach System,
   Touch-Ziele ≥ 48 px, funktioniert ab 360 px Breite.
 - **Karten-Rendering:** Karten-HTML in einem `<iframe sandbox srcdoc=…>` ohne `allow-scripts`
@@ -330,6 +348,8 @@ im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
 - Datenschutzhinweis-Seite `/privacy` (Platzhaltertext) im Footer.
 - Nutzer kann jederzeit exportieren; Admin kann Nutzer samt Daten löschen.
 - Logs ohne Login-Codes (Query-Parameter `c` aus Access-Logs filtern).
+- Die Schrift kommt von Google Fonts: Browser übertragen dabei ihre IP-Adresse an Google.
+  Betreiber müssen das im Datenschutzhinweis nennen (oder Archivo selbst hosten).
 
 ## 10. Hosting: Docker auf eigenem Server (Portainer)
 

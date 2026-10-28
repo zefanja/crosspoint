@@ -12,6 +12,7 @@ from app import anki_service, stats
 from app.auth import cookie_secure, current_collection, media_base, require_user, verify_csrf
 from app.models import User
 from app.templating import is_htmx, render
+from app.i18n import _
 
 router = APIRouter()
 
@@ -24,6 +25,8 @@ TYPE_COOKIE = "vf_type"
 def _render_state(request: Request, state, full_page: bool, undone: bool = False,
                   typed_diff=None, shown_at: str | None = None):
     col = request.state.collection_id
+    if state.deck_id == anki_service.ALL_DECKS:
+        state.deck_name = _(anki_service.ALL_DECKS_NAME)
     ctx = {"state": state, "media_base": media_base(col), "shown_at": shown_at or f"{time.time():.3f}", "undone": undone,
            "typing": request.cookies.get(TYPE_COOKIE) == "1", "typed_diff": typed_diff}
     return render(request, "review.html" if full_page else "partials/review_card.html", ctx)

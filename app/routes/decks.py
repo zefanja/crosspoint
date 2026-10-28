@@ -14,15 +14,26 @@ router = APIRouter()
 RETENTION_MIN, RETENTION_MAX = 0.80, 0.97
 
 
+SECONDS_PER_CARD = 15  # rough estimate for the "~N min" hint
+
+
 @router.get("/")
 async def deck_list(request: Request, user: User = Depends(require_user),
     col: str = Depends(current_collection), error: str | None = None):
     decks = await anki_service.deck_list(col)
-    _rows, total_cards = await anki_service.search_cards(col, "", limit=0)
-    all_done = total_cards > 0 and all(d.new + d.learn + d.review == 0 for d in decks)
+    stats = await anki_service.collection_stats(col, days=1)
+    top = [d for d in decks if d.depth == 0]  # parent counts include their subdecks
+    totals = {"new": sum(d.new for d in top), "learn": sum(d.learn for d in top),
+              "review": sum(d.review for d in top)}
+    todo = sum(totals.values())
     return render(
         request, "decks.html",
-        {"decks": decks, "total_cards": total_cards, "all_done": all_done, "error": error},
+        {"decks": decks, "total_cards": stats.total_cards, "totals": totals, "todo": todo,
+         "minutes": max(1, round(todo * SECONDS_PER_CARD / 60)),
+         "all_done": stats.total_cards > 0 and todo == 0,
+         "streak": stats.streak_days, "reviews_today": stats.reviews_today,
+         "first_name": user.display_name.split()[0] if user.display_name.strip() else "",
+         "all_decks": anki_service.ALL_DECKS, "error": error},
     )
 
 

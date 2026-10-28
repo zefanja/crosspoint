@@ -1,0 +1,23 @@
+{% set path = request.url.path %}
+{% set active = "start" if path == "/" else "cards" if path.startswith("/browse") or (path.startswith("/notes/") and path not in ("/notes/new", "/notes/bible")) else "add" if path in ("/notes/new", "/notes/bible") else "progress" if path.startswith("/stats") else "me" if path in ("/me", "/export", "/privacy") else "" %}
+<nav class="tabbar" aria-label="{{ _('Main navigation') }}">
+  <a href="/" class="tab-item{% if active == 'start' %} active{% endif %}"{% if active == 'start' %} aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/></svg>
+    <span>{{ _("Start") }}</span>
+  </a>
+  <a href="/browse" class="tab-item{% if active == 'cards' %} active{% endif %}"{% if active == 'cards' %} aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="3.5" width="12.5" height="12.5" rx="2.5"/><path d="M16 20.5H6a2.5 2.5 0 0 1-2.5-2.5V8"/></svg>
+    <span>{{ _("Cards") }}</span>
+  </a>
+  <a href="/notes/new" class="tab-add{% if active == 'add' %} active{% endif %}" aria-label="{{ _('Add card') }}"{% if active == 'add' %} aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  </a>
+  <a href="/stats" class="tab-item{% if active == 'progress' %} active{% endif %}"{% if active == 'progress' %} aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19v-7M12 19V5M18 19v-4"/></svg>
+    <span>{{ _("Progress") }}</span>
+  </a>
+  <a href="/me" class="tab-item{% if active == 'me' %} active{% endif %}"{% if active == 'me' %} aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg>
+    <span>{{ _("Me") }}</span>
+  </a>
+</nav>

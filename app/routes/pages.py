@@ -3,11 +3,12 @@
 import hmac
 from urllib.parse import urlsplit
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import FileResponse, RedirectResponse, Response
 
 from app import anki_service, i18n
-from app.auth import cookie_secure, media_token
+from app.auth import cookie_secure, media_token, require_user
+from app.models import User
 
 from app.templating import render
 
@@ -17,6 +18,12 @@ router = APIRouter()
 @router.get("/privacy")
 def privacy(request: Request):
     return render(request, "privacy.html")
+
+
+@router.get("/me")
+def me(request: Request, user: User = Depends(require_user)):
+    """Account page (tab "Me"): export, language, log out."""
+    return render(request, "me.html")
 
 
 @router.get("/media/{collection_id}/{token}/{filename}")
