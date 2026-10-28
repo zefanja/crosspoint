@@ -81,7 +81,7 @@ def test_workspace_admin_collection(client, admin):
     client.post("/admin/workspace", data={"csrf_token": csrf, "ws": "admin"})
     page = client.get("/")
     assert "Admin-Sammlung" in page.text
-    deck = int(re.search(r'href="/review/(\d+)">Meine Karten<', page.text).group(1))
+    deck = int(re.search(r'href="/review/(\d+)">\s*<span class="deck-info">\s*<span class="deck-title"><span class="deck-name">Meine Karten<', page.text).group(1))
     client.post("/notes/new", data={"csrf_token": csrf, "notetype": "Basic", "deck_id": deck,
                                     "field_0": "Q", "field_1": "A"})
     rows, _ = client.portal.call(anki_service.search_cards, anki_service.ADMIN_COLLECTION,
