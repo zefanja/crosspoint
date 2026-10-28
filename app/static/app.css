@@ -575,11 +575,12 @@ textarea.input { resize: vertical; line-height: 1.4; }
 /* ---------- study screen (3a–3c) ---------- */
 
 .review-page .footer { display: none; }
-/* The study screen is exactly one screen high: the card shrinks (and scrolls inside its
-   frame), so the answer buttons stay visible without scrolling the page. */
-.review-page { height: 100vh; height: 100dvh; min-height: 0; }
-.review-page .content { display: flex; flex-direction: column; min-height: 0; padding: 0; max-width: 820px; }
-.review { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
+/* The study screen fills exactly the visible area: the card shrinks (and scrolls inside its
+   frame), so the answer buttons stay visible without scrolling the page. Pinned with
+   position: fixed instead of 100vh/100dvh – in Android PWAs Chrome computed those as the
+   whole screen including the status and navigation bar. */
+.review-page .content { padding: 0; max-width: 820px; }
+.review { position: fixed; inset: 0; z-index: 1; display: flex; flex-direction: column; width: 100%; max-width: 820px; margin: 0 auto; overflow-y: auto; background: var(--bg); }
 
 .study-top { display: flex; flex-direction: column; gap: 10px; padding: 0 16px; padding-top: env(safe-area-inset-top); background: var(--brand-navy); border-bottom: 3px solid var(--brand-yellow); }
 .study-bar { display: flex; align-items: center; gap: 8px; min-height: 56px; }

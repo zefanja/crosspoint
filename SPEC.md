@@ -211,11 +211,10 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 
 **Lernansicht** (wichtigste Seite, mobile-first)
 - Kartenvorderseite füllt den Bildschirm; großer Button „Antwort zeigen“ unten (Daumenzone).
-- Die Lernansicht ist genau eine Bildschirmhöhe (`100dvh`): Die Karte schrumpft und scrollt bei
-  langem Inhalt in ihrem Rahmen, „Antwort zeigen“ und die Bewertungsbuttons sind ohne Scrollen
-  sichtbar (auch als installierte PWA auf kleinen Android-Geräten). Kein `viewport-fit=cover`:
-  Damit meldete Chrome (Android, PWA) einen oberen Safe-Area-Abstand, obwohl die Seite nicht
-  unter der Statusleiste lag – die Seite wurde um diesen Betrag zu hoch und musste scrollen.
+- Die Lernansicht füllt genau den sichtbaren Bereich (`position: fixed; inset: 0`, **nicht**
+  `100vh`/`100dvh` – die rechnete Chrome in Android-PWAs inkl. Status- und Navigationsleiste):
+  Die Karte schrumpft und scrollt bei langem Inhalt in ihrem Rahmen, „Antwort zeigen“ und die
+  Bewertungsbuttons sind ohne Scrollen sichtbar.
 - Danach vier Buttons **Nochmal / Schwer / Gut / Einfach** mit Intervall-Vorschau darunter
   („<10 min“, „2 T“, …). Farben wie Anki.
 - Desktop: Leertaste = Antwort zeigen / Gut; Tasten 1–4 = Bewertung; `Z` = Rückgängig.

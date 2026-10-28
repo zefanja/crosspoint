@@ -7,12 +7,12 @@
   <meta name="theme-color" content="#001a3f">
   <title>{% block title %}{{ app_name }}{% endblock %}</title>
   <link rel="preload" href="/static/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/app.css?v={{ app_version }}">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/static/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
-  <script src="/static/htmx.min.js" defer></script>
-  <script src="/static/app.js" defer></script>
+  <script src="/static/htmx.min.js?v={{ app_version }}" defer></script>
+  <script src="/static/app.js?v={{ app_version }}" defer></script>
   {% block head %}{% endblock %}
 </head>
 {% set show_tabs = user and not request.url.path.startswith("/admin") %}
