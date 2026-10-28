@@ -173,6 +173,51 @@ def test_group_decks_page_distribute_and_log(client, setup, db):
     assert db.query(GroupDeckEdit).filter_by(user_id=setup["lea"].id, action="add").count() == 1
 
 
+def test_leader_renames_group_deck_for_members(client, setup, db):
+    csrf, decks, member = setup["csrf"], setup["decks"], setup["member"]
+    call = client.portal.call
+    own = db.query(GroupDeck).filter_by(deck_name="Psalmen").one()
+    wait_job(client, client.post(f"/admin/group-decks/{own.id}/distribute",
+                                 data={"csrf_token": csrf}, follow_redirects=False))
+    sub = call(anki_service.create_deck, A, "Psalmen::Teil 1")  # not distributed yet
+
+    page = client.get("/")
+    assert f'href="/decks/{decks["Psalmen"]}/rename"' in page.text
+    assert f'href="/decks/{decks["Sprüche"]}/rename"' not in page.text  # view only
+    assert "Nur der letzte Teil" in client.get(f"/decks/{decks['Psalmen']}/rename").text
+    for deck in ("Sprüche", "Geheim"):
+        r = client.post(f"/decks/{decks[deck]}/rename", data={"csrf_token": csrf, "name": "X"})
+        assert r.status_code in (403, 404)
+    r = client.post(f"/decks/{decks['Psalmen']}/rename", data={"csrf_token": csrf, "name": "Sprüche"})
+    assert r.status_code == 400 and "gibt es schon" in r.text
+
+    job = wait_job(client, client.post(f"/decks/{decks['Psalmen']}/rename", data={
+        "csrf_token": csrf, "name": "Psalter"}, follow_redirects=False))
+    assert job.finished and job.errors == [] and job.done == 1
+    names = dict(call(anki_service.deck_names, A))
+    assert names[decks["Psalmen"]] == "Psalter" and names[sub] == "Psalter::Teil 1"
+    db.expire_all()
+    assert own.deck_name == "Psalter"
+    member_names = [n for _id, n in call(anki_service.deck_names, member.id)]
+    assert "Psalter" in member_names and "Psalmen" not in member_names
+
+    # distributing again updates the renamed deck instead of creating "Psalmen" again
+    call(anki_service.add_note, A, "Basic", decks["Psalmen"], {"Front": "Neu", "Back": "B"},
+         (anki_service.GROUP_TAG,))
+    wait_job(client, client.post(f"/admin/group-decks/{own.id}/distribute",
+                                 data={"csrf_token": csrf}, follow_redirects=False))
+    member_names = [n for _id, n in call(anki_service.deck_names, member.id)]
+    assert "Psalmen" not in member_names
+    assert call(anki_service.search_cards, member.id, '"deck:Psalter"')[1] == 2
+
+    # subdecks too; moving to another parent deck is refused
+    job = wait_job(client, client.post(f"/decks/{sub}/rename", data={
+        "csrf_token": csrf, "name": "Psalter::Teil B"}, follow_redirects=False))
+    assert job.errors == [] and dict(call(anki_service.deck_names, A))[sub] == "Psalter::Teil B"
+    r = client.post(f"/decks/{sub}/rename", data={"csrf_token": csrf, "name": "Geheim::Teil B"})
+    assert r.status_code == 400 and "nicht in ein anderes Elterndeck" in r.text
+
+
 def test_concurrent_edit_is_not_overwritten(client, setup):
     csrf, deck, nid = setup["csrf"], setup["decks"]["Psalmen"], setup["notes"]["Psalmen"]
     form = client.get(f"/notes/{nid}").text

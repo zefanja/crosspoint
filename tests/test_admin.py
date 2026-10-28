@@ -89,6 +89,11 @@ def test_workspace_admin_collection(client, admin):
     assert len(rows) == 1
     edit = client.get(f"/notes/{rows[0].note_id}")
     assert "Speichern" in edit.text  # admins may edit group notes in the admin collection
+    assert "auch bei allen Gruppenmitgliedern" in client.get(f"/decks/{deck}/options").text
+    r = client.post(f"/decks/{deck}/rename", data={"csrf_token": csrf, "name": "Gruppe"},
+                    follow_redirects=False)  # not distributed yet: no job
+    assert r.headers["location"] == f"/decks/{deck}/options?renamed=1"
+    assert dict(client.portal.call(anki_service.deck_names, anki_service.ADMIN_COLLECTION))[deck] == "Gruppe"
     client.post("/admin/workspace", data={"csrf_token": csrf, "ws": "own"})
     assert "Admin-Sammlung" not in client.get("/").text
 

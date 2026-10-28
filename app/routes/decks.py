@@ -1,4 +1,4 @@
-"""Deck list (start page), creating decks, deck options."""
+"""Deck list (start page), creating and renaming decks, deck options."""
 
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
@@ -68,20 +68,33 @@ async def create_deck(
     return RedirectResponse("/", status_code=303)
 
 
+async def _options_page(request: Request, col: str, deck_id: int, opts=None, *,
+                        status_code: int = 200, **ctx):
+    names = dict(await anki_service.deck_names(col))
+    if deck_id not in names:
+        raise anki_service.NotFound(_("Deck not found."))
+    return render(
+        request, "deck_options.html",
+        {"deck_id": deck_id, "deck_name": names[deck_id],
+         "opts": opts or await anki_service.get_deck_options(col, deck_id),
+         "saved": False, "renamed": False, "errors": [], "rename_error": None, "optimized": None,
+         "can_rename": col == anki_service.ADMIN_COLLECTION
+                       or not await anki_service.is_group_deck(col, deck_id),
+         "group_rename": col == anki_service.ADMIN_COLLECTION,
+         "reviews": await anki_service.review_count(col, deck_id),
+         "min_reviews": anki_service.MIN_OPTIMIZE_REVIEWS, **ctx},
+        status_code=status_code,
+    )
+
+
 @router.get("/decks/{deck_id}/options", dependencies=[Depends(no_leader_workspace)])
 async def options_page(
     request: Request, deck_id: int, user: User = Depends(require_user),
-    col: str = Depends(current_collection), saved: int = 0, optimized: str | None = None
+    col: str = Depends(current_collection), saved: int = 0, renamed: int = 0,
+    optimized: str | None = None
 ):
-    opts = await anki_service.get_deck_options(col, deck_id)
-    names = dict(await anki_service.deck_names(col))
-    return render(
-        request, "deck_options.html",
-        {"deck_id": deck_id, "deck_name": names.get(deck_id, ""), "opts": opts,
-         "saved": bool(saved), "errors": [], "optimized": optimized,
-         "reviews": await anki_service.review_count(col, deck_id),
-         "min_reviews": anki_service.MIN_OPTIMIZE_REVIEWS},
-    )
+    return await _options_page(request, col, deck_id, saved=bool(saved), renamed=bool(renamed),
+                               optimized=optimized)
 
 
 @router.post("/decks/{deck_id}/options", dependencies=[Depends(no_leader_workspace)])
@@ -106,15 +119,7 @@ async def options_save(
     if not RETENTION_MIN <= opts.desired_retention <= RETENTION_MAX:
         errors.append(_("Desired retention: %(min)s to %(max)s.", min=format_decimal(RETENTION_MIN), max=format_decimal(RETENTION_MAX)))
     if errors:
-        names = dict(await anki_service.deck_names(col))
-        return render(
-            request, "deck_options.html",
-            {"deck_id": deck_id, "deck_name": names.get(deck_id, ""), "opts": opts,
-             "saved": False, "errors": errors, "optimized": None,
-             "reviews": await anki_service.review_count(col, deck_id),
-             "min_reviews": anki_service.MIN_OPTIMIZE_REVIEWS},
-            status_code=400,
-        )
+        return await _options_page(request, col, deck_id, opts, errors=errors, status_code=400)
     await anki_service.set_deck_options(col, deck_id, opts)
     return RedirectResponse(f"/decks/{deck_id}/options?saved=1", status_code=303)
 
@@ -125,3 +130,50 @@ async def optimize(deck_id: int, user: User = Depends(verify_csrf),
     result = await anki_service.optimize_fsrs(col, deck_id)
     state = "changed" if result.changed else "unchanged"
     return RedirectResponse(f"/decks/{deck_id}/options?optimized={state}", status_code=303)
+
+
+@router.get("/decks/{deck_id}/rename")
+async def rename_page(request: Request, deck_id: int, user: User = Depends(require_user),
+                      col: str = Depends(current_collection),
+                      access: DeckAccess = Depends(deck_access)):
+    """Own page for group leaders (the options page is blocked in their workspace)."""
+    return await _rename_page(request, col, access, deck_id)
+
+
+async def _rename_page(request: Request, col: str, access: DeckAccess, deck_id: int,
+                       error: str | None = None):
+    if not access.can_edit(deck_id):
+        raise anki_service.NotFound(_("Deck not found."))
+    names = dict(await anki_service.deck_names(col))
+    if deck_id not in names:
+        raise anki_service.NotFound(_("Deck not found."))
+    is_group = col == anki_service.ADMIN_COLLECTION
+    return render(request, "deck_rename.html", {
+        "deck_id": deck_id, "deck_name": names[deck_id], "rename_error": error,
+        "can_rename": is_group or not await anki_service.is_group_deck(col, deck_id),
+        "group_rename": is_group,
+    }, status_code=400 if error else 200)
+
+
+@router.post("/decks/{deck_id}/rename")
+async def rename(request: Request, deck_id: int, name: str = Form(""),
+                 user: User = Depends(verify_csrf), col: str = Depends(current_collection),
+                 access: DeckAccess = Depends(deck_access), db: DbSession = Depends(get_db)):
+    job = None
+    try:
+        if col == anki_service.ADMIN_COLLECTION:
+            job = await workspace.rename_deck(db, access, deck_id, name)
+        else:
+            await anki_service.rename_deck(col, deck_id, name)
+    except anki_service.NotFound:
+        raise
+    except anki_service.AnkiServiceError as exc:
+        if access.restricted:
+            return await _rename_page(request, col, access, deck_id, _(str(exc)))
+        return await _options_page(request, col, deck_id, rename_error=_(str(exc)),
+                                   status_code=400)
+    if job is not None:
+        return RedirectResponse(f"/admin/jobs/{job.id}?back=/admin/group-decks", status_code=303)
+    if access.restricted:
+        return RedirectResponse("/", status_code=303)
+    return RedirectResponse(f"/decks/{deck_id}/options?renamed=1", status_code=303)

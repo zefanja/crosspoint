@@ -40,7 +40,8 @@
           <span class="deck-meta">{{ ngettext("%(num)s card", "%(num)s cards", d.total) }}{% if not can_edit %} · {{ _("also goes to groups you don't lead") }}{% endif %}</span>
         </span>
       </a>
-      {% if can_edit %}<a class="iconlink" href="/notes/new?deck_id={{ d.id }}" aria-label="{{ _('Add card to %(deck)s', deck=d.short_name) }}" title="{{ _('Add card') }}">+</a>{% endif %}
+      {% if can_edit %}<a class="iconlink" href="/decks/{{ d.id }}/rename" aria-label="{{ _('Rename %(deck)s', deck=d.short_name) }}" title="{{ _('Rename') }}">✎</a>
+      <a class="iconlink" href="/notes/new?deck_id={{ d.id }}" aria-label="{{ _('Add card to %(deck)s', deck=d.short_name) }}" title="{{ _('Add card') }}">+</a>{% endif %}
     </li>
     {% else %}
     <li class="hint">{{ _("Your groups don't have any decks yet. Create the first one with “+ New deck”.") }}</li>

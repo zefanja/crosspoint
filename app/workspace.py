@@ -12,7 +12,7 @@ from fastapi import Depends, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DbSession
 
-from app import anki_service
+from app import anki_service, distribution
 from app.auth import Forbidden, current_collection, require_user, visible_group_ids
 from app.db import get_db
 from app.i18n import N_
@@ -178,6 +178,30 @@ async def create_deck(db: DbSession, access: DeckAccess, name: str,
     db.add(GroupDeck(group_id=group_id, admin_deck_id=did, deck_name=names.get(did, name)))
     db.commit()
     return did
+
+
+async def rename_deck(db: DbSession, access: DeckAccess, deck_id: int,
+                      name: str) -> distribution.Job | None:
+    """Rename a deck of the admin collection (admins: any, leaders: decks they may edit) and
+    the distributed copies in all member collections (background job, None if the deck is
+    not distributed). Only the last part of the name changes, so the receiving groups (and
+    a leader's permissions) stay the same."""
+    if not access.can_edit(deck_id):
+        raise Forbidden()
+    names = dict(await anki_service.deck_names(anki_service.ADMIN_COLLECTION))
+    if deck_id not in names:
+        raise anki_service.NotFound(N_("Deck not found."))
+    groups = receiving_groups(names, _group_decks(db), names[deck_id])
+    old, new = await anki_service.rename_deck(anki_service.ADMIN_COLLECTION, deck_id, name,
+                                              allow_group=True, keep_parent=True)
+    if old == new:
+        return None
+    for gd in db.scalars(select(GroupDeck)):
+        current = names.get(gd.admin_deck_id, gd.deck_name)
+        if deck_within(current, old):
+            gd.deck_name = new + current[len(old):]
+    db.commit()
+    return distribution.rename_in_members(groups, old, new) if groups else None
 
 
 # --------------------------------------------------------------------------- edit log

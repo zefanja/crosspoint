@@ -162,3 +162,24 @@ def refresh_stats(users: list[tuple[str, str]], title: str) -> Job:
             job.done += 1
 
     return _start(job, run())
+
+
+def rename_in_members(group_ids: set[int], old: str, new: str) -> Job:
+    """Rename a group deck in the collections of all members of the receiving groups, so
+    distributing again (decks are matched by name) updates the renamed deck."""
+    users = sorted({u for gid in group_ids for u in _members(gid)}, key=lambda u: u[1])
+    job = _new_job(_("Rename “%(old)s” to “%(new)s”", old=old, new=new))
+
+    async def run():
+        job.total = len(users)
+        for user_id, name in users:
+            try:
+                await anki_service.rename_deck_by_name(user_id, old, new)
+            except anki_service.AnkiServiceError as exc:
+                job.errors.append(f"{name}: {_(str(exc))}")
+            except Exception as exc:  # noqa: BLE001 - continue with the others
+                log.exception("Renaming for %s failed", user_id)
+                job.errors.append(f"{name}: {exc}")
+            job.done += 1
+
+    return _start(job, run())

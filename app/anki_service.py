@@ -626,6 +626,72 @@ async def create_deck(user_id: str, name: str) -> int:
     return await _run(user_id, _create_deck, name)
 
 
+def _has_group_cards(col: Collection, deck_name: str) -> bool:
+    return bool(col.find_cards(f"{deck_search(deck_name)} tag:{GROUP_TAG}"))
+
+
+def _is_group_deck(col: Collection, deck_id: int) -> bool:
+    return _has_group_cards(col, _require_deck(col, deck_id)["name"])
+
+
+async def is_group_deck(user_id: str, deck_id: int) -> bool:
+    """The deck or one of its subdecks contains group deck cards."""
+    return await _run(user_id, _is_group_deck, deck_id)
+
+
+def _rename_deck(col: Collection, deck_id: int, name: str, allow_group: bool,
+                 keep_parent: bool) -> tuple[str, str]:
+    deck = _require_deck(col, deck_id)
+    old = deck["name"]
+    name = "::".join(part.strip() for part in name.split("::") if part.strip())
+    if not name:
+        raise AnkiServiceError(N_("Please enter a deck name."))
+    if keep_parent:
+        parent, _sep, _last = old.rpartition("::")
+        new_parent, _sep, last = name.rpartition("::")
+        if new_parent and new_parent.casefold() != parent.casefold():
+            raise AnkiServiceError(N_("Group decks can only be renamed, not moved to another "
+                                      "parent deck."))
+        name = f"{parent}::{last}" if parent else last
+    if name == old:
+        return old, name
+    # Anki itself would append "+" to a taken name and accepts moving a deck below itself.
+    if name.casefold().startswith(old.casefold() + "::"):
+        raise AnkiServiceError(N_("A deck cannot be moved into its own subdeck."))
+    existing = col.decks.id_for_name(name)
+    if existing and existing != deck_id:
+        raise AnkiServiceError(N_("A deck with this name already exists."))
+    if not allow_group and _has_group_cards(col, old):
+        # Distributing again would put new cards into a deck with the old name.
+        raise AnkiServiceError(N_("Group decks cannot be renamed."))
+    col.decks.rename(deck_id, name)
+    return old, name
+
+
+async def rename_deck(user_id: str, deck_id: int, name: str, allow_group: bool = False,
+                      keep_parent: bool = False) -> tuple[str, str]:
+    """Rename a deck (subdecks follow; `::` moves it unless `keep_parent`).
+    Returns (old, new) full name. Decks with group deck cards only with `allow_group`."""
+    return await _run(user_id, _rename_deck, deck_id, name, allow_group, keep_parent)
+
+
+def _rename_deck_by_name(col: Collection, old: str, new: str) -> bool:
+    deck = col.decks.by_name(old)
+    if deck is None:
+        return False
+    existing = col.decks.id_for_name(new)
+    if existing and existing != deck["id"]:
+        raise AnkiServiceError(N_("A deck with this name already exists."))
+    col.decks.rename(deck["id"], new)
+    return True
+
+
+async def rename_deck_by_name(user_id: str, old: str, new: str) -> bool:
+    """Rename a group deck in a member collection (decks are matched by name when
+    distributing). False if the member has no such deck."""
+    return await _run(user_id, _rename_deck_by_name, old, new)
+
+
 # --------------------------------------------------------------------------- review
 
 

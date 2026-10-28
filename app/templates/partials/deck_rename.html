@@ -1,0 +1,15 @@
+<form method="post" action="/decks/{{ deck_id }}/rename" class="panel">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="field">
+    <label class="field-label" for="deck_name">{{ _("Deck name") }}</label>
+    <div class="rename-row">
+      <input id="deck_name" name="name" class="input" value="{{ deck_name }}" required maxlength="100" autocomplete="off">
+      <button class="btn-line strong fsrs-btn">{{ _("Rename") }}</button>
+    </div>
+  </div>
+  {% if group_rename %}
+  <p class="hint">{{ _("The deck is also renamed for all group members who already received it. Only the last part of the name can be changed.") }}</p>
+  {% else %}
+  <p class="hint">{{ _("Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>.") }}</p>
+  {% endif %}
+</form>
