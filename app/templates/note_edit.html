@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}{{ _("Edit card") }}{% endblock %}
+{% block title %}{{ _("Edit note") }}{% endblock %}
 {% block content %}
 <p><a href="/browse" class="back">‹ {{ _("Cards") }}</a></p>
 <section class="card">
-  <h1>{{ _("Edit card") }}</h1>
+  <h1>{{ _("Edit note") }}</h1>
   <p class="muted small">{{ _("Note type: %(type)s", type=note.notetype) }}{% if note.suspended %} · <strong>{{ _("suspended") }}</strong>{% endif %}</p>
   {% if note.readonly %}<p class="alert">{{ _("This card belongs to a group deck and cannot be edited.") }}</p>
   {% elif note.generated %}<p class="alert">{{ _("Bible text cards are generated from the text and cannot be edited individually. To change them, delete and import the passage again.") }}</p>{% endif %}

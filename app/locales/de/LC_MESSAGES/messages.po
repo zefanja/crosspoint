@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-28 10:10+0000\n"
+"POT-Creation-Date: 2026-10-28 10:12+0000\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -693,8 +693,8 @@ msgid "Create cards"
 msgstr "Karten erstellen"
 
 #: app/templates/note_edit.html:2 app/templates/note_edit.html:6
-msgid "Edit card"
-msgstr "Karte bearbeiten"
+msgid "Edit note"
+msgstr "Notiz bearbeiten"
 
 #: app/templates/note_edit.html:7
 #, python-format
@@ -1480,4 +1480,7 @@ msgstr "Start"
 
 #~ msgid "Import Anki deck (.apkg)"
 #~ msgstr "Anki-Deck importieren (.apkg)"
+
+#~ msgid "Edit card"
+#~ msgstr "Karte bearbeiten"
 

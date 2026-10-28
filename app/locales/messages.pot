@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-28 10:10+0000\n"
+"POT-Creation-Date: 2026-10-28 10:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -692,7 +692,7 @@ msgid "Create cards"
 msgstr ""
 
 #: app/templates/note_edit.html:2 app/templates/note_edit.html:6
-msgid "Edit card"
+msgid "Edit note"
 msgstr ""
 
 #: app/templates/note_edit.html:7
