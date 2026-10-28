@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ state.deck_name }} – {{ _("Study") }}{% endblock %}
-{% block head %}<script src="/static/review.js" defer></script>{% endblock %}
+{% block head %}<script src="/static/review.js?v={{ app_version }}" defer></script>{% endblock %}
 {% block body_class %}review-page{% endblock %}
 {% block topbar %}{% endblock %}
 {% block content %}

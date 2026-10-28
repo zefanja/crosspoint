@@ -38,7 +38,7 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE).then((c) => c.put(req, copy));
           return res;
         })
-        .catch(() => caches.match(req))
+        .catch(() => caches.match(req, { ignoreSearch: true }))  // versioned URLs (?v=)
     );
   }
 });
