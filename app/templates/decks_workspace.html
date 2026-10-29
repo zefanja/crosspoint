@@ -45,7 +45,7 @@
       <a class="iconlink" href="/notes/new?deck_id={{ d.id }}" aria-label="{{ _('Add card to %(deck)s', deck=d.short_name) }}" title="{{ _('Add card') }}">+</a>{% endif %}
     </li>
     {% else %}
-    <li class="hint">{{ _("Your groups don't have any decks yet. Create the first one with “+ New deck”.") }}</li>
+    <li class="hint">{% if groups %}{{ _("Your groups don't have any decks yet. Create the first one with “+ New deck”.") }}{% else %}{{ _("You are not assigned as leader of any group yet. An admin can do that on the group page or on your user page (“Leads groups”).") }}{% endif %}</li>
     {% endfor %}
   </ul>
 </div>

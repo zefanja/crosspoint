@@ -40,7 +40,7 @@ Konsequenzen:
 |---|---|
 | **Lerner** | Eigene Decks lernen, Karten anlegen/bearbeiten, Deck-Optionen, Export |
 | **Admin** | Alles von Lerner + Dashboard: Gruppen, Nutzer, Codes, Gruppendecks verteilen, Fortschritt sehen |
-| *Gruppenleiter* (Phase 3) | Wie Lerner + Fortschritt und neue Codes/Druckblatt nur für Mitglieder der eigenen Gruppen (zugewiesen auf der Gruppenseite, Tabelle `group_leaders`); Gruppendecks der eigenen Gruppen gemeinsam bearbeiten und verteilen (§7.3); keine Nutzer-/Gruppenverwaltung |
+| *Gruppenleiter* (Phase 3) | Wie Lerner + Fortschritt und neue Codes/Druckblatt nur für Mitglieder der eigenen Gruppen (zugewiesen auf der Gruppenseite oder der Nutzerseite unter „Leitet Gruppen“, Tabelle `group_leaders`; Mitgliedschaft allein reicht nicht – ohne Zuweisung zeigen die Gruppendeck-Seiten einen Hinweis); Gruppendecks der eigenen Gruppen gemeinsam bearbeiten und verteilen (§7.3); keine Nutzer-/Gruppenverwaltung |
 
 ## 4. Anmeldung per Code
 

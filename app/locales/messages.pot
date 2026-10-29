@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 19:10+0000\n"
+"POT-Creation-Date: 2026-10-29 19:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 msgid "All decks"
 msgstr ""
 
-#: app/anki_service.py:633 app/routes/admin_group_decks.py:74
+#: app/anki_service.py:633 app/routes/admin_group_decks.py:75
 #: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
 #: app/routes/decks.py:78 app/routes/decks.py:189 app/routes/decks.py:230
 #: app/routes/decks.py:278 app/routes/decks.py:281 app/routes/export.py:59
@@ -178,24 +178,24 @@ msgstr ""
 msgid "Please enter one name per line (at most %(max)s)."
 msgstr ""
 
-#: app/routes/admin_users.py:159
+#: app/routes/admin_users.py:170
 msgid "You cannot remove your own admin role."
 msgstr ""
 
-#: app/routes/admin_users.py:172
+#: app/routes/admin_users.py:189
 #, python-format
 msgid "Group decks for %(name)s"
 msgstr ""
 
-#: app/routes/admin_users.py:200
+#: app/routes/admin_users.py:214
 msgid "You cannot deactivate yourself."
 msgstr ""
 
-#: app/routes/admin_users.py:214
+#: app/routes/admin_users.py:228
 msgid "You cannot delete yourself."
 msgstr ""
 
-#: app/routes/admin_users.py:217
+#: app/routes/admin_users.py:231
 msgid "The name does not match. The user was not deleted."
 msgstr ""
 
@@ -426,7 +426,7 @@ msgstr ""
 msgid "Sibling cards come from the same note, e.g. a verse and its reverse card. On different days, one card does not give away the answer to the other."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:48
+#: app/templates/admin/user_detail.html:41 app/templates/deck_options.html:48
 #: app/templates/note_edit.html:29
 msgid "Save"
 msgstr ""
@@ -777,6 +777,11 @@ msgstr ""
 
 #: app/templates/decks_workspace.html:48
 msgid "Your groups don't have any decks yet. Create the first one with “+ New deck”."
+msgstr ""
+
+#: app/templates/admin/group_decks.html:41
+#: app/templates/decks_workspace.html:48
+msgid "You are not assigned as leader of any group yet. An admin can do that on the group page or on your user page (“Leads groups”)."
 msgstr ""
 
 #: app/templates/error.html:2
@@ -1353,7 +1358,7 @@ msgid "Group leaders"
 msgstr ""
 
 #: app/templates/admin/group_detail.html:66
-msgid "Group leaders see the progress of this group and can print new codes for its members."
+msgid "Group leaders see the progress of this group, can print new codes for its members and edit its group decks. Being a member of the group is not enough."
 msgstr ""
 
 #: app/templates/admin/group_detail.html:75
@@ -1557,39 +1562,47 @@ msgstr ""
 msgid "New group members receive all decks of the group automatically."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:37
+#: app/templates/admin/user_detail.html:34
+msgid "Leads groups"
+msgstr ""
+
+#: app/templates/admin/user_detail.html:39
+msgid "Group leaders see the progress of these groups, print codes for their members and edit their group decks. A learner who leads a group becomes a group leader."
+msgstr ""
+
+#: app/templates/admin/user_detail.html:46
 msgid "Login code"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:38
+#: app/templates/admin/user_detail.html:47
 msgid "Codes are not stored in readable form and cannot be shown again. If a code is lost, create a new one – the old one stops working."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:40
+#: app/templates/admin/user_detail.html:49
 msgid "Create a new code? The old code stops working."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:42
+#: app/templates/admin/user_detail.html:51
 msgid "New code + print sheet"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:48
+#: app/templates/admin/user_detail.html:57
 msgid "Deactivate or delete"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:51
+#: app/templates/admin/user_detail.html:60
 msgid "Activate"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:51
+#: app/templates/admin/user_detail.html:60
 msgid "Deactivate (cannot log in, data is kept)"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:55
+#: app/templates/admin/user_detail.html:64
 msgid "Delete permanently – type the name to confirm:"
 msgstr ""
 
-#: app/templates/admin/user_detail.html:57
+#: app/templates/admin/user_detail.html:66
 msgid "Delete user and all cards"
 msgstr ""
 

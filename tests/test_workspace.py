@@ -473,3 +473,55 @@ def test_admin_keeps_full_access(client, setup, login):
     assert client.get(f"/review/{setup['decks']['Geheim']}").status_code == 200
     groups = client.get("/admin/group-decks").text
     assert "Geheim" in groups and "Hauskreis" in groups
+
+
+def test_leader_assigned_on_user_page(client, login, make_user, db):
+    """Being a member with role "leader" is not enough: the user page assigns led groups."""
+    from app.auth import create_user
+    from app.models import User
+
+    _admin, csrf = login("Admin", "admin")
+    g = Group(name="Jugend")
+    db.add(g)
+    db.commit()
+    did = client.portal.call(anki_service.create_deck, A, "Psalmen")
+    db.add(GroupDeck(group_id=g.id, admin_deck_id=did, deck_name="Psalmen"))
+    db.commit()
+    lea, code = create_user(db, "Lea", "leader")
+    client.post(f"/admin/users/{lea.id}", data={"csrf_token": csrf, "display_name": "Lea",
+                                                "role": "leader", "groups": [g.id]})
+    assert "Leitet Gruppen" in client.get(f"/admin/users/{lea.id}").text
+
+    client.cookies.clear()
+    client.get(f"/login?c={code}")
+    lea_csrf = csrf_token_for(client.cookies[SESSION_COOKIE])
+    assert "noch keiner Gruppe als Gruppenleitung" in client.get("/admin/group-decks").text
+    client.post("/admin/workspace", data={"csrf_token": lea_csrf, "ws": "admin"})
+    assert "noch keiner Gruppe als Gruppenleitung" in client.get("/").text
+
+    client.cookies.clear()
+    _admin2, csrf = login("Admin2", "admin")
+    client.post(f"/admin/users/{lea.id}", data={"csrf_token": csrf, "display_name": "Lea",
+                                                "role": "leader", "groups": [g.id], "leads": [g.id]})
+    assert db.query(GroupLeader).filter_by(group_id=g.id, user_id=lea.id).count() == 1
+
+    client.cookies.clear()
+    client.get(f"/login?c={code}")
+    lea_csrf = csrf_token_for(client.cookies[SESSION_COOKIE])
+    assert "Psalmen" in client.get("/admin/group-decks").text
+    client.post("/admin/workspace", data={"csrf_token": lea_csrf, "ws": "admin"})
+    assert '<span class="deck-name">Psalmen</span>' in client.get("/").text
+
+    # demoting to learner ends the leadership; leading a group promotes a learner
+    client.cookies.clear()
+    _admin3, csrf = login("Admin3", "admin")
+    client.post(f"/admin/users/{lea.id}", data={"csrf_token": csrf, "display_name": "Lea",
+                                                "role": "learner", "leads": [g.id]})
+    db.expire_all()
+    assert db.get(User, lea.id).role == "learner"
+    assert db.query(GroupLeader).filter_by(user_id=lea.id).count() == 0
+    client.post(f"/admin/users/{lea.id}", data={"csrf_token": csrf, "display_name": "Lea",
+                                                "role": "learner", "leads": [g.id]})
+    db.expire_all()
+    assert db.get(User, lea.id).role == "leader"
+    assert db.query(GroupLeader).filter_by(user_id=lea.id).count() == 1

@@ -38,7 +38,7 @@
       </form>
       {% endif %}
     </li>
-    {% else %}<li class="muted">{{ _("No group decks yet.") }}</li>{% endfor %}
+    {% else %}<li class="muted">{% if no_groups %}{{ _("You are not assigned as leader of any group yet. An admin can do that on the group page or on your user page (“Leads groups”).") }}{% else %}{{ _("No group decks yet.") }}{% endif %}</li>{% endfor %}
   </ul>
 </section>
 

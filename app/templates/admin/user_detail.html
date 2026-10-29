@@ -29,6 +29,15 @@
       {% else %}<p class="muted small">{{ _("No groups yet.") }} <a href="/admin/groups">{{ _("Create a group") }}</a></p>{% endfor %}
     </fieldset>
     <p class="muted small">{{ _("New group members receive all decks of the group automatically.") }}</p>
+    {% if groups and not u.is_admin %}
+    <fieldset class="checklist">
+      <legend>{{ _("Leads groups") }}</legend>
+      {% for g in groups %}
+      <label class="check"><input type="checkbox" name="leads" value="{{ g.id }}"{% if g.id in leads %} checked{% endif %}><span>{{ g.name }}</span></label>
+      {% endfor %}
+    </fieldset>
+    <p class="muted small">{{ _("Group leaders see the progress of these groups, print codes for their members and edit their group decks. A learner who leads a group becomes a group leader.") }}</p>
+    {% endif %}
     <button class="btn btn-primary btn-block">{{ _("Save") }}</button>
   </form>
 </section>
