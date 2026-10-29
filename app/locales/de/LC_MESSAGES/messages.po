@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 17:27+0000\n"
+"POT-Creation-Date: 2026-10-29 17:51+0000\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -28,8 +28,8 @@ msgstr "Alle Decks"
 
 #: app/anki_service.py:614 app/routes/admin_group_decks.py:74
 #: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
-#: app/routes/decks.py:75 app/routes/decks.py:152 app/routes/decks.py:185
-#: app/routes/decks.py:220 app/routes/decks.py:223 app/routes/export.py:59
+#: app/routes/decks.py:78 app/routes/decks.py:200 app/routes/decks.py:236
+#: app/routes/decks.py:282 app/routes/decks.py:285 app/routes/export.py:59
 #: app/workspace.py:193
 msgid "Deck not found."
 msgstr "Deck nicht gefunden."
@@ -54,8 +54,8 @@ msgstr "Ein Deck mit diesem Namen gibt es schon."
 msgid "Group decks cannot be renamed."
 msgstr "Gruppendecks können nicht umbenannt werden."
 
-#: app/anki_service.py:854 app/anki_service.py:1146 app/routes/decks.py:199
-#: app/workspace.py:65
+#: app/anki_service.py:854 app/anki_service.py:1158 app/anki_service.py:1172
+#: app/routes/decks.py:251 app/routes/decks.py:255 app/workspace.py:65
 msgid "Note not found."
 msgstr "Notiz nicht gefunden."
 
@@ -91,15 +91,15 @@ msgstr "Bibeltext-Karten werden aus dem Text erzeugt. Zum Ändern bitte löschen
 msgid "Cards from group decks cannot be deleted."
 msgstr "Karten aus Gruppendecks können nicht gelöscht werden."
 
-#: app/anki_service.py:1084 app/anki_service.py:1184
+#: app/anki_service.py:1084 app/anki_service.py:1215
 msgid "Card not found."
 msgstr "Karte nicht gefunden."
 
-#: app/anki_service.py:1603
+#: app/anki_service.py:1634
 msgid "The image is too large (max. 5 MB)."
 msgstr "Das Bild ist zu groß (max. 5 MB)."
 
-#: app/anki_service.py:1606
+#: app/anki_service.py:1637
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr "Nur PNG-, JPEG-, GIF- oder WebP-Bilder werden unterstützt."
 
@@ -245,20 +245,20 @@ msgstr "Ausgesetzt"
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr "Die Suche ist ungültig. Beispiele: Joh, is:due, is:new"
 
-#: app/routes/decks.py:120
+#: app/routes/decks.py:123
 msgid "New cards per day: 0 to 9999."
 msgstr "Neue Karten pro Tag: 0 bis 9999."
 
-#: app/routes/decks.py:122
+#: app/routes/decks.py:125
 msgid "Reviews per day: 0 to 9999."
 msgstr "Wiederholungen pro Tag: 0 bis 9999."
 
-#: app/routes/decks.py:124
+#: app/routes/decks.py:127
 #, python-format
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr "Gewünschte Behaltensquote: %(min)s bis %(max)s."
 
-#: app/routes/decks.py:154
+#: app/routes/decks.py:202
 msgid "The group leaders release the cards of group decks."
 msgstr "Die Karten von Gruppendecks geben die Gruppenleiter frei."
 
@@ -483,69 +483,99 @@ msgstr[1] "%(num)s Notizen gesperrt."
 msgid "All notes are released."
 msgstr "Alle Notizen sind freigegeben."
 
-#: app/templates/deck_release.html:9
+#: app/templates/deck_release.html:9 app/templates/deck_release.html:10
 #, python-format
 msgid "Locked: %(front)s"
 msgstr "Gesperrt: %(front)s"
 
 #: app/templates/deck_release.html:9 app/templates/deck_release.html:10
-#: app/templates/deck_release.html:36
+#: app/templates/deck_release.html:11 app/templates/deck_release.html:35
+#: app/templates/deck_release.html:56
 #: app/templates/partials/browse_card_row.html:4
 #: app/templates/partials/browse_results.html:13
 msgid "(empty)"
 msgstr "(leer)"
 
-#: app/templates/deck_release.html:10
+#: app/templates/deck_release.html:9 app/templates/deck_release.html:11
 #, python-format
 msgid "Released: %(front)s"
 msgstr "Freigegeben: %(front)s"
 
-#: app/templates/deck_release.html:14
+#: app/templates/deck_release.html:15
 #, python-format
 msgid "%(released)s of %(total)s notes released"
 msgstr "%(released)s von %(total)s Notizen freigegeben"
 
-#: app/templates/deck_release.html:19
+#: app/templates/deck_release.html:20
 msgid "Release next"
 msgstr "Nächste freigeben"
 
-#: app/templates/deck_release.html:21
+#: app/templates/deck_release.html:22
 msgid "Locked notes are suspended and do not appear when studying. Release them one after another, e.g. one verse per week."
 msgstr "Gesperrte Notizen sind ausgesetzt und erscheinen nicht beim Lernen. Gib sie nacheinander frei, z. B. einen Vers pro Woche."
 
-#: app/templates/deck_release.html:21
+#: app/templates/deck_release.html:22
 msgid "Members get the release when the deck is distributed."
 msgstr "Die Mitglieder erhalten die Freigabe beim Verteilen."
 
-#: app/templates/deck_release.html:25
+#: app/templates/deck_release.html:26
 msgid "Lock new cards"
 msgstr "Neue Karten sperren"
 
-#: app/templates/deck_release.html:27
+#: app/templates/deck_release.html:28
 msgid "Locks all notes that have not been studied yet – the starting point for releasing them step by step."
 msgstr "Sperrt alle Notizen, die noch nicht gelernt wurden – der Ausgangspunkt für die schrittweise Freigabe."
 
-#: app/templates/deck_release.html:37
+#: app/templates/deck_release.html:36 app/templates/deck_release.html:57
 msgid "locked"
 msgstr "gesperrt"
 
-#: app/templates/deck_release.html:37
+#: app/templates/deck_release.html:36
 msgid "released · suspended"
 msgstr "freigegeben · ausgesetzt"
 
-#: app/templates/deck_release.html:37
+#: app/templates/deck_release.html:36 app/templates/deck_release.html:57
 msgid "released"
 msgstr "freigegeben"
 
-#: app/templates/deck_release.html:44
+#: app/templates/deck_release.html:43
 msgid "Release"
 msgstr "Freigeben"
 
-#: app/templates/deck_release.html:44
+#: app/templates/deck_release.html:43
 msgid "Lock"
 msgstr "Sperren"
 
-#: app/templates/deck_release.html:49
+#: app/templates/deck_release.html:56
+msgid "Collective note"
+msgstr "Sammelnotiz"
+
+#: app/templates/deck_release.html:57
+#: app/templates/partials/browse_results.html:6
+#, python-format
+msgid "%(num)s note"
+msgid_plural "%(num)s notes"
+msgstr[0] "%(num)s Notiz"
+msgstr[1] "%(num)s Notizen"
+
+#: app/templates/deck_release.html:57
+#, python-format
+msgid "%(released)s of %(total)s released"
+msgstr "%(released)s von %(total)s freigegeben"
+
+#: app/templates/deck_release.html:64
+msgid "Release all"
+msgstr "Alle freigeben"
+
+#: app/templates/deck_release.html:64
+msgid "Lock all"
+msgstr "Alle sperren"
+
+#: app/templates/deck_release.html:68
+msgid "Show individually"
+msgstr "Einzeln anzeigen"
+
+#: app/templates/deck_release.html:77
 msgid "This deck has no cards yet."
 msgstr "Dieses Deck hat noch keine Karten."
 
@@ -1660,13 +1690,6 @@ msgstr "Keine Notizen gefunden."
 #: app/templates/partials/browse_results.html:4
 msgid "No cards found."
 msgstr "Keine Karten gefunden."
-
-#: app/templates/partials/browse_results.html:6
-#, python-format
-msgid "%(num)s note"
-msgid_plural "%(num)s notes"
-msgstr[0] "%(num)s Notiz"
-msgstr[1] "%(num)s Notizen"
 
 #: app/templates/partials/browse_results.html:6
 #, python-format

@@ -1109,3 +1109,10 @@ label.option-row { cursor: pointer; }
 .release-row.current { background: var(--surface-2); }
 .release-row { scroll-margin-top: 80px; }
 .release-link { color: var(--text); text-decoration: none; gap: 4px; }
+.release-group.current > .browserow { background: var(--surface-2); }
+.release-group { scroll-margin-top: 80px; }
+.badge-collective { display: inline-block; padding: 1px 6px; margin-right: 4px; border-radius: 6px; background: var(--brand-cyan); color: var(--brand-navy); font-size: 11px; font-weight: 800; vertical-align: 2px; }
+.release-parts { padding: 0 8px 8px 14px; }
+.release-parts summary { min-height: var(--touch); display: flex; align-items: center; font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; }
+.release-parts .rowlist { margin-top: 0; }
+.release-group > .browserow .row-title { white-space: normal; }

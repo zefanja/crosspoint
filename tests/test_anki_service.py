@@ -426,7 +426,7 @@ def test_release_step_by_step(run, deck):
     assert run(svc.lock_new(U, deck)) == 0  # already locked
 
     first_locked = next(n for n in notes if n.locked)
-    assert run(svc.release_next(U, deck)).note_id == first_locked.note_id
+    assert [n.note_id for n in run(svc.release_next(U, deck))] == [first_locked.note_id]
     row = next(n for n in run(svc.release_notes(U, deck)) if n.note_id == first_locked.note_id)
     assert not row.locked and not row.suspended
     rows, _total = run(svc.search_cards(U, f"nid:{first_locked.note_id}"))
@@ -438,9 +438,39 @@ def test_release_step_by_step(run, deck):
     other = run(svc.create_deck(U, "Andere"))
     with pytest.raises(svc.NotFound):
         run(svc.set_locked(U, other, last, False))
-    while run(svc.release_next(U, deck)) is not None:
+    while run(svc.release_next(U, deck)):
         pass
     assert not any(n.locked or n.suspended for n in run(svc.release_notes(U, deck)))
+
+
+def test_release_collective_notes(run, deck):
+    single = add_verse(run, deck, "Joh 3,16")
+    run(svc.add_bible_text(U, deck, "Psalm 23", 2, "Der Herr ist mein Hirte\nmir wird nichts mangeln\ner weidet mich", False))
+    run(svc.add_bible_text(U, deck, "Psalm 1", 2, "Wohl dem\nder nicht wandelt", False))
+    notes = run(svc.release_notes(U, deck))
+    groups = [n.group for n in notes]
+    assert groups[0] is None and notes[0].note_id == single
+    ps23, ps1 = groups[1], groups[4]
+    assert ps23 and ps1 and ps23 != ps1 and groups[1:4] == [ps23] * 3 and groups[4:] == [ps1] * 2
+    assert {n.title for n in notes[1:4]} == {"Psalm 23"}
+
+    assert run(svc.lock_new(U, deck)) == 6
+    released = run(svc.release_next(U, deck))
+    assert [n.note_id for n in released] == [single]
+    released = run(svc.release_next(U, deck))  # the whole collective note
+    assert len(released) == 3 and {n.group for n in released} == {ps23}
+    assert [n.locked for n in run(svc.release_notes(U, deck))] == [False] * 4 + [True] * 2
+
+    part = notes[2].note_id  # a single part can still be locked on its own
+    run(svc.set_locked(U, deck, part, True))
+    assert sum(n.locked for n in run(svc.release_notes(U, deck)) if n.group == ps23) == 1
+    run(svc.set_group_locked(U, deck, ps23, False))
+    run(svc.set_group_locked(U, deck, ps1, False))
+    assert not any(n.locked or n.suspended for n in run(svc.release_notes(U, deck)))
+    run(svc.set_group_locked(U, deck, ps1, True))
+    assert [n.locked for n in run(svc.release_notes(U, deck))] == [False] * 4 + [True] * 2
+    with pytest.raises(svc.NotFound):
+        run(svc.set_group_locked(U, deck, "bm-1", True))
 
 
 def test_import_group_package_applies_release_state(run, deck, tmp_path):

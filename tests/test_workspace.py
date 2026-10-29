@@ -351,6 +351,37 @@ def test_release_own_cards(client, login):
         "csrf_token": csrf, "action": "lock_new"}).status_code == 403
 
 
+def test_release_collective_notes_page(client, login):
+    user, csrf = login("Tom")
+    call = client.portal.call
+    deck = call(anki_service.create_deck, user.id, "Psalmen")
+    call(anki_service.add_bible_text, user.id, deck, "Psalm 23", 2,
+         "Der Herr ist mein Hirte\nmir wird nichts mangeln", False)
+    call(anki_service.add_note, user.id, "Basic", deck, {"Front": "Einzeln", "Back": "B"})
+    group = next(n.group for n in call(anki_service.release_notes, user.id, deck) if n.group)
+
+    def post(**data):
+        return client.post(f"/decks/{deck}/release", data={"csrf_token": csrf, **data})
+
+    page = html.unescape(post(action="lock_new").text)
+    assert "Sammelnotiz" in page and page.count("Psalm 23") >= 1 and "2 Notizen · gesperrt" in page
+    assert "Einzeln anzeigen" in page and 'value="release_group"' in page
+
+    r = client.post(f"/decks/{deck}/release", data={"csrf_token": csrf, "action": "next"},
+                    follow_redirects=False)
+    assert r.headers["location"].endswith(f"#{group}")  # the collective note came first
+    page = html.unescape(client.get(r.headers["location"]).text)
+    assert "Freigegeben: Psalm 23" in page and "2 von 3 Notizen freigegeben" in page
+    assert 'value="lock_group"' in page
+
+    part = next(n.note_id for n in call(anki_service.release_notes, user.id, deck) if n.group)
+    page = html.unescape(post(action="lock", note_id=part).text)
+    assert "1 von 2 freigegeben" in page and "<details class=\"release-parts\" open>" in page
+    page = html.unescape(post(action="lock_group", group=group).text)
+    assert "Gesperrt: Psalm 23" in page and "2 Notizen · gesperrt" in page
+    assert post(action="release_group", group="bm-1").status_code == 404
+
+
 def test_leader_renames_group_deck_for_members(client, setup, db):
     csrf, decks, member = setup["csrf"], setup["decks"], setup["member"]
     call = client.portal.call

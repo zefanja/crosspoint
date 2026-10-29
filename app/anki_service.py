@@ -1105,6 +1105,17 @@ class ReleaseNote:
     locked: bool  # tagged LOCK_TAG: waits for its release
     suspended: bool  # all cards suspended (also without a lock: suspended by hand)
     new: bool  # no card studied yet
+    group: str | None = None  # notes of one Bible text import share it (a "collective note")
+    title: str = ""  # the Bible text's title (group notes)
+
+
+def _note_group(note) -> tuple[str | None, str]:
+    """(group key, title) of a Bible Memorizer note: one import shares the "{ms}-" prefix
+    of its `id` field (in-app Bible text and the browser generator)."""
+    if note.note_type()["name"] != BIBLE_MEMORIZER:
+        return None, ""
+    batch = note["id"].partition("-")[0]
+    return (f"bm-{batch}" if batch.isdigit() else None), plain_text(note["title"])
 
 
 def _deck_note_ids(col: Collection, deck_id: int) -> list[int]:
@@ -1117,10 +1128,11 @@ def _release_notes(col: Collection, deck_id: int) -> list[ReleaseNote]:
     for nid in _deck_note_ids(col, deck_id):
         note = col.get_note(nid)
         cards = note.cards()
+        group, title = _note_group(note)
         rows.append(ReleaseNote(
             note_id=nid, front=plain_text(note.fields[0])[:80], locked=note.has_tag(LOCK_TAG),
             suspended=bool(cards) and all(c.queue == QUEUE_SUSPENDED for c in cards),
-            new=all(c.type == CARD_TYPE_NEW for c in cards)))
+            new=all(c.type == CARD_TYPE_NEW for c in cards), group=group, title=title))
     return rows
 
 
@@ -1153,16 +1165,35 @@ async def set_locked(user_id: str, deck_id: int, note_id: int, locked: bool) -> 
     return await _run(user_id, _set_locked, deck_id, note_id, locked)
 
 
-def _release_next(col: Collection, deck_id: int) -> ReleaseNote | None:
-    first = next((n for n in _release_notes(col, deck_id) if n.locked), None)
+def _set_group_locked(col: Collection, deck_id: int, group: str,
+                      locked: bool) -> list[ReleaseNote]:
+    notes = [n for n in _release_notes(col, deck_id) if n.group == group]
+    if not notes:
+        raise NotFound(N_("Note not found."))
+    _lock_notes(col, [n.note_id for n in notes if n.locked != locked], locked)
+    return notes
+
+
+async def set_group_locked(user_id: str, deck_id: int, group: str,
+                           locked: bool) -> list[ReleaseNote]:
+    """Lock or release all notes of a collective note (one Bible text) in the deck."""
+    return await _run(user_id, _set_group_locked, deck_id, group, locked)
+
+
+def _release_next(col: Collection, deck_id: int) -> list[ReleaseNote]:
+    notes = _release_notes(col, deck_id)
+    first = next((n for n in notes if n.locked), None)
     if first is None:
-        return None
-    _lock_notes(col, [first.note_id], False)
-    return first
+        return []
+    released = [n for n in notes if n.locked
+                and (n.note_id == first.note_id or first.group and n.group == first.group)]
+    _lock_notes(col, [n.note_id for n in released], False)
+    return released
 
 
-async def release_next(user_id: str, deck_id: int) -> ReleaseNote | None:
-    """Release the first locked note of the deck; None if nothing is locked."""
+async def release_next(user_id: str, deck_id: int) -> list[ReleaseNote]:
+    """Release the first locked note of the deck – a whole collective note if it belongs
+    to one. Returns the released notes (empty if nothing is locked)."""
     return await _run(user_id, _release_next, deck_id)
 
 

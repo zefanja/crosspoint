@@ -5,9 +5,10 @@
 <h1 class="page-title">{{ deck_name }} <span class="muted">{{ _("release") }}</span></h1>
 <div class="ui-stack">
   {% if done == "lock_new" %}<p class="alert alert-success" role="status">{{ ngettext("%(num)s note locked.", "%(num)s notes locked.", count) }}</p>
-  {% elif done == "next" and not changed %}<p class="alert" role="status">{{ _("All notes are released.") }}</p>
-  {% elif changed and changed.locked %}<p class="alert alert-success" role="status">{{ _("Locked: %(front)s", front=changed.front or _("(empty)")) }}</p>
-  {% elif changed %}<p class="alert alert-success" role="status">{{ _("Released: %(front)s", front=changed.front or _("(empty)")) }}</p>{% endif %}
+  {% elif done == "next" and not changed_note and not changed_item %}<p class="alert" role="status">{{ _("All notes are released.") }}</p>
+  {% elif changed_item %}<p class="alert alert-success" role="status">{% if changed_item.released == 0 %}{{ _("Locked: %(front)s", front=changed_item.title or _("(empty)")) }}{% else %}{{ _("Released: %(front)s", front=changed_item.title or _("(empty)")) }}{% endif %}</p>
+  {% elif changed_note and changed_note.locked %}<p class="alert alert-success" role="status">{{ _("Locked: %(front)s", front=changed_note.front or _("(empty)")) }}</p>
+  {% elif changed_note %}<p class="alert alert-success" role="status">{{ _("Released: %(front)s", front=changed_note.front or _("(empty)")) }}</p>{% endif %}
   {% include "partials/distribute_prompt.html" %}
 
   <section class="panel">
@@ -27,10 +28,8 @@
     <p class="hint">{{ _("Locks all notes that have not been studied yet – the starting point for releasing them step by step.") }}</p>
   </section>
 
-  {% if notes %}
-  <ul class="rowlist">
-    {% for n in notes %}
-    <li class="browserow release-row{% if changed and changed.note_id == n.note_id %} current{% endif %}" id="note-{{ n.note_id }}">
+  {% macro note_row(n) %}
+    <li class="browserow release-row{% if changed_note and changed_note.note_id == n.note_id %} current{% endif %}" id="note-{{ n.note_id }}">
       <a href="/notes/{{ n.note_id }}" class="rowlink{% if n.locked %} off{% endif %}">
         <span class="row-main">
           <span class="row-title">{{ n.front or _("(empty)") }}</span>
@@ -44,6 +43,35 @@
         <button class="row-action">{{ _("Release") if n.locked else _("Lock") }}</button>
       </form>
     </li>
+  {% endmacro %}
+  {% if items %}
+  <ul class="rowlist">
+    {% for item in items %}
+    {% if item.group %}
+    {% set open = changed_note and changed_note.group == item.group %}
+    <li class="release-group{% if changed_item and changed_item.group == item.group %} current{% endif %}" id="{{ item.anchor }}">
+      <div class="browserow">
+        <div class="rowlink{% if item.released == 0 %} off{% endif %}">
+          <span class="row-main">
+            <span class="row-title"><span class="badge-collective">{{ _("Collective note") }}</span> {{ item.title or _("(empty)") }}</span>
+            <span class="row-meta">{{ ngettext("%(num)s note", "%(num)s notes", item.notes | length) }} · {% if item.released == 0 %}{{ _("locked") }}{% elif not item.locked %}{{ _("released") }}{% else %}{{ _("%(released)s of %(total)s released", released=item.released, total=item.notes | length) }}{% endif %}</span>
+          </span>
+        </div>
+        <form method="post" action="/decks/{{ deck_id }}/release">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="action" value="{{ 'release_group' if item.locked else 'lock_group' }}">
+          <input type="hidden" name="group" value="{{ item.group }}">
+          <button class="row-action">{{ _("Release all") if item.locked else _("Lock all") }}</button>
+        </form>
+      </div>
+      <details class="release-parts"{% if open %} open{% endif %}>
+        <summary>{{ _("Show individually") }}</summary>
+        <ul class="rowlist">{% for n in item.notes %}{{ note_row(n) }}{% endfor %}</ul>
+      </details>
+    </li>
+    {% else %}
+    {{ note_row(item.notes[0]) }}
+    {% endif %}
     {% endfor %}
   </ul>
   {% else %}<p class="hint">{{ _("This deck has no cards yet.") }}</p>{% endif %}
