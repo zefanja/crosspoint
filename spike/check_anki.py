@@ -181,6 +181,11 @@ def main() -> int:
     check(done == 50, f"50 reviews answered (got {done})")
     check(revlog_count(col) == 50, "50 revlog entries")
 
+    # After 50 answers all 20 cards may have graduated (learning steps get a random delay
+    # that the seed above does not control), so add a fresh card for the undo test.
+    note = col.new_note(m)
+    note["Reference"], note["Text"] = VERSES[0]
+    col.add_note(note, did)
     before_counts = col.sched.counts()
     res = answer_one(col, CardAnswer.GOOD)
     check(res is not None, "51st card answered for undo test")
@@ -202,7 +207,7 @@ def main() -> int:
         ),
         limit=DeckIdLimit(deck_id=did),
     )
-    check(apkg.stat().st_size > 0 and n == 20, f".apkg written ({n} notes)")
+    check(apkg.stat().st_size > 0 and n == 21, f".apkg written ({n} notes)")
     col.export_collection_package(str(colpkg), include_media=False, legacy=False)
     check(colpkg.stat().st_size > 0, ".colpkg written")
     col.close()
