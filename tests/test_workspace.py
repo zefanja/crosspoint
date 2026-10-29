@@ -274,6 +274,83 @@ def test_deck_options_are_distributed_when_changed(client, setup, db, login):
     assert call(anki_service.get_deck_options, late.id, did).new_per_day == 3
 
 
+def test_release_group_deck_step_by_step(client, setup, db):
+    csrf, decks, member = setup["csrf"], setup["decks"], setup["member"]
+    call = client.portal.call
+    deck = decks["Psalmen"]
+    for i in (2, 3):
+        call(anki_service.add_note, A, "Basic", deck, {"Front": f"Psalm {i}", "Back": "B"},
+             (anki_service.GROUP_TAG,))
+    own = db.query(GroupDeck).filter_by(deck_name="Psalmen").one()
+
+    assert f'href="/decks/{deck}/release"' in client.get("/").text
+    assert f'href="/decks/{decks["Sprüche"]}/release"' not in client.get("/").text
+    assert client.get(f"/decks/{decks['Sprüche']}/release").status_code == 404  # view only
+    assert client.post(f"/decks/{decks['Sprüche']}/release", data={
+        "csrf_token": csrf, "action": "lock_new"}).status_code == 404
+
+    def post(**data):
+        return client.post(f"/decks/{deck}/release", data={"csrf_token": csrf, **data})
+
+    page = html.unescape(post(action="lock_new").text)
+    assert "3 Notizen gesperrt." in page and "0 von 3 Notizen freigegeben" in page
+    assert "Änderungen gleich verteilen?" in page
+    page = html.unescape(post(action="next").text)
+    assert "Freigegeben: Frage Psalmen" in page and "1 von 3 Notizen freigegeben" in page
+
+    def distribute():
+        job = wait_job(client, client.post(f"/admin/group-decks/{own.id}/distribute",
+                                           data={"csrf_token": csrf}, follow_redirects=False))
+        assert job.errors == []
+
+    def member_state():
+        rows, _total = call(anki_service.search_notes, member.id, '"deck:Psalmen"')
+        return {r.front: r.status == "suspended" for r in rows}
+
+    distribute()
+    assert member_state() == {"Frage Psalmen": False, "Psalm 2": True, "Psalm 3": True}
+
+    time.sleep(1.1)  # anki skips notes with the same mtime (seconds)
+    psalm3 = next(n.note_id for n in call(anki_service.release_notes, A, deck)
+                  if n.front == "Psalm 3")
+    r = client.post(f"/decks/{deck}/release", data={
+        "csrf_token": csrf, "action": "release", "note_id": psalm3}, follow_redirects=False)
+    assert r.headers["location"].endswith(f"#note-{psalm3}")
+    distribute()
+    assert member_state() == {"Frage Psalmen": False, "Psalm 2": True, "Psalm 3": False}
+    page = html.unescape(client.get("/admin/group-decks").text)
+    assert "Lea hat „Psalm 3“ freigegeben" in page and "Lea hat die neuen Karten gesperrt" in page
+
+
+
+def test_release_own_cards(client, login):
+    user, csrf = login("Tom")
+    call = client.portal.call
+    deck = call(anki_service.create_deck, user.id, "Verse")
+    for i in (1, 2):
+        call(anki_service.add_note, user.id, "Basic", deck, {"Front": f"Vers {i}", "Back": "B"})
+    assert f'href="/decks/{deck}/release"' in client.get(f"/decks/{deck}/options").text
+    page = html.unescape(client.post(f"/decks/{deck}/release",
+                                     data={"csrf_token": csrf, "action": "lock_new"}).text)
+    assert "2 Notizen gesperrt." in page and "Änderungen gleich verteilen?" not in page
+    page = html.unescape(client.post(f"/decks/{deck}/release",
+                                     data={"csrf_token": csrf, "action": "next"}).text)
+    assert "Freigegeben: Vers 1" in page and "1 von 2 Notizen freigegeben" in page
+    rows, _total = call(anki_service.search_notes, user.id, "is:suspended")
+    assert [r.front for r in rows] == ["Vers 2"]
+    assert client.post(f"/decks/{deck}/release", data={
+        "csrf_token": csrf, "action": "bogus"}).status_code == 404
+
+    # received group decks are released by their editors
+    group = call(anki_service.create_deck, user.id, "Gruppe")
+    call(anki_service.add_note, user.id, "Basic", group, {"Front": "G", "Back": "B"},
+         (anki_service.GROUP_TAG,))
+    assert f'href="/decks/{group}/release"' not in client.get(f"/decks/{group}/options").text
+    assert client.get(f"/decks/{group}/release").status_code == 403
+    assert client.post(f"/decks/{group}/release", data={
+        "csrf_token": csrf, "action": "lock_new"}).status_code == 403
+
+
 def test_leader_renames_group_deck_for_members(client, setup, db):
     csrf, decks, member = setup["csrf"], setup["decks"], setup["member"]
     call = client.portal.call

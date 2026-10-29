@@ -50,6 +50,7 @@ ADMIN_COLLECTION = "_admin"
 MAX_OPEN = 20
 IDLE_SECONDS = 600
 GROUP_TAG = "gruppendeck"
+LOCK_TAG = "gesperrt"  # not released yet (step-by-step release, cards suspended)
 DEFAULT_DECK = N_("My cards")  # created in the user's language
 BASIC = "Basic"
 BIBLE_VERSE = "Bible Verse"
@@ -1094,6 +1095,88 @@ async def set_card_suspended(user_id: str, card_id: int, suspended: bool) -> Car
     return await _run(user_id, _set_card_suspended, card_id, suspended)
 
 
+# --------------------------------------------------------------------------- release
+
+
+@dataclass
+class ReleaseNote:
+    note_id: int
+    front: str
+    locked: bool  # tagged LOCK_TAG: waits for its release
+    suspended: bool  # all cards suspended (also without a lock: suspended by hand)
+    new: bool  # no card studied yet
+
+
+def _deck_note_ids(col: Collection, deck_id: int) -> list[int]:
+    """Notes of the deck (incl. subdecks) in the order they were added."""
+    return sorted(int(nid) for nid in col.find_notes(deck_search(_require_deck(col, deck_id)["name"])))
+
+
+def _release_notes(col: Collection, deck_id: int) -> list[ReleaseNote]:
+    rows = []
+    for nid in _deck_note_ids(col, deck_id):
+        note = col.get_note(nid)
+        cards = note.cards()
+        rows.append(ReleaseNote(
+            note_id=nid, front=plain_text(note.fields[0])[:80], locked=note.has_tag(LOCK_TAG),
+            suspended=bool(cards) and all(c.queue == QUEUE_SUSPENDED for c in cards),
+            new=all(c.type == CARD_TYPE_NEW for c in cards)))
+    return rows
+
+
+async def release_notes(user_id: str, deck_id: int) -> list[ReleaseNote]:
+    """The deck's notes with their release state, in the order they were added."""
+    return await _run(user_id, _release_notes, deck_id)
+
+
+def _lock_notes(col: Collection, note_ids: list[int], locked: bool) -> None:
+    if not note_ids:
+        return
+    card_ids = [cid for nid in note_ids for cid in col.get_note(nid).card_ids()]
+    if locked:
+        col.tags.bulk_add(note_ids, LOCK_TAG)
+        col.sched.suspend_cards(card_ids)
+    else:
+        col.tags.bulk_remove(note_ids, LOCK_TAG)
+        col.sched.unsuspend_cards(card_ids)
+
+
+def _set_locked(col: Collection, deck_id: int, note_id: int, locked: bool) -> ReleaseNote:
+    if note_id not in _deck_note_ids(col, deck_id):
+        raise NotFound(N_("Note not found."))
+    _lock_notes(col, [note_id], locked)
+    return next(n for n in _release_notes(col, deck_id) if n.note_id == note_id)
+
+
+async def set_locked(user_id: str, deck_id: int, note_id: int, locked: bool) -> ReleaseNote:
+    """Lock (tag + suspend all cards) or release a note of the deck."""
+    return await _run(user_id, _set_locked, deck_id, note_id, locked)
+
+
+def _release_next(col: Collection, deck_id: int) -> ReleaseNote | None:
+    first = next((n for n in _release_notes(col, deck_id) if n.locked), None)
+    if first is None:
+        return None
+    _lock_notes(col, [first.note_id], False)
+    return first
+
+
+async def release_next(user_id: str, deck_id: int) -> ReleaseNote | None:
+    """Release the first locked note of the deck; None if nothing is locked."""
+    return await _run(user_id, _release_next, deck_id)
+
+
+def _lock_new(col: Collection, deck_id: int) -> int:
+    note_ids = [n.note_id for n in _release_notes(col, deck_id) if n.new and not n.locked]
+    _lock_notes(col, note_ids, True)
+    return len(note_ids)
+
+
+async def lock_new(user_id: str, deck_id: int) -> int:
+    """Lock every note of the deck that has never been studied. Returns the count."""
+    return await _run(user_id, _lock_new, deck_id)
+
+
 def _card_deck_id(col: Collection, card_id: int) -> int:
     try:
         return int(col.get_card(card_id).did)
@@ -1297,6 +1380,26 @@ def _import_package(col: Collection, path: str, with_scheduling: bool,
     if clean_field is not None:
         _clean_notes(col, [entry.id.nid for entry in imported], clean_field)
     return len(imported)
+
+
+def _import_group_package(col: Collection, path: str) -> int:
+    """Import a group deck and apply its release state: the lock tag travels with the
+    notes, suspension does not (no scheduling). Locked group notes are suspended; notes
+    whose lock was removed are unsuspended. Other suspensions of the member stay."""
+    locked_search = f"tag:{GROUP_TAG} tag:{LOCK_TAG}"
+    before = set(col.find_notes(locked_search))
+    count = _import_package(col, path, False, None)
+    locked = set(col.find_notes(locked_search))
+    for note_ids, suspend in ((locked, True), (before - locked, False)):
+        card_ids = [cid for nid in note_ids for cid in col.get_note(nid).card_ids()]
+        if card_ids:
+            (col.sched.suspend_cards if suspend else col.sched.unsuspend_cards)(card_ids)
+    return count
+
+
+async def import_group_package(user_id: str, path: Path) -> int:
+    """Import a distributed group deck (without scheduling) incl. its release state."""
+    return await _run(user_id, _import_group_package, str(path))
 
 
 def _clean_notes(col: Collection, note_ids: list[int], clean_field: Callable[[str], str]) -> None:

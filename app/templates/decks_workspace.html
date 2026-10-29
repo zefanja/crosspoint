@@ -41,6 +41,7 @@
         </span>
       </a>
       {% if can_edit %}<a class="iconlink" href="/decks/{{ d.id }}/rename" aria-label="{{ _('Rename %(deck)s', deck=d.short_name) }}" title="{{ _('Rename') }}">✎</a>
+      <a class="iconlink" href="/decks/{{ d.id }}/release" aria-label="{{ _('Release cards of %(deck)s step by step', deck=d.short_name) }}" title="{{ _('Release step by step') }}">🔓</a>
       <a class="iconlink" href="/notes/new?deck_id={{ d.id }}" aria-label="{{ _('Add card to %(deck)s', deck=d.short_name) }}" title="{{ _('Add card') }}">+</a>{% endif %}
     </li>
     {% else %}

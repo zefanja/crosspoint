@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session as DbSession
 
 from app import anki_service, workspace
-from app.auth import current_collection, require_user, verify_csrf
+from app.auth import Forbidden, current_collection, require_user, verify_csrf
 from app.db import get_db
 from app.models import User
 from app.workspace import DeckAccess, deck_access, no_leader_workspace
@@ -81,6 +81,8 @@ async def _options_page(request: Request, col: str, deck_id: int, opts=None, *,
          "can_rename": col == anki_service.ADMIN_COLLECTION
                        or not await anki_service.is_group_deck(col, deck_id),
          "group_rename": col == anki_service.ADMIN_COLLECTION,
+         "can_release": col == anki_service.ADMIN_COLLECTION
+                        or not await anki_service.is_group_deck(col, deck_id),
          "reviews": await anki_service.review_count(col, deck_id),
          "min_reviews": anki_service.MIN_OPTIMIZE_REVIEWS, **ctx},
         status_code=status_code,
@@ -135,6 +137,73 @@ async def optimize(deck_id: int, user: User = Depends(verify_csrf),
     result = await anki_service.optimize_fsrs(col, deck_id)
     state = "changed" if result.changed else "unchanged"
     return RedirectResponse(f"/decks/{deck_id}/options?optimized={state}", status_code=303)
+
+
+# --------------------------------------------------------------------------- release
+
+RELEASE_ACTIONS = ("next", "lock_new", "lock", "release")
+
+
+async def _release_deck(col: str, access: DeckAccess, deck_id: int) -> str:
+    """Name of a deck whose notes the user may release step by step: own decks except
+    received group decks (the editors release those), group decks the user may edit."""
+    names = dict(await anki_service.deck_names(col))
+    if deck_id not in names or not access.can_edit(deck_id):
+        raise anki_service.NotFound(_("Deck not found."))
+    if col != anki_service.ADMIN_COLLECTION and await anki_service.is_group_deck(col, deck_id):
+        raise anki_service.ReadOnlyNote(_("The group leaders release the cards of group decks."))
+    return names[deck_id]
+
+
+@router.get("/decks/{deck_id}/release")
+async def release_page(request: Request, deck_id: int, done: str | None = None,
+                       note: int | None = None, count: int = 0,
+                       user: User = Depends(require_user),
+                       col: str = Depends(current_collection),
+                       access: DeckAccess = Depends(deck_access),
+                       db: DbSession = Depends(get_db)):
+    try:
+        deck_name = await _release_deck(col, access, deck_id)
+    except anki_service.ReadOnlyNote as exc:
+        return render(request, "error.html", {"message": str(exc)}, 403)
+    notes = await anki_service.release_notes(col, deck_id)
+    changed = next((n for n in notes if n.note_id == note), None)
+    return render(request, "deck_release.html", {
+        "deck_id": deck_id, "deck_name": deck_name, "notes": notes,
+        "released": sum(1 for n in notes if not n.locked),
+        "locked": sum(1 for n in notes if n.locked),
+        "done": done, "changed": changed, "count": count,
+        "distribute": await workspace.distribute_targets(db, user, col, deck_id) if done else [],
+    })
+
+
+@router.post("/decks/{deck_id}/release")
+async def release(deck_id: int, action: str = Form(...), note_id: int | None = Form(None),
+                  user: User = Depends(verify_csrf), col: str = Depends(current_collection),
+                  access: DeckAccess = Depends(deck_access), db: DbSession = Depends(get_db)):
+    if action not in RELEASE_ACTIONS:
+        raise anki_service.NotFound(_("Deck not found."))
+    try:
+        await _release_deck(col, access, deck_id)
+    except anki_service.ReadOnlyNote:
+        raise Forbidden()
+    url = f"/decks/{deck_id}/release?done={action}"
+    if action == "lock_new":
+        count = await anki_service.lock_new(col, deck_id)
+        if count:
+            workspace.log_edit(db, user, col, 0, deck_id, "lock_new")
+        return RedirectResponse(f"{url}&count={count}", status_code=303)
+    if action == "next":
+        note = await anki_service.release_next(col, deck_id)
+    elif note_id is None:
+        raise anki_service.NotFound(_("Note not found."))
+    else:
+        note = await anki_service.set_locked(col, deck_id, note_id, action == "lock")
+    if note is None:  # nothing left to release
+        return RedirectResponse(url, status_code=303)
+    workspace.log_edit(db, user, col, note.note_id, deck_id,
+                       "lock" if action == "lock" else "release", note.front)
+    return RedirectResponse(f"{url}&note={note.note_id}#note-{note.note_id}", status_code=303)
 
 
 @router.get("/decks/{deck_id}/rename")

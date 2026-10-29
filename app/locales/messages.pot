@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 17:04+0000\n"
+"POT-Creation-Date: 2026-10-29 17:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,95 +17,97 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/anki_service.py:53
+#: app/anki_service.py:54
 msgid "My cards"
 msgstr ""
 
-#: app/anki_service.py:61 app/templates/stats.html:7
+#: app/anki_service.py:62 app/templates/stats.html:7
 msgid "All decks"
 msgstr ""
 
-#: app/anki_service.py:613 app/routes/admin_group_decks.py:74
+#: app/anki_service.py:614 app/routes/admin_group_decks.py:74
 #: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
-#: app/routes/decks.py:75 app/routes/decks.py:151 app/routes/decks.py:154
-#: app/routes/export.py:59 app/workspace.py:193
+#: app/routes/decks.py:75 app/routes/decks.py:152 app/routes/decks.py:185
+#: app/routes/decks.py:220 app/routes/decks.py:223 app/routes/export.py:59
+#: app/workspace.py:193
 msgid "Deck not found."
 msgstr ""
 
-#: app/anki_service.py:620 app/anki_service.py:648 app/workspace.py:161
+#: app/anki_service.py:621 app/anki_service.py:649 app/workspace.py:161
 msgid "Please enter a deck name."
 msgstr ""
 
-#: app/anki_service.py:653
+#: app/anki_service.py:654
 msgid "Group decks can only be renamed, not moved to another parent deck."
 msgstr ""
 
-#: app/anki_service.py:660
+#: app/anki_service.py:661
 msgid "A deck cannot be moved into its own subdeck."
 msgstr ""
 
-#: app/anki_service.py:663 app/anki_service.py:684 app/workspace.py:167
+#: app/anki_service.py:664 app/anki_service.py:685 app/workspace.py:167
 msgid "A deck with this name already exists."
 msgstr ""
 
-#: app/anki_service.py:666 app/templates/deck_rename.html:9
+#: app/anki_service.py:667 app/templates/deck_rename.html:9
 msgid "Group decks cannot be renamed."
 msgstr ""
 
-#: app/anki_service.py:853 app/workspace.py:65
+#: app/anki_service.py:854 app/anki_service.py:1146 app/routes/decks.py:199
+#: app/workspace.py:65
 msgid "Note not found."
 msgstr ""
 
-#: app/anki_service.py:861
+#: app/anki_service.py:862
 msgid "The first field must not be empty."
 msgstr ""
 
-#: app/anki_service.py:867 app/routes/notes.py:80
+#: app/anki_service.py:868 app/routes/notes.py:80
 msgid "Note type not found."
 msgstr ""
 
-#: app/anki_service.py:894
+#: app/anki_service.py:895
 msgid "Please enter a Bible text."
 msgstr ""
 
-#: app/anki_service.py:904
+#: app/anki_service.py:905
 msgid "[Beginning]"
 msgstr ""
 
-#: app/anki_service.py:957
+#: app/anki_service.py:958
 msgid "Someone else changed this note in the meantime. Check the fields and save again to overwrite the other change."
 msgstr ""
 
-#: app/anki_service.py:960
+#: app/anki_service.py:961
 msgid "Cards from group decks cannot be edited."
 msgstr ""
 
-#: app/anki_service.py:962
+#: app/anki_service.py:963
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr ""
 
-#: app/anki_service.py:985
+#: app/anki_service.py:986
 msgid "Cards from group decks cannot be deleted."
 msgstr ""
 
-#: app/anki_service.py:1083 app/anki_service.py:1101
+#: app/anki_service.py:1084 app/anki_service.py:1184
 msgid "Card not found."
 msgstr ""
 
-#: app/anki_service.py:1500
+#: app/anki_service.py:1603
 msgid "The image is too large (max. 5 MB)."
 msgstr ""
 
-#: app/anki_service.py:1503
+#: app/anki_service.py:1606
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr ""
 
-#: app/distribution.py:173
+#: app/distribution.py:175
 #, python-format
 msgid "Distribute “%(deck)s”"
 msgstr ""
 
-#: app/distribution.py:206
+#: app/distribution.py:208
 #, python-format
 msgid "Rename “%(old)s” to “%(new)s”"
 msgstr ""
@@ -242,17 +244,21 @@ msgstr ""
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr ""
 
-#: app/routes/decks.py:118
+#: app/routes/decks.py:120
 msgid "New cards per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:120
+#: app/routes/decks.py:122
 msgid "Reviews per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:122
+#: app/routes/decks.py:124
 #, python-format
 msgid "Desired retention: %(min)s to %(max)s."
+msgstr ""
+
+#: app/routes/decks.py:154
+msgid "The group leaders release the cards of group decks."
 msgstr ""
 
 #: app/routes/imports.py:26
@@ -358,12 +364,13 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
-#: app/templates/deck_options.html:2 app/templates/decks.html:60
+#: app/templates/deck_options.html:2 app/templates/deck_release.html:3
+#: app/templates/decks.html:60
 msgid "Options"
 msgstr ""
 
-#: app/templates/deck_options.html:3 app/templates/deck_rename.html:3
-#: app/templates/decks_workspace.html:13
+#: app/templates/deck_options.html:3 app/templates/deck_release.html:3
+#: app/templates/deck_rename.html:3 app/templates/decks_workspace.html:13
 msgid "Decks"
 msgstr ""
 
@@ -423,32 +430,122 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: app/templates/deck_options.html:51
-msgid "Parameters optimized. Future intervals use your personal parameters."
+#: app/templates/deck_options.html:53 app/templates/deck_release.html:2
+#: app/templates/decks_workspace.html:44
+msgid "Release step by step"
 msgstr ""
 
-#: app/templates/deck_options.html:52
-msgid "Not enough reviews yet or no improvement found – the parameters stay unchanged."
+#: app/templates/deck_options.html:54
+msgid "Lock cards and release them one after another, e.g. one verse per week."
 msgstr ""
 
 #: app/templates/deck_options.html:57
-msgid "Optimize FSRS"
+msgid "Parameters optimized. Future intervals use your personal parameters."
 msgstr ""
 
 #: app/templates/deck_options.html:58
+msgid "Not enough reviews yet or no improvement found – the parameters stay unchanged."
+msgstr ""
+
+#: app/templates/deck_options.html:63
+msgid "Optimize FSRS"
+msgstr ""
+
+#: app/templates/deck_options.html:64
 #, python-format
 msgid "%(num)s review so far"
 msgid_plural "%(num)s reviews so far"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/deck_options.html:60
+#: app/templates/deck_options.html:66
 msgid "Optimize"
 msgstr ""
 
-#: app/templates/deck_options.html:62
+#: app/templates/deck_options.html:68
 #, python-format
 msgid "FSRS can adapt to your memory based on your review history. This makes sense from about %(n)s reviews."
+msgstr ""
+
+#: app/templates/deck_release.html:5
+msgid "release"
+msgstr ""
+
+#: app/templates/deck_release.html:7
+#, python-format
+msgid "%(num)s note locked."
+msgid_plural "%(num)s notes locked."
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/deck_release.html:8
+msgid "All notes are released."
+msgstr ""
+
+#: app/templates/deck_release.html:9
+#, python-format
+msgid "Locked: %(front)s"
+msgstr ""
+
+#: app/templates/deck_release.html:9 app/templates/deck_release.html:10
+#: app/templates/deck_release.html:36
+#: app/templates/partials/browse_card_row.html:4
+#: app/templates/partials/browse_results.html:13
+msgid "(empty)"
+msgstr ""
+
+#: app/templates/deck_release.html:10
+#, python-format
+msgid "Released: %(front)s"
+msgstr ""
+
+#: app/templates/deck_release.html:14
+#, python-format
+msgid "%(released)s of %(total)s notes released"
+msgstr ""
+
+#: app/templates/deck_release.html:19
+msgid "Release next"
+msgstr ""
+
+#: app/templates/deck_release.html:21
+msgid "Locked notes are suspended and do not appear when studying. Release them one after another, e.g. one verse per week."
+msgstr ""
+
+#: app/templates/deck_release.html:21
+msgid "Members get the release when the deck is distributed."
+msgstr ""
+
+#: app/templates/deck_release.html:25
+msgid "Lock new cards"
+msgstr ""
+
+#: app/templates/deck_release.html:27
+msgid "Locks all notes that have not been studied yet – the starting point for releasing them step by step."
+msgstr ""
+
+#: app/templates/deck_release.html:37
+msgid "locked"
+msgstr ""
+
+#: app/templates/deck_release.html:37
+msgid "released · suspended"
+msgstr ""
+
+#: app/templates/deck_release.html:37
+msgid "released"
+msgstr ""
+
+#: app/templates/deck_release.html:44
+msgid "Release"
+msgstr ""
+
+#: app/templates/deck_release.html:44
+msgid "Lock"
+msgstr ""
+
+#: app/templates/deck_release.html:49
+msgid "This deck has no cards yet."
 msgstr ""
 
 #: app/templates/deck_rename.html:2 app/templates/deck_rename.html:5
@@ -627,16 +724,21 @@ msgstr ""
 
 #: app/templates/decks_workspace.html:44
 #, python-format
+msgid "Release cards of %(deck)s step by step"
+msgstr ""
+
+#: app/templates/decks_workspace.html:45
+#, python-format
 msgid "Add card to %(deck)s"
 msgstr ""
 
-#: app/templates/decks_workspace.html:44 app/templates/import.html:4
+#: app/templates/decks_workspace.html:45 app/templates/import.html:4
 #: app/templates/note_add.html:2 app/templates/note_add.html:4
 #: app/templates/note_bible.html:4 app/templates/partials/tabbar.html:12
 msgid "Add card"
 msgstr ""
 
-#: app/templates/decks_workspace.html:47
+#: app/templates/decks_workspace.html:48
 msgid "Your groups don't have any decks yet. Create the first one with “+ New deck”."
 msgstr ""
 
@@ -1129,10 +1231,25 @@ msgstr ""
 
 #: app/templates/admin/group_decks.html:54
 #, python-format
-msgid "%(name)s changed “%(front)s”"
+msgid "%(name)s released “%(front)s”"
+msgstr ""
+
+#: app/templates/admin/group_decks.html:55
+#, python-format
+msgid "%(name)s locked “%(front)s”"
+msgstr ""
+
+#: app/templates/admin/group_decks.html:56
+#, python-format
+msgid "%(name)s locked the new cards"
 msgstr ""
 
 #: app/templates/admin/group_decks.html:57
+#, python-format
+msgid "%(name)s changed “%(front)s”"
+msgstr ""
+
+#: app/templates/admin/group_decks.html:60
 msgid "No changes yet."
 msgstr ""
 
@@ -1534,11 +1651,6 @@ msgid "%(num)s verse"
 msgid_plural "%(num)s verses"
 msgstr[0] ""
 msgstr[1] ""
-
-#: app/templates/partials/browse_card_row.html:4
-#: app/templates/partials/browse_results.html:13
-msgid "(empty)"
-msgstr ""
 
 #: app/templates/partials/browse_results.html:4
 msgid "No notes found."

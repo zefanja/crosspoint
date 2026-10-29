@@ -413,6 +413,63 @@ def test_import_package_cleans_fields(run, deck, tmp_path):
     assert dict(note.fields) == {"Front": "<b>F</b>", "Back": "B"} and not note.readonly
 
 
+def test_release_step_by_step(run, deck):
+    nids = [add_verse(run, deck, f"Ps {i}") for i in range(1, 5)]
+    _review_all(run, deck, 1)  # Ps 1 has been studied
+    studied = [n.note_id for n in run(svc.release_notes(U, deck)) if not n.new]
+    assert len(studied) == 1
+    assert run(svc.lock_new(U, deck)) == 3
+    notes = run(svc.release_notes(U, deck))
+    assert [n.note_id for n in notes] == sorted(nids)  # the order they were added
+    assert [n.locked for n in notes] == [n.note_id not in studied for n in notes]
+    assert all(n.suspended == n.locked for n in notes)
+    assert run(svc.lock_new(U, deck)) == 0  # already locked
+
+    first_locked = next(n for n in notes if n.locked)
+    assert run(svc.release_next(U, deck)).note_id == first_locked.note_id
+    row = next(n for n in run(svc.release_notes(U, deck)) if n.note_id == first_locked.note_id)
+    assert not row.locked and not row.suspended
+    rows, _total = run(svc.search_cards(U, f"nid:{first_locked.note_id}"))
+    assert not rows[0].suspended
+
+    last = sorted(nids)[-1]
+    assert not run(svc.set_locked(U, deck, last, False)).locked
+    assert run(svc.set_locked(U, deck, last, True)).suspended
+    other = run(svc.create_deck(U, "Andere"))
+    with pytest.raises(svc.NotFound):
+        run(svc.set_locked(U, other, last, False))
+    while run(svc.release_next(U, deck)) is not None:
+        pass
+    assert not any(n.locked or n.suspended for n in run(svc.release_notes(U, deck)))
+
+
+def test_import_group_package_applies_release_state(run, deck, tmp_path):
+    admin = svc.ADMIN_COLLECTION
+    adeck = run(svc.create_deck(admin, "Gruppe"))
+    a, b, c = (run(svc.add_note(admin, svc.BIBLE_VERSE, adeck,
+                                {"Reference": f"Ps {i}", "Text": "x"}, (svc.GROUP_TAG,)))
+               for i in range(3))
+    run(svc.set_locked(admin, adeck, b, True))
+    run(svc.set_locked(admin, adeck, c, True))
+    pkg = tmp_path / "g.apkg"
+    run(svc.export_deck(admin, adeck, pkg, with_scheduling=False))
+    assert run(svc.import_group_package(U, pkg)) == 3
+
+    def suspended():
+        rows, _total = run(svc.search_notes(U, "deck:Gruppe"))
+        return {r.front: r.status == "suspended" for r in rows}
+
+    assert suspended() == {"Ps 0": False, "Ps 1": True, "Ps 2": True}
+    own = next(r.note_id for r in run(svc.search_notes(U, "deck:Gruppe"))[0] if r.front == "Ps 0")
+    run(svc.set_suspended(U, own, True))  # the member's own choice stays
+
+    time.sleep(1.1)  # anki skips notes with the same mtime (seconds)
+    run(svc.release_next(admin, adeck))
+    run(svc.export_deck(admin, adeck, pkg, with_scheduling=False))
+    run(svc.import_group_package(U, pkg))
+    assert suspended() == {"Ps 0": True, "Ps 1": False, "Ps 2": True}
+
+
 def test_import_package_updates_by_guid_and_keeps_progress(run, deck, tmp_path):
     admin = svc.ADMIN_COLLECTION
     adeck = run(svc.create_deck(admin, "Gruppe"))

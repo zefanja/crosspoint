@@ -48,6 +48,12 @@
     <button type="submit" class="btn-go">{{ _("Save") }}</button>
   </form>
 
+  {% if can_release %}
+  <a class="panel release-link" href="/decks/{{ deck_id }}/release">
+    <span class="panel-title">{{ _("Release step by step") }} ›</span>
+    <span class="hint">{{ _("Lock cards and release them one after another, e.g. one verse per week.") }}</span>
+  </a>
+  {% endif %}
   {% if optimized == "changed" %}<p class="alert alert-success">{{ _("Parameters optimized. Future intervals use your personal parameters.") }}</p>
   {% elif optimized == "unchanged" %}<p class="alert">{{ _("Not enough reviews yet or no improvement found – the parameters stay unchanged.") }}</p>{% endif %}
   <form method="post" action="/decks/{{ deck_id }}/optimize" class="panel fsrs">

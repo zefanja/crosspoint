@@ -288,6 +288,25 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
   Collection-Konfiguration); das Tageslimit neuer Karten bestehender Decks bleibt unverändert.
 - Phase 2: Button „FSRS-Parameter optimieren“ (ab ca. 400 Reviews sinnvoll).
 
+**Schrittweise freigeben** (`/decks/{id}/release`, verlinkt aus den Deck-Optionen und – für
+Gruppenleiter – aus ihrer Deckliste)
+- Notizen eines Decks (inkl. Unterdecks) lassen sich sperren und Stück für Stück freigeben,
+  z. B. ein Vers pro Woche. Gesperrt = Tag `gesperrt` + alle Karten der Notiz ausgesetzt;
+  freigeben = Tag entfernen + Karten wieder aktivieren.
+- Liste der Notizen in Reihenfolge des Anlegens (Notiz-ID) mit Status und je einem Button
+  „Sperren“/„Freigeben“; oben „X von Y freigegeben“, Button **„Nächste freigeben“** (die erste
+  gesperrte Notiz der Liste) und „Neue Karten sperren“ (sperrt alle Notizen, deren Karten noch
+  nie gelernt wurden – der Startpunkt).
+- Funktioniert in der eigenen Sammlung und in der Admin-Collection (Gruppenleiter nur in
+  bearbeitbaren Decks). Empfangene Gruppendecks in der eigenen Sammlung sind ausgenommen
+  (die Freigabe steuert der Admin).
+- Gruppendecks: Der Tag reist beim Verteilen mit, das Aussetzen nicht (ohne Lernstand). Die
+  Verteilung gleicht danach in jeder Mitglieds-Collection ab: Gruppendeck-Notizen mit
+  `gesperrt` werden ausgesetzt, Notizen, die vor dem Import gesperrt waren und den Tag nicht
+  mehr haben, werden wieder aktiviert. Eigene Aussetzungen der Mitglieder bleiben unberührt.
+  Sperren/Freigeben in der Admin-Collection wird protokolliert (§7.3) und bietet danach
+  „Änderungen gleich verteilen?“ an.
+
 **Fortschritt** (`/stats`, Entwurf 2a)
 - Deck-Chips (Alle Decks + jedes Deck), Serie groß mit Wochenleiste (Mo–So, heute gestrichelt,
   solange noch nicht gelernt), vier Kacheln: Wiederholungen heute, behalten (30 Tage),
