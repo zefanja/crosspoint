@@ -67,8 +67,10 @@ def _get_user(db: DbSession, user_id: str) -> User:
 
 
 @router.get("")
-def user_list(request: Request, group: int | None = None,
+def user_list(request: Request, group: str = "",
               admin: User = Depends(require_staff), db: DbSession = Depends(get_db)):
+    # the "All users" option submits an empty value
+    group = int(group) if group.isdigit() else None
     query = select(User).order_by(User.display_name)
     visible = visible_user_ids(db, admin)
     if visible is not None:  # group leader: members of the own groups only
