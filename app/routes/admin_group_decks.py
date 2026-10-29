@@ -59,6 +59,7 @@ async def group_decks(request: Request, user: User = Depends(require_staff),
     return render(request, "admin/group_decks.html", {
         "decks": decks, "recent": edits[:RECENT],
         "admin_ws": request.cookies.get(WORKSPACE_COOKIE) == "admin",
+        "no_groups": groups is not None and not groups,
     })
 
 

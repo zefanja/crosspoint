@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 19:10+0000\n"
+"POT-Creation-Date: 2026-10-29 19:33+0000\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -26,7 +26,7 @@ msgstr "Meine Karten"
 msgid "All decks"
 msgstr "Alle Decks"
 
-#: app/anki_service.py:633 app/routes/admin_group_decks.py:74
+#: app/anki_service.py:633 app/routes/admin_group_decks.py:75
 #: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
 #: app/routes/decks.py:78 app/routes/decks.py:189 app/routes/decks.py:230
 #: app/routes/decks.py:278 app/routes/decks.py:281 app/routes/export.py:59
@@ -179,24 +179,24 @@ msgstr "Nutzer nicht gefunden."
 msgid "Please enter one name per line (at most %(max)s)."
 msgstr "Bitte einen Namen pro Zeile eingeben (höchstens %(max)s)."
 
-#: app/routes/admin_users.py:159
+#: app/routes/admin_users.py:170
 msgid "You cannot remove your own admin role."
 msgstr "Du kannst dir die Admin-Rolle nicht selbst entziehen."
 
-#: app/routes/admin_users.py:172
+#: app/routes/admin_users.py:189
 #, python-format
 msgid "Group decks for %(name)s"
 msgstr "Gruppendecks für %(name)s"
 
-#: app/routes/admin_users.py:200
+#: app/routes/admin_users.py:214
 msgid "You cannot deactivate yourself."
 msgstr "Du kannst dich nicht selbst deaktivieren."
 
-#: app/routes/admin_users.py:214
+#: app/routes/admin_users.py:228
 msgid "You cannot delete yourself."
 msgstr "Du kannst dich nicht selbst löschen."
 
-#: app/routes/admin_users.py:217
+#: app/routes/admin_users.py:231
 msgid "The name does not match. The user was not deleted."
 msgstr "Der Name stimmt nicht überein. Der Nutzer wurde nicht gelöscht."
 
@@ -427,7 +427,7 @@ msgstr "Wiederholungen: Geschwisterkarten an verschiedenen Tagen zeigen"
 msgid "Sibling cards come from the same note, e.g. a verse and its reverse card. On different days, one card does not give away the answer to the other."
 msgstr "Geschwisterkarten stammen aus derselben Notiz, z. B. ein Vers und seine Umkehrkarte. An verschiedenen Tagen verrät die eine Karte nicht die Antwort der anderen."
 
-#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:48
+#: app/templates/admin/user_detail.html:41 app/templates/deck_options.html:48
 #: app/templates/note_edit.html:29
 msgid "Save"
 msgstr "Speichern"
@@ -779,6 +779,11 @@ msgstr "Karte hinzufügen"
 #: app/templates/decks_workspace.html:48
 msgid "Your groups don't have any decks yet. Create the first one with “+ New deck”."
 msgstr "Deine Gruppen haben noch keine Decks. Lege das erste mit „+ Neues Deck“ an."
+
+#: app/templates/admin/group_decks.html:41
+#: app/templates/decks_workspace.html:48
+msgid "You are not assigned as leader of any group yet. An admin can do that on the group page or on your user page (“Leads groups”)."
+msgstr "Du bist noch keiner Gruppe als Gruppenleitung zugewiesen. Ein Admin kann das auf der Gruppenseite oder auf deiner Nutzerseite („Leitet Gruppen“) tun."
 
 #: app/templates/error.html:2
 msgid "Notice"
@@ -1354,8 +1359,8 @@ msgid "Group leaders"
 msgstr "Gruppenleitung"
 
 #: app/templates/admin/group_detail.html:66
-msgid "Group leaders see the progress of this group and can print new codes for its members."
-msgstr "Die Gruppenleitung sieht den Fortschritt dieser Gruppe und kann neue Codes für ihre Mitglieder drucken."
+msgid "Group leaders see the progress of this group, can print new codes for its members and edit its group decks. Being a member of the group is not enough."
+msgstr "Die Gruppenleitung sieht den Fortschritt dieser Gruppe, kann neue Codes für ihre Mitglieder drucken und ihre Gruppendecks bearbeiten. Mitglied der Gruppe zu sein reicht dafür nicht."
 
 #: app/templates/admin/group_detail.html:75
 msgid "Save group leaders"
@@ -1558,39 +1563,47 @@ msgstr "Gruppe anlegen"
 msgid "New group members receive all decks of the group automatically."
 msgstr "Neue Gruppenmitglieder erhalten automatisch alle Decks der Gruppe."
 
-#: app/templates/admin/user_detail.html:37
+#: app/templates/admin/user_detail.html:34
+msgid "Leads groups"
+msgstr "Leitet Gruppen"
+
+#: app/templates/admin/user_detail.html:39
+msgid "Group leaders see the progress of these groups, print codes for their members and edit their group decks. A learner who leads a group becomes a group leader."
+msgstr "Die Gruppenleitung sieht den Fortschritt dieser Gruppen, druckt Codes für ihre Mitglieder und bearbeitet ihre Gruppendecks. Lernende, die eine Gruppe leiten, werden zur Gruppenleitung."
+
+#: app/templates/admin/user_detail.html:46
 msgid "Login code"
 msgstr "Login-Code"
 
-#: app/templates/admin/user_detail.html:38
+#: app/templates/admin/user_detail.html:47
 msgid "Codes are not stored in readable form and cannot be shown again. If a code is lost, create a new one – the old one stops working."
 msgstr "Codes werden nicht lesbar gespeichert und können nicht erneut angezeigt werden. Bei Verlust einen neuen Code erzeugen – der alte wird ungültig."
 
-#: app/templates/admin/user_detail.html:40
+#: app/templates/admin/user_detail.html:49
 msgid "Create a new code? The old code stops working."
 msgstr "Neuen Code erzeugen? Der alte Code wird ungültig."
 
-#: app/templates/admin/user_detail.html:42
+#: app/templates/admin/user_detail.html:51
 msgid "New code + print sheet"
 msgstr "Neuer Code + Druckblatt"
 
-#: app/templates/admin/user_detail.html:48
+#: app/templates/admin/user_detail.html:57
 msgid "Deactivate or delete"
 msgstr "Deaktivieren oder löschen"
 
-#: app/templates/admin/user_detail.html:51
+#: app/templates/admin/user_detail.html:60
 msgid "Activate"
 msgstr "Aktivieren"
 
-#: app/templates/admin/user_detail.html:51
+#: app/templates/admin/user_detail.html:60
 msgid "Deactivate (cannot log in, data is kept)"
 msgstr "Deaktivieren (kein Login mehr, Daten bleiben)"
 
-#: app/templates/admin/user_detail.html:55
+#: app/templates/admin/user_detail.html:64
 msgid "Delete permanently – type the name to confirm:"
 msgstr "Endgültig löschen – zur Bestätigung den Namen eintippen:"
 
-#: app/templates/admin/user_detail.html:57
+#: app/templates/admin/user_detail.html:66
 msgid "Delete user and all cards"
 msgstr "Nutzer und alle Karten löschen"
 
@@ -1942,4 +1955,7 @@ msgstr "Nach Tag filtern"
 #: app/templates/partials/tag_filter.html:5
 msgid "All tags"
 msgstr "Alle Tags"
+
+#~ msgid "Group leaders see the progress of this group and can print new codes for its members."
+#~ msgstr "Die Gruppenleitung sieht den Fortschritt dieser Gruppe und kann neue Codes für ihre Mitglieder drucken."
 

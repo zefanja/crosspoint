@@ -63,7 +63,7 @@
 
 <section class="card">
   <h2>{{ _("Group leaders") }}</h2>
-  <p class="muted small">{{ _("Group leaders see the progress of this group and can print new codes for its members.") }}</p>
+  <p class="muted small">{{ _("Group leaders see the progress of this group, can print new codes for its members and edit its group decks. Being a member of the group is not enough.") }}</p>
   <form method="post" action="/admin/groups/{{ group.id }}/leaders" class="stack">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <fieldset class="checklist">

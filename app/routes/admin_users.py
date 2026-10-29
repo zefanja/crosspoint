@@ -15,7 +15,7 @@ from app.auth import (
 from app.config import get_settings
 from app.db import get_db
 from app.i18n import _
-from app.models import Group, GroupMember, Session, User, UserStats
+from app.models import Group, GroupLeader, GroupMember, Session, User, UserStats
 from app.templating import render
 
 router = APIRouter(prefix="/admin/users")
@@ -139,12 +139,17 @@ async def users_print(request: Request, admin: User = Depends(require_staff),
 def user_detail(request: Request, user_id: str, admin: User = Depends(require_admin),
                 db: DbSession = Depends(get_db), job: str | None = None, saved: int = 0):
     user = _get_user(db, user_id)
-    member_of = set(db.scalars(select(GroupMember.group_id).where(GroupMember.user_id == user_id)))
     return render(request, "admin/user_detail.html", {
-        "u": user, "groups": _groups(db), "member_of": member_of,
-        "stats": db.get(UserStats, user_id), "job": job and distribution.get_job(job),
-        "saved": bool(saved), "error": None, "is_self": user.id == admin.id,
+        **_detail_context(db, user, admin),
+        "job": job and distribution.get_job(job), "saved": bool(saved), "error": None,
     })
+
+
+def _detail_context(db: DbSession, user: User, admin: User) -> dict:
+    member_of = set(db.scalars(select(GroupMember.group_id).where(GroupMember.user_id == user.id)))
+    leads = set(db.scalars(select(GroupLeader.group_id).where(GroupLeader.user_id == user.id)))
+    return {"u": user, "groups": _groups(db), "member_of": member_of, "leads": leads,
+            "stats": db.get(UserStats, user.id), "is_self": user.id == admin.id}
 
 
 @router.post("/{user_id}")
@@ -156,6 +161,12 @@ async def user_update(request: Request, user_id: str, display_name: str = Form(.
     group_ids = {int(g) for g in form.getlist("groups") if str(g).isdigit()}
     valid = set(db.scalars(select(Group.id)))
     group_ids &= valid
+    lead_ids = {int(g) for g in form.getlist("leads") if str(g).isdigit()} & valid
+    if role == "learner":
+        if lead_ids and user.role == "learner":
+            role = "leader"  # same as assigning leaders on the group page
+        else:
+            lead_ids = set()  # demoted to learner: no longer leads any group
     if role in ROLES and role != user.role:
         if user.id == admin.id and role != "admin":
             return _detail_error(request, db, user, admin, _("You cannot remove your own admin role."))
@@ -167,6 +178,12 @@ async def user_update(request: Request, user_id: str, display_name: str = Form(.
         db.query(GroupMember).filter_by(group_id=gid, user_id=user_id).delete()
     for gid in group_ids - current:
         db.add(GroupMember(group_id=gid, user_id=user_id))
+    if not user.is_admin:  # admins see every group anyway (not listed as leaders)
+        leading = set(db.scalars(select(GroupLeader.group_id).where(GroupLeader.user_id == user_id)))
+        for gid in leading - lead_ids:
+            db.query(GroupLeader).filter_by(group_id=gid, user_id=user_id).delete()
+        for gid in lead_ids - leading:
+            db.add(GroupLeader(group_id=gid, user_id=user_id))
     db.commit()
     job = None
     for gid in group_ids - current:
@@ -178,11 +195,8 @@ async def user_update(request: Request, user_id: str, display_name: str = Form(.
 
 
 def _detail_error(request, db, user, admin, message: str):
-    member_of = set(db.scalars(select(GroupMember.group_id).where(GroupMember.user_id == user.id)))
     return render(request, "admin/user_detail.html", {
-        "u": user, "groups": _groups(db), "member_of": member_of,
-        "stats": db.get(UserStats, user.id), "job": None, "saved": False,
-        "error": message, "is_self": user.id == admin.id,
+        **_detail_context(db, user, admin), "job": None, "saved": False, "error": message,
     }, status_code=400)
 
 
