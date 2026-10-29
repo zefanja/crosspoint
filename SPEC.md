@@ -297,6 +297,13 @@ Gruppenleiter – aus ihrer Deckliste)
   „Sperren“/„Freigeben“; oben „X von Y freigegeben“, Button **„Nächste freigeben“** (die erste
   gesperrte Notiz der Liste) und „Neue Karten sperren“ (sperrt alle Notizen, deren Karten noch
   nie gelernt wurden – der Startpunkt).
+- **Sammelnotizen:** Bibeltexte (Notiztyp „Bible Memorizer“) bestehen aus mehreren Notizen,
+  eine je Zeile. Notizen mit demselben Präfix im Feld `id` (`{ms}-{idx}`, gesetzt von der
+  Bibeltext-Eingabe und vom Browser-Generator) gehören zu einem Import und erscheinen als eine
+  Zeile mit dem Titel (Feld `title`), Kennzeichnung „Sammelnotiz“ und „X von Y freigegeben“.
+  Ein Button sperrt bzw. gibt alle Notizen der Sammelnotiz frei; „Nächste freigeben“ gibt die
+  nächste Zeile der Liste frei, bei einer Sammelnotiz also den ganzen Text. „Einzeln anzeigen“
+  klappt die einzelnen Notizen auf (je Notiz bearbeiten, sperren, freigeben).
 - Funktioniert in der eigenen Sammlung und in der Admin-Collection (Gruppenleiter nur in
   bearbeitbaren Decks). Empfangene Gruppendecks in der eigenen Sammlung sind ausgenommen
   (die Freigabe steuert der Admin).

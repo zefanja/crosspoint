@@ -1,5 +1,8 @@
 """Deck list (start page), creating and renaming decks, deck options."""
 
+from dataclasses import dataclass
+from urllib.parse import urlencode
+
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session as DbSession
@@ -141,7 +144,52 @@ async def optimize(deck_id: int, user: User = Depends(verify_csrf),
 
 # --------------------------------------------------------------------------- release
 
-RELEASE_ACTIONS = ("next", "lock_new", "lock", "release")
+RELEASE_ACTIONS = ("next", "lock_new", "lock", "release", "lock_group", "release_group")
+
+
+@dataclass
+class ReleaseItem:
+    """A row of the release page: one note, or a collective note (all notes of one
+    Bible text import, released and locked together)."""
+
+    notes: list[anki_service.ReleaseNote]
+
+    @property
+    def group(self) -> str | None:
+        return self.notes[0].group
+
+    @property
+    def anchor(self) -> str:
+        return self.group or f"note-{self.notes[0].note_id}"
+
+    @property
+    def title(self) -> str:
+        first = self.notes[0]
+        return (first.title or first.front) if self.group else first.front
+
+    @property
+    def released(self) -> int:
+        return sum(1 for n in self.notes if not n.locked)
+
+    @property
+    def locked(self) -> bool:
+        """Something left to release (all notes, or some of a collective note)."""
+        return self.released < len(self.notes)
+
+
+def release_items(notes: list[anki_service.ReleaseNote]) -> list[ReleaseItem]:
+    """Group the notes of collective notes, in the order of each group's first note."""
+    items: list[ReleaseItem] = []
+    groups: dict[str, ReleaseItem] = {}
+    for note in notes:
+        if note.group is None:
+            items.append(ReleaseItem([note]))
+        elif note.group in groups:
+            groups[note.group].notes.append(note)
+        else:
+            groups[note.group] = ReleaseItem([note])
+            items.append(groups[note.group])
+    return items
 
 
 async def _release_deck(col: str, access: DeckAccess, deck_id: int) -> str:
@@ -157,7 +205,7 @@ async def _release_deck(col: str, access: DeckAccess, deck_id: int) -> str:
 
 @router.get("/decks/{deck_id}/release")
 async def release_page(request: Request, deck_id: int, done: str | None = None,
-                       note: int | None = None, count: int = 0,
+                       note: int | None = None, group: str | None = None, count: int = 0,
                        user: User = Depends(require_user),
                        col: str = Depends(current_collection),
                        access: DeckAccess = Depends(deck_access),
@@ -167,18 +215,21 @@ async def release_page(request: Request, deck_id: int, done: str | None = None,
     except anki_service.ReadOnlyNote as exc:
         return render(request, "error.html", {"message": str(exc)}, 403)
     notes = await anki_service.release_notes(col, deck_id)
-    changed = next((n for n in notes if n.note_id == note), None)
+    items = release_items(notes)
     return render(request, "deck_release.html", {
-        "deck_id": deck_id, "deck_name": deck_name, "notes": notes,
+        "deck_id": deck_id, "deck_name": deck_name, "notes": notes, "items": items,
         "released": sum(1 for n in notes if not n.locked),
         "locked": sum(1 for n in notes if n.locked),
-        "done": done, "changed": changed, "count": count,
+        "done": done, "count": count,
+        "changed_note": next((n for n in notes if n.note_id == note), None),
+        "changed_item": next((i for i in items if group and i.group == group), None),
         "distribute": await workspace.distribute_targets(db, user, col, deck_id) if done else [],
     })
 
 
 @router.post("/decks/{deck_id}/release")
 async def release(deck_id: int, action: str = Form(...), note_id: int | None = Form(None),
+                  group: str | None = Form(None),
                   user: User = Depends(verify_csrf), col: str = Depends(current_collection),
                   access: DeckAccess = Depends(deck_access), db: DbSession = Depends(get_db)):
     if action not in RELEASE_ACTIONS:
@@ -194,16 +245,27 @@ async def release(deck_id: int, action: str = Form(...), note_id: int | None = F
             workspace.log_edit(db, user, col, 0, deck_id, "lock_new")
         return RedirectResponse(f"{url}&count={count}", status_code=303)
     if action == "next":
-        note = await anki_service.release_next(col, deck_id)
+        changed = await anki_service.release_next(col, deck_id)
+    elif action in ("lock_group", "release_group"):
+        if not group:
+            raise anki_service.NotFound(_("Note not found."))
+        changed = await anki_service.set_group_locked(col, deck_id, group,
+                                                      action == "lock_group")
     elif note_id is None:
         raise anki_service.NotFound(_("Note not found."))
     else:
-        note = await anki_service.set_locked(col, deck_id, note_id, action == "lock")
-    if note is None:  # nothing left to release
+        changed = [await anki_service.set_locked(col, deck_id, note_id, action == "lock")]
+    if not changed:  # nothing left to release
         return RedirectResponse(url, status_code=303)
-    workspace.log_edit(db, user, col, note.note_id, deck_id,
-                       "lock" if action == "lock" else "release", note.front)
-    return RedirectResponse(f"{url}&note={note.note_id}#note-{note.note_id}", status_code=303)
+    first = changed[0]
+    whole_group = first.group and action in ("next", "lock_group", "release_group")
+    workspace.log_edit(db, user, col, first.note_id, deck_id,
+                       "lock" if action.startswith("lock") else "release",
+                       first.title if whole_group else first.front)
+    if whole_group:
+        return RedirectResponse(f"{url}&{urlencode({'group': first.group})}#{first.group}",
+                                status_code=303)
+    return RedirectResponse(f"{url}&note={first.note_id}#note-{first.note_id}", status_code=303)
 
 
 @router.get("/decks/{deck_id}/rename")
