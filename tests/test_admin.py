@@ -202,6 +202,10 @@ def test_acceptance_two_groups_distribute_fix_redistribute(client, admin, db):
     assert prog.status_code == 200 and ">A1</a>" in prog.text
     # match the link text: user ids (ULIDs) in the hrefs may contain "A2" by chance
     assert prog.text.index(">A1</a>") < prog.text.index(">A2</a>")  # A1 reviewed today
+    # "All learners" / "All users" submit an empty group value
+    for path in ("/admin/progress?group=", "/admin/users?group="):
+        r = client.get(path)
+        assert r.status_code == 200 and "A1" in r.text and "B1" in r.text, path
     job = wait_job(client, client.post("/admin/progress/refresh",
                                        data={"csrf_token": csrf, "group": group_ids[0]},
                                        follow_redirects=False))

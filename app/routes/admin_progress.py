@@ -91,9 +91,11 @@ def _groups(db: DbSession, viewer: User) -> list[Group]:
 
 
 @router.get("")
-def progress(request: Request, group: int | None = None, sort: str = "name", desc: int = 0,
+def progress(request: Request, group: str = "", sort: str = "name", desc: int = 0,
              admin: User = Depends(require_staff), db: DbSession = Depends(get_db)):
     groups = _groups(db, admin)
+    # the "All learners" option submits an empty value
+    group = int(group) if group.isdigit() else None
     if group is not None and group not in {g.id for g in groups}:
         group = None
     sort = sort if sort in SORT_KEYS else "name"
