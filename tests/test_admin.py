@@ -199,8 +199,9 @@ def test_acceptance_two_groups_distribute_fix_redistribute(client, admin, db):
 
     # progress table
     prog = client.get(f"/admin/progress?group={group_ids[0]}&sort=today&desc=1")
-    assert prog.status_code == 200 and "A1" in prog.text
-    assert prog.text.index("A1") < prog.text.index("A2")  # A1 reviewed today
+    assert prog.status_code == 200 and ">A1</a>" in prog.text
+    # match the link text: user ids (ULIDs) in the hrefs may contain "A2" by chance
+    assert prog.text.index(">A1</a>") < prog.text.index(">A2</a>")  # A1 reviewed today
     job = wait_job(client, client.post("/admin/progress/refresh",
                                        data={"csrf_token": csrf, "group": group_ids[0]},
                                        follow_redirects=False))
