@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 19:03+0000\n"
+"POT-Creation-Date: 2026-10-29 19:06+0000\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -366,7 +366,7 @@ msgid "Filter"
 msgstr "Filtern"
 
 #: app/templates/deck_options.html:2 app/templates/deck_release.html:3
-#: app/templates/decks.html:60
+#: app/templates/decks.html:59
 msgid "Options"
 msgstr "Optionen"
 
@@ -626,81 +626,77 @@ msgstr[1] "%(num)s Karten wiederholt."
 msgid "Your streak is safe. New cards unlock tomorrow."
 msgstr "Deine Serie ist sicher. Morgen gibt es neue Karten."
 
-#: app/templates/decks.html:16
-msgid "Add a new verse"
-msgstr "Neuen Vers hinzufügen"
-
-#: app/templates/decks.html:20
+#: app/templates/decks.html:19
 msgid "card waiting<br>for you today"
 msgid_plural "cards waiting<br>for you today"
 msgstr[0] "Karte wartet<br>heute auf dich"
 msgstr[1] "Karten warten<br>heute auf dich"
 
-#: app/templates/decks.html:23
+#: app/templates/decks.html:22
 #, python-format
 msgid "%(num)s new"
 msgstr "%(num)s neu"
 
-#: app/templates/decks.html:24
+#: app/templates/decks.html:23
 #, python-format
 msgid "%(num)s learning"
 msgstr "%(num)s lernen"
 
-#: app/templates/decks.html:25
+#: app/templates/decks.html:24
 #, python-format
 msgid "%(num)s to review"
 msgstr "%(num)s wiederholen"
 
-#: app/templates/decks.html:27
+#: app/templates/decks.html:26
 #, python-format
 msgid "Let's go · ~%(min)s min"
 msgstr "Los geht's · ~%(min)s Min."
 
-#: app/templates/decks.html:32
+#: app/templates/decks.html:31
 msgid "Your decks"
 msgstr "Deine Decks"
 
-#: app/templates/decks.html:32 app/templates/decks_workspace.html:13
+#: app/templates/decks.html:31 app/templates/decks_workspace.html:13
 msgid "+ New deck"
 msgstr "+ Neues Deck"
 
-#: app/templates/decks.html:37 app/templates/decks_workspace.html:18
+#: app/templates/decks.html:36 app/templates/decks_workspace.html:18
 msgid "e.g. Psalms"
 msgstr "z. B. Psalmen"
 
-#: app/templates/decks.html:37 app/templates/decks_workspace.html:18
+#: app/templates/decks.html:36 app/templates/decks_workspace.html:18
 #: app/templates/partials/deck_rename.html:4
 msgid "Deck name"
 msgstr "Deckname"
 
-#: app/templates/admin/groups.html:11 app/templates/decks.html:38
+#: app/templates/admin/groups.html:11 app/templates/decks.html:37
 #: app/templates/decks_workspace.html:27
 msgid "Create"
 msgstr "Anlegen"
 
-#: app/templates/decks.html:40 app/templates/partials/deck_rename.html:13
+#: app/templates/decks.html:39 app/templates/partials/deck_rename.html:13
 msgid "Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>."
 msgstr "Unterdecks mit <code>::</code>, z. B. <code>Bibel::Psalmen</code>."
 
-#: app/templates/decks.html:50
+#: app/templates/decks.html:49
 msgid "GROUP"
 msgstr "GRUPPE"
 
-#: app/templates/decks.html:52
+#: app/templates/decks.html:51
 #, python-format
 msgid "%(mature)s of %(total)s memorized"
 msgstr "%(mature)s von %(total)s gelernt"
 
-#: app/templates/decks.html:55
+#: app/templates/decks.html:54
 #, python-format
 msgid "%(new)s new, %(learn)s learning, %(due)s due"
 msgstr "%(new)s neu, %(learn)s lernen, %(due)s fällig"
 
-#: app/templates/decks.html:57
+#: app/templates/decks.html:56
 msgid "Nothing due"
 msgstr "Nichts fällig"
 
-#: app/templates/decks.html:60
+#: app/templates/decks.html:59
 #, python-format
 msgid "Options for %(deck)s"
 msgstr "Optionen für %(deck)s"
@@ -1932,4 +1928,3 @@ msgstr "Hauptnavigation"
 #: app/templates/partials/tabbar.html:6
 msgid "Start"
 msgstr "Start"
-

@@ -379,7 +379,7 @@ textarea.input { resize: vertical; line-height: 1.4; }
 .mission-label { flex: 1; min-width: 0; padding-bottom: 4px; font-size: 17px; line-height: 1.25; color: #cfe0f2; }
 .mission-chips { display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; font-weight: 600; }
 .mission-chips span { flex: none; padding: 5px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); white-space: nowrap; }
-.mission-go, .mission-alt {
+.mission-go {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -387,8 +387,6 @@ textarea.input { resize: vertical; line-height: 1.4; }
   text-align: center;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-}
-.mission-go {
   min-height: 54px;
   padding: 6px 12px;
   background: var(--brand-yellow);
@@ -399,8 +397,7 @@ textarea.input { resize: vertical; line-height: 1.4; }
   font-size: 20px;
   line-height: 1.1;
 }
-.mission-go:active, .mission-alt:active { transform: translateY(2px); }
-.mission-alt { min-height: 52px; border: 2px solid rgba(255, 255, 255, 0.25); color: #ffffff; font-weight: 700; font-size: 16px; }
+.mission-go:active { transform: translateY(2px); }
 .mission-done { font-size: 44px; line-height: 0.95; font-weight: 900; font-style: italic; text-transform: uppercase; color: var(--brand-cyan); }
 .mission-text { font-size: 16px; color: #cfe0f2; }
 

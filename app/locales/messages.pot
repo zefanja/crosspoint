@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 19:03+0000\n"
+"POT-Creation-Date: 2026-10-29 19:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -365,7 +365,7 @@ msgid "Filter"
 msgstr ""
 
 #: app/templates/deck_options.html:2 app/templates/deck_release.html:3
-#: app/templates/decks.html:60
+#: app/templates/decks.html:59
 msgid "Options"
 msgstr ""
 
@@ -625,81 +625,77 @@ msgstr[1] ""
 msgid "Your streak is safe. New cards unlock tomorrow."
 msgstr ""
 
-#: app/templates/decks.html:16
-msgid "Add a new verse"
-msgstr ""
-
-#: app/templates/decks.html:20
+#: app/templates/decks.html:19
 msgid "card waiting<br>for you today"
 msgid_plural "cards waiting<br>for you today"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/decks.html:23
+#: app/templates/decks.html:22
 #, python-format
 msgid "%(num)s new"
 msgstr ""
 
-#: app/templates/decks.html:24
+#: app/templates/decks.html:23
 #, python-format
 msgid "%(num)s learning"
 msgstr ""
 
-#: app/templates/decks.html:25
+#: app/templates/decks.html:24
 #, python-format
 msgid "%(num)s to review"
 msgstr ""
 
-#: app/templates/decks.html:27
+#: app/templates/decks.html:26
 #, python-format
 msgid "Let's go · ~%(min)s min"
 msgstr ""
 
-#: app/templates/decks.html:32
+#: app/templates/decks.html:31
 msgid "Your decks"
 msgstr ""
 
-#: app/templates/decks.html:32 app/templates/decks_workspace.html:13
+#: app/templates/decks.html:31 app/templates/decks_workspace.html:13
 msgid "+ New deck"
 msgstr ""
 
-#: app/templates/decks.html:37 app/templates/decks_workspace.html:18
+#: app/templates/decks.html:36 app/templates/decks_workspace.html:18
 msgid "e.g. Psalms"
 msgstr ""
 
-#: app/templates/decks.html:37 app/templates/decks_workspace.html:18
+#: app/templates/decks.html:36 app/templates/decks_workspace.html:18
 #: app/templates/partials/deck_rename.html:4
 msgid "Deck name"
 msgstr ""
 
-#: app/templates/admin/groups.html:11 app/templates/decks.html:38
+#: app/templates/admin/groups.html:11 app/templates/decks.html:37
 #: app/templates/decks_workspace.html:27
 msgid "Create"
 msgstr ""
 
-#: app/templates/decks.html:40 app/templates/partials/deck_rename.html:13
+#: app/templates/decks.html:39 app/templates/partials/deck_rename.html:13
 msgid "Subdecks with <code>::</code>, e.g. <code>Bible::Psalms</code>."
 msgstr ""
 
-#: app/templates/decks.html:50
+#: app/templates/decks.html:49
 msgid "GROUP"
 msgstr ""
 
-#: app/templates/decks.html:52
+#: app/templates/decks.html:51
 #, python-format
 msgid "%(mature)s of %(total)s memorized"
 msgstr ""
 
-#: app/templates/decks.html:55
+#: app/templates/decks.html:54
 #, python-format
 msgid "%(new)s new, %(learn)s learning, %(due)s due"
 msgstr ""
 
-#: app/templates/decks.html:57
+#: app/templates/decks.html:56
 msgid "Nothing due"
 msgstr ""
 
-#: app/templates/decks.html:60
+#: app/templates/decks.html:59
 #, python-format
 msgid "Options for %(deck)s"
 msgstr ""

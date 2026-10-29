@@ -59,6 +59,7 @@ def test_start_page_mission_and_review_all(client, learner):
     assert "Fertig<br>für heute" in r.text and "2 Karten wiederholt" not in r.text  # per deck
     page = client.get("/")
     assert "Fertig<br>für heute" in page.text and "2 Karten wiederholt." in page.text
+    assert "Neuen Vers hinzufügen" not in page.text and "/notes/new?notetype" not in page.text
     assert "1 Tag" in page.text  # streak pill
     assert re.search(r'<a class="streak-pill" href="/stats"', page.text)
 
