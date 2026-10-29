@@ -268,7 +268,10 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - Schnellfilter (Entwurf 4b): Alle · Fällig (`is:due`) · Neu · Ausgesetzt · je Hauptdeck
   (`anki_service.deck_search`). Status als Pille: neu, heute (fällig), Datum, ausgesetzt.
 - Notizen: eine Zeile pro Notiz – erstes Feld (gekürzt), Deck, Anzahl Karten (davon
-  ausgesetzt), nächste Fälligkeit bzw. „neu“/„ausgesetzt“.
+  ausgesetzt), nächste Fälligkeit bzw. „neu“/„ausgesetzt“. Sammelnotizen (Bibeltexte, siehe
+  „Schrittweise freigeben“) als eine Zeile mit Kennzeichnung, Titel, Zahl der Notizen und
+  zusammengefasstem Status; Antippen klappt die einzelnen Notizen auf (je Notiz bearbeiten).
+  Die Kartenansicht bleibt eine Zeile pro Karte.
 - Karten: eine Zeile pro Karte mit Kartentyp (z. B. „Text → Reference“, nur bei Notizen mit mehreren
   Karten), Deck, fällig am; Button „Aussetzen“/„Wieder aktivieren“ pro Karte (htmx, auch für
   Gruppendeck-Karten).

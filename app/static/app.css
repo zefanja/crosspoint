@@ -1116,3 +1116,10 @@ label.option-row { cursor: pointer; }
 .release-parts summary { min-height: var(--touch); display: flex; align-items: center; font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; }
 .release-parts .rowlist { margin-top: 0; }
 .release-group > .browserow .row-title { white-space: normal; }
+/* collective notes in the note list (/browse) */
+.browse-group summary { cursor: pointer; list-style: none; }
+.browse-group summary::-webkit-details-marker { display: none; }
+.browse-group summary .row-title { white-space: normal; }
+.browse-group summary::after { content: "▾"; flex: none; color: var(--muted); font-size: 14px; }
+.browse-group details[open] summary::after { content: "▴"; }
+.browse-group .rowlist { margin: 0 8px 8px 14px; }

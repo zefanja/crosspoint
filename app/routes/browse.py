@@ -1,5 +1,6 @@
 """Note and card list with Anki search syntax; single cards can be suspended."""
 
+from dataclasses import dataclass
 from datetime import date
 from urllib.parse import urlencode
 
@@ -18,6 +19,55 @@ from app.workspace import DeckAccess, deck_access
 router = APIRouter()
 LIMIT = 200
 VIEWS = ("notes", "cards")
+
+
+@dataclass
+class CollectiveRow:
+    """The notes of one Bible text import as a single row of the note list."""
+
+    parts: list[anki_service.NoteRow]
+
+    @property
+    def group(self) -> str:
+        return self.parts[0].group
+
+    @property
+    def title(self) -> str:
+        return self.parts[0].title or self.parts[0].front
+
+    @property
+    def deck(self) -> str:
+        decks = {p.deck for p in self.parts}
+        return self.parts[0].deck if len(decks) == 1 else self.parts[0].deck.rstrip(" …") + " …"
+
+    @property
+    def cards(self) -> int:
+        return sum(p.cards for p in self.parts)
+
+    @property
+    def suspended_cards(self) -> int:
+        return sum(p.suspended_cards for p in self.parts)
+
+    @property
+    def status(self) -> str:
+        """Like a note's status: suspended only if all parts are, new if all active are."""
+        active = [p for p in self.parts if p.status != "suspended"]
+        if not active:
+            return "suspended"
+        return "new" if all(p.status == "new" for p in active) else "scheduled"
+
+    @property
+    def due(self) -> date | None:
+        dues = [p.due for p in self.parts if p.due is not None and p.status != "suspended"]
+        return min(dues) if dues else None
+
+
+def note_items(rows: list[anki_service.NoteRow]) -> list:
+    """Collective notes as one CollectiveRow (parts in the order they were added: the
+    sort field `id` orders "…-10" before "…-2"), every other note as it is."""
+    return [group[0] if group[0].group is None
+            else CollectiveRow(sorted(group, key=lambda r: r.note_id))
+            for group in anki_service.group_rows(rows)]
 
 
 async def _filters(col: str, access: DeckAccess) -> list[tuple[str, str]]:
@@ -46,6 +96,8 @@ async def browse(request: Request, q: str = "", view: str = "notes",
             rows, total = await search(col, query, limit=LIMIT)
     except anki_service.InvalidSearch:
         error = _("The search is not valid. Examples: John, is:due, is:new")
+    if view == "notes":
+        rows = note_items(rows)
     ctx = {"q": q, "view": view, "rows": rows, "total": total, "limit": LIMIT, "error": error,
            "today": date.today(), "editable_names": access.editable_names}
     if is_htmx(request) and request.headers.get("HX-Target") == "results":

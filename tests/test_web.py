@@ -482,3 +482,23 @@ def test_apkg_import_into_own_collection_sanitizes(client, learner, tmp_path):
         assert r.status_code == 400
     r = client.post("/import", files={"file": ("joh.apkg", pkg.read_bytes())})
     assert r.status_code == 403
+
+
+def test_browse_shows_collective_notes(client, learner):
+    user, csrf = learner
+    deck = default_deck(client)
+    lines = "\n".join(f"Zeile {i}" for i in range(1, 12))  # 11 parts: "…-10" sorts before "…-2"
+    client.portal.call(anki_service.add_bible_text, user.id, deck, "Psalm 23", 2, lines, False)
+    add_verse(client, csrf, deck, ref="Röm 8,28", text="Alle Dinge")
+    page = html.unescape(client.get("/browse").text)
+    assert page.count("Sammelnotiz") == 1 and "Psalm 23" in page and "11 Notizen" in page
+    assert "Röm 8,28" in page and "12 Notizen" in page  # the total still counts notes
+    parts = re.findall(r'<span class="row-title">(Zeile \d+)</span>', page)
+    assert parts == [f"Zeile {i}" for i in range(1, 12)]  # in the order they were added
+
+    first = client.portal.call(anki_service.search_notes, user.id, '"Zeile 1"')[0][0].note_id
+    client.post(f"/notes/{first}/suspend", data={"csrf_token": csrf, "suspended": 1})
+    page = html.unescape(client.get("/browse").text)
+    assert "Sammelnotiz" in page and "ausgesetzt" in page  # some cards suspended, not all
+    cards = html.unescape(client.get("/browse?view=cards").text)
+    assert "Sammelnotiz" not in cards  # the card list stays one row per card
