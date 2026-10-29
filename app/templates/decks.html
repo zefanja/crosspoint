@@ -13,7 +13,6 @@
   {% elif all_done %}
   <p class="mission-done">{{ _("All done<br>for today") }}</p>
   <p class="mission-text">{{ ngettext("%(num)s card reviewed.", "%(num)s cards reviewed.", reviews_today) }} {{ _("Your streak is safe. New cards unlock tomorrow.") }}</p>
-  <a class="mission-alt" href="/notes/new?notetype=Bible%20Verse">{{ _("Add a new verse") }}</a>
   {% else %}
   <div class="mission-count">
     <span class="mission-num">{{ todo }}</span>

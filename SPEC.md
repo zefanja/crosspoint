@@ -188,7 +188,7 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - Große „Heute“-Karte: Summe aller fälligen Karten, Chips neu/lernen/wiederholen und
   Button „Los geht's · ~N Min.“ (Schätzung 15 s pro Karte) → Lernansicht **aller Decks**
   (`/review/0`, `anki_service.ALL_DECKS`). Erledigt: „Fertig für heute“ mit Anzahl der
-  heutigen Wiederholungen und „Neuen Vers hinzufügen“; ohne Karten: „Erste Karte anlegen“.
+  heutigen Wiederholungen (ohne weiteren Button); ohne Karten: „Erste Karte anlegen“.
 - Darunter die Decks als Karten (Unterdecks eingerückt): Name, Badge „GRUPPE“ (Deck enthält
   Gruppendeck-Karten), Balken „X von Y gelernt“ (gelernt = *mature*, Intervall ≥ 21 Tage;
   ausgesetzte Karten zählen nicht, Unterdecks zählen mit), Chip mit der Zahl fälliger Karten
