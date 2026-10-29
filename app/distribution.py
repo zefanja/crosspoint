@@ -5,6 +5,8 @@ admin UI polls. Each deck is exported once from the admin collection WITHOUT sch
 and imported into every member collection; notes carry the tag `gruppendeck`.
 Re-distributing updates existing notes by GUID (content changes, learning progress
 stays) and adds new ones. Notes deleted in the admin deck are not deleted for members.
+The lock tag of step-by-step release travels with the notes; the import then suspends
+locked notes and unsuspends released ones (anki_service.import_group_package).
 Deck options changed in the admin collection since the last distribution (edit log) are
 applied to the members' decks afterwards – the import never updates existing presets.
 """
@@ -146,7 +148,7 @@ async def _run_distribution(job: Job, decks: list[GroupDeck], users: list[tuple[
         for user_id, name in users:
             for gd, path in packages:
                 try:
-                    await anki_service.import_package(user_id, path, with_scheduling=False)
+                    await anki_service.import_group_package(user_id, path)
                 except Exception as exc:  # noqa: BLE001 - continue with the others
                     log.exception("Import for %s failed", user_id)
                     job.errors.append(f"{name}: {exc}")

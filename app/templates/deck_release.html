@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Release step by step") }} – {{ deck_name }}{% endblock %}
+{% block topbar_left %}{% if leader_workspace %}<a href="/" class="topbar-back">‹ {{ _("Decks") }}</a>{% else %}<a href="/decks/{{ deck_id }}/options" class="topbar-back">‹ {{ _("Options") }}</a>{% endif %}{% endblock %}
+{% block content %}
+<h1 class="page-title">{{ deck_name }} <span class="muted">{{ _("release") }}</span></h1>
+<div class="ui-stack">
+  {% if done == "lock_new" %}<p class="alert alert-success" role="status">{{ ngettext("%(num)s note locked.", "%(num)s notes locked.", count) }}</p>
+  {% elif done == "next" and not changed %}<p class="alert" role="status">{{ _("All notes are released.") }}</p>
+  {% elif changed and changed.locked %}<p class="alert alert-success" role="status">{{ _("Locked: %(front)s", front=changed.front or _("(empty)")) }}</p>
+  {% elif changed %}<p class="alert alert-success" role="status">{{ _("Released: %(front)s", front=changed.front or _("(empty)")) }}</p>{% endif %}
+  {% include "partials/distribute_prompt.html" %}
+
+  <section class="panel">
+    <h2 class="panel-title">{{ _("%(released)s of %(total)s notes released", released=released, total=notes | length) }}</h2>
+    <progress class="progress" max="{{ notes | length or 1 }}" value="{{ released }}"></progress>
+    <form method="post" action="/decks/{{ deck_id }}/release">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="next">
+      <button class="btn-go"{% if not locked %} disabled{% endif %}>{{ _("Release next") }}</button>
+    </form>
+    <p class="hint">{{ _("Locked notes are suspended and do not appear when studying. Release them one after another, e.g. one verse per week.") }}{% if admin_workspace %} {{ _("Members get the release when the deck is distributed.") }}{% endif %}</p>
+    <form method="post" action="/decks/{{ deck_id }}/release">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="lock_new">
+      <button class="btn-line">{{ _("Lock new cards") }}</button>
+    </form>
+    <p class="hint">{{ _("Locks all notes that have not been studied yet – the starting point for releasing them step by step.") }}</p>
+  </section>
+
+  {% if notes %}
+  <ul class="rowlist">
+    {% for n in notes %}
+    <li class="browserow release-row{% if changed and changed.note_id == n.note_id %} current{% endif %}" id="note-{{ n.note_id }}">
+      <a href="/notes/{{ n.note_id }}" class="rowlink{% if n.locked %} off{% endif %}">
+        <span class="row-main">
+          <span class="row-title">{{ n.front or _("(empty)") }}</span>
+          <span class="row-meta">{% if n.locked %}{{ _("locked") }}{% elif n.suspended %}{{ _("released · suspended") }}{% else %}{{ _("released") }}{% endif %}</span>
+        </span>
+      </a>
+      <form method="post" action="/decks/{{ deck_id }}/release">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="{{ 'release' if n.locked else 'lock' }}">
+        <input type="hidden" name="note_id" value="{{ n.note_id }}">
+        <button class="row-action">{{ _("Release") if n.locked else _("Lock") }}</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}<p class="hint">{{ _("This deck has no cards yet.") }}</p>{% endif %}
+</div>
+{% endblock %}

@@ -1104,3 +1104,8 @@ label.option-row { cursor: pointer; }
 .distribute-prompt p { margin: 0 0 10px; }
 .distribute-prompt form { margin: 8px 0 0; }
 .distribute-prompt .btn { min-height: var(--touch); max-width: 100%; white-space: normal; text-align: left; }
+
+/* step-by-step release (/decks/{id}/release) */
+.release-row.current { background: var(--surface-2); }
+.release-row { scroll-margin-top: 80px; }
+.release-link { color: var(--text); text-decoration: none; gap: 4px; }

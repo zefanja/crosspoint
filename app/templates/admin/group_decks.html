@@ -51,6 +51,9 @@
       {% if e.action == "add" %}{{ _("%(name)s added “%(front)s”", name=who, front=e.summary) }}
       {% elif e.action == "delete" %}{{ _("%(name)s deleted “%(front)s”", name=who, front=e.summary) }}
       {% elif e.action == "options" %}{{ _("%(name)s changed the deck options", name=who) }}
+      {% elif e.action == "release" %}{{ _("%(name)s released “%(front)s”", name=who, front=e.summary) }}
+      {% elif e.action == "lock" %}{{ _("%(name)s locked “%(front)s”", name=who, front=e.summary) }}
+      {% elif e.action == "lock_new" %}{{ _("%(name)s locked the new cards", name=who) }}
       {% else %}{{ _("%(name)s changed “%(front)s”", name=who, front=e.summary) }}{% endif %}
       <br><span class="muted small">{{ e.deck_name }} · {{ e.created_at | datetime }}</span>
     </li>
