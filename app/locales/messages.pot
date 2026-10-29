@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 19:06+0000\n"
+"POT-Creation-Date: 2026-10-29 19:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,88 +17,88 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/anki_service.py:54
+#: app/anki_service.py:55
 msgid "My cards"
 msgstr ""
 
-#: app/anki_service.py:62 app/templates/stats.html:7
+#: app/anki_service.py:63 app/templates/stats.html:7
 msgid "All decks"
 msgstr ""
 
-#: app/anki_service.py:632 app/routes/admin_group_decks.py:74
+#: app/anki_service.py:633 app/routes/admin_group_decks.py:74
 #: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
-#: app/routes/decks.py:78 app/routes/decks.py:189 app/routes/decks.py:225
-#: app/routes/decks.py:271 app/routes/decks.py:274 app/routes/export.py:59
+#: app/routes/decks.py:78 app/routes/decks.py:189 app/routes/decks.py:230
+#: app/routes/decks.py:278 app/routes/decks.py:281 app/routes/export.py:59
 #: app/workspace.py:193
 msgid "Deck not found."
 msgstr ""
 
-#: app/anki_service.py:639 app/anki_service.py:667 app/workspace.py:161
+#: app/anki_service.py:640 app/anki_service.py:668 app/workspace.py:161
 msgid "Please enter a deck name."
 msgstr ""
 
-#: app/anki_service.py:672
+#: app/anki_service.py:673
 msgid "Group decks can only be renamed, not moved to another parent deck."
 msgstr ""
 
-#: app/anki_service.py:679
+#: app/anki_service.py:680
 msgid "A deck cannot be moved into its own subdeck."
 msgstr ""
 
-#: app/anki_service.py:682 app/anki_service.py:703 app/workspace.py:167
+#: app/anki_service.py:683 app/anki_service.py:704 app/workspace.py:167
 msgid "A deck with this name already exists."
 msgstr ""
 
-#: app/anki_service.py:685 app/templates/deck_rename.html:9
+#: app/anki_service.py:686 app/templates/deck_rename.html:9
 msgid "Group decks cannot be renamed."
 msgstr ""
 
-#: app/anki_service.py:872 app/anki_service.py:1184 app/anki_service.py:1198
-#: app/routes/decks.py:240 app/routes/decks.py:244 app/workspace.py:65
+#: app/anki_service.py:873 app/anki_service.py:1210 app/anki_service.py:1224
+#: app/routes/decks.py:247 app/routes/decks.py:251 app/workspace.py:65
 msgid "Note not found."
 msgstr ""
 
-#: app/anki_service.py:880
+#: app/anki_service.py:881
 msgid "The first field must not be empty."
 msgstr ""
 
-#: app/anki_service.py:886 app/routes/notes.py:80
+#: app/anki_service.py:887 app/routes/notes.py:80
 msgid "Note type not found."
 msgstr ""
 
-#: app/anki_service.py:913
+#: app/anki_service.py:914
 msgid "Please enter a Bible text."
 msgstr ""
 
-#: app/anki_service.py:923
+#: app/anki_service.py:924
 msgid "[Beginning]"
 msgstr ""
 
-#: app/anki_service.py:976
+#: app/anki_service.py:977
 msgid "Someone else changed this note in the meantime. Check the fields and save again to overwrite the other change."
 msgstr ""
 
-#: app/anki_service.py:979
+#: app/anki_service.py:980
 msgid "Cards from group decks cannot be edited."
 msgstr ""
 
-#: app/anki_service.py:981
+#: app/anki_service.py:982
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr ""
 
-#: app/anki_service.py:1004
+#: app/anki_service.py:1005
 msgid "Cards from group decks cannot be deleted."
 msgstr ""
 
-#: app/anki_service.py:1105 app/anki_service.py:1241
+#: app/anki_service.py:1124 app/anki_service.py:1267
 msgid "Card not found."
 msgstr ""
 
-#: app/anki_service.py:1660
+#: app/anki_service.py:1691
 msgid "The image is too large (max. 5 MB)."
 msgstr ""
 
-#: app/anki_service.py:1663
+#: app/anki_service.py:1694
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr ""
 
@@ -240,7 +240,7 @@ msgstr ""
 msgid "Suspended"
 msgstr ""
 
-#: app/routes/browse.py:98
+#: app/routes/browse.py:101
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr ""
 
@@ -341,6 +341,7 @@ msgid "Cards"
 msgstr ""
 
 #: app/templates/admin/progress.html:12 app/templates/browse.html:7
+#: app/templates/partials/tag_filter.html:9
 msgid "Show"
 msgstr ""
 
@@ -348,19 +349,19 @@ msgstr ""
 msgid "Notes"
 msgstr ""
 
-#: app/templates/browse.html:16
+#: app/templates/browse.html:17
 msgid "Search cards"
 msgstr ""
 
-#: app/templates/browse.html:16
+#: app/templates/browse.html:17
 msgid "Search (Anki search syntax)"
 msgstr ""
 
-#: app/templates/browse.html:17
+#: app/templates/browse.html:18
 msgid "Anki search syntax, e.g. John, is:due, is:new"
 msgstr ""
 
-#: app/templates/admin/users.html:13 app/templates/browse.html:19
+#: app/templates/admin/users.html:13 app/templates/browse.html:22
 msgid "Filter"
 msgstr ""
 
@@ -489,7 +490,7 @@ msgstr ""
 
 #: app/templates/deck_release.html:9 app/templates/deck_release.html:10
 #: app/templates/deck_release.html:11 app/templates/deck_release.html:35
-#: app/templates/deck_release.html:56
+#: app/templates/deck_release.html:62
 #: app/templates/partials/browse_card_row.html:4
 #: app/templates/partials/browse_results.html:14
 #: app/templates/partials/browse_results.html:24
@@ -527,7 +528,7 @@ msgstr ""
 msgid "Locks all notes that have not been studied yet – the starting point for releasing them step by step."
 msgstr ""
 
-#: app/templates/deck_release.html:36 app/templates/deck_release.html:57
+#: app/templates/deck_release.html:36 app/templates/deck_release.html:63
 msgid "locked"
 msgstr ""
 
@@ -535,7 +536,7 @@ msgstr ""
 msgid "released · suspended"
 msgstr ""
 
-#: app/templates/deck_release.html:36 app/templates/deck_release.html:57
+#: app/templates/deck_release.html:36 app/templates/deck_release.html:63
 msgid "released"
 msgstr ""
 
@@ -547,12 +548,17 @@ msgstr ""
 msgid "Lock"
 msgstr ""
 
-#: app/templates/deck_release.html:56
+#: app/templates/deck_release.html:51
+#, python-format
+msgid "%(shown)s of %(total)s entries with tag “%(tag)s”"
+msgstr ""
+
+#: app/templates/deck_release.html:62
 #: app/templates/partials/browse_results.html:14
 msgid "Collective note"
 msgstr ""
 
-#: app/templates/deck_release.html:57
+#: app/templates/deck_release.html:63
 #: app/templates/partials/browse_results.html:6
 #: app/templates/partials/browse_results.html:15
 #, python-format
@@ -561,24 +567,24 @@ msgid_plural "%(num)s notes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/deck_release.html:57
+#: app/templates/deck_release.html:63
 #, python-format
 msgid "%(released)s of %(total)s released"
 msgstr ""
 
-#: app/templates/deck_release.html:64
+#: app/templates/deck_release.html:70
 msgid "Release all"
 msgstr ""
 
-#: app/templates/deck_release.html:64
+#: app/templates/deck_release.html:70
 msgid "Lock all"
 msgstr ""
 
-#: app/templates/deck_release.html:68
+#: app/templates/deck_release.html:74
 msgid "Show individually"
 msgstr ""
 
-#: app/templates/deck_release.html:77
+#: app/templates/deck_release.html:83
 msgid "This deck has no cards yet."
 msgstr ""
 
@@ -1012,12 +1018,12 @@ msgid "a deleted user"
 msgstr ""
 
 #: app/templates/note_edit.html:36
-#: app/templates/partials/browse_card_row.html:15
+#: app/templates/partials/browse_card_row.html:16
 msgid "Unsuspend"
 msgstr ""
 
 #: app/templates/note_edit.html:36
-#: app/templates/partials/browse_card_row.html:15
+#: app/templates/partials/browse_card_row.html:16
 msgid "Suspend"
 msgstr ""
 
@@ -1926,5 +1932,13 @@ msgstr ""
 
 #: app/templates/partials/tabbar.html:6
 msgid "Start"
+msgstr ""
+
+#: app/templates/partials/tag_filter.html:4
+msgid "Filter by tag"
+msgstr ""
+
+#: app/templates/partials/tag_filter.html:5
+msgid "All tags"
 msgstr ""
 

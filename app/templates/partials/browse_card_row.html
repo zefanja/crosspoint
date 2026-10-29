@@ -12,6 +12,7 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="suspended" value="{{ 0 if r.suspended else 1 }}">
     <input type="hidden" name="q" value="{{ q }}">
+    <input type="hidden" name="tag" value="{{ tag }}">
     <button class="row-action">{{ _("Unsuspend") if r.suspended else _("Suspend") }}</button>
   </form>
   {% endif %}

@@ -51,6 +51,7 @@ MAX_OPEN = 20
 IDLE_SECONDS = 600
 GROUP_TAG = "gruppendeck"
 LOCK_TAG = "gesperrt"  # not released yet (step-by-step release, cards suspended)
+INTERNAL_TAGS = {GROUP_TAG, LOCK_TAG}  # set by the app, not offered as tag filters
 DEFAULT_DECK = N_("My cards")  # created in the user's language
 BASIC = "Basic"
 BIBLE_VERSE = "Bible Verse"
@@ -1098,6 +1099,24 @@ async def search_notes(user_id: str, query: str, limit: int = 200) -> tuple[list
     return await _run(user_id, _search_notes, query, limit)
 
 
+def _note_tags(col: Collection, query: str) -> list[str]:
+    try:
+        note_ids = col.find_notes(query.strip() or "deck:*")
+    except SearchError as exc:
+        raise InvalidSearch(str(exc)) from exc
+    tags: dict[str, str] = {}  # Anki tags are case-insensitive
+    for nid in note_ids:
+        for tag in col.get_note(nid).tags:
+            if tag.lower() not in INTERNAL_TAGS:
+                tags.setdefault(tag.lower(), tag)
+    return sorted(tags.values(), key=str.lower)
+
+
+async def note_tags(user_id: str, query: str = "") -> list[str]:
+    """Tags of the notes matching an Anki search (for the tag filter), without internal tags."""
+    return await _run(user_id, _note_tags, query)
+
+
 def _set_card_suspended(col: Collection, card_id: int, suspended: bool) -> CardRow:
     try:
         card = col.get_card(card_id)
@@ -1128,6 +1147,12 @@ class ReleaseNote:
     new: bool  # no card studied yet
     group: str | None = None  # notes of one Bible text import share it (a "collective note")
     title: str = ""  # the Bible text's title (group notes)
+    tags: tuple[str, ...] = ()  # without the internal tags (INTERNAL_TAGS)
+
+    def has_tag(self, tag: str) -> bool:
+        """Like Anki's `tag:` search: case-insensitive, includes child tags (a::b)."""
+        tag = tag.lower()
+        return any(t.lower() == tag or t.lower().startswith(tag + "::") for t in self.tags)
 
 
 def _note_group(note) -> tuple[str | None, str]:
@@ -1158,7 +1183,8 @@ def _release_notes(col: Collection, deck_id: int) -> list[ReleaseNote]:
         rows.append(ReleaseNote(
             note_id=nid, front=plain_text(note.fields[0])[:80], locked=note.has_tag(LOCK_TAG),
             suspended=bool(cards) and all(c.queue == QUEUE_SUSPENDED for c in cards),
-            new=all(c.type == CARD_TYPE_NEW for c in cards), group=group, title=title))
+            new=all(c.type == CARD_TYPE_NEW for c in cards), group=group, title=title,
+            tags=tuple(t for t in note.tags if t.lower() not in INTERNAL_TAGS)))
     return rows
 
 
@@ -1491,6 +1517,11 @@ def _tag_deck_notes(col: Collection, deck_id: int, tag: str) -> int:
 def deck_search(deck_name: str) -> str:
     """Anki search for all cards of a deck (and its subdecks), e.g. for filter chips."""
     return f'"deck:{_escape_search(deck_name)}"'
+
+
+def tag_search(tag: str) -> str:
+    """Anki search for notes with a tag (or one of its child tags)."""
+    return f'"tag:{_escape_search(tag)}"'
 
 
 def _escape_search(text: str) -> str:

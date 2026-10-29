@@ -413,6 +413,23 @@ def test_import_package_cleans_fields(run, deck, tmp_path):
     assert dict(note.fields) == {"Front": "<b>F</b>", "Back": "B"} and not note.readonly
 
 
+def test_note_tags_and_tag_search(run, deck):
+    add_verse(run, deck, "Joh 3,16", tags=("Woche_1", "Johannes::Kap3"))
+    add_verse(run, deck, "Ps 23,1", tags=("woche_1", svc.GROUP_TAG))
+    add_verse(run, deck, "Ps 1,1", tags=("Woche12",))
+    assert run(svc.note_tags(U)) == ["Johannes::Kap3", "Woche12", "Woche_1"]
+    assert run(svc.note_tags(U, "Ps")) == ["Woche12", "Woche_1"]  # Anki unifies the case
+    rows, _total = run(svc.search_notes(U, svc.tag_search("woche_1")))
+    assert sorted(r.front for r in rows) == ["Joh 3,16", "Ps 23,1"]  # "_" is no wildcard
+    rows, _total = run(svc.search_notes(U, svc.tag_search("Johannes")))
+    assert [r.front for r in rows] == ["Joh 3,16"]  # child tags match
+    notes = {n.front: n for n in run(svc.release_notes(U, deck))}
+    assert notes["Ps 23,1"].tags == ("Woche_1",)  # without internal tags
+    assert notes["Joh 3,16"].has_tag("johannes") and not notes["Ps 1,1"].has_tag("Woche1")
+    with pytest.raises(svc.InvalidSearch):
+        run(svc.note_tags(U, "deck:("))
+
+
 def test_release_step_by_step(run, deck):
     nids = [add_verse(run, deck, f"Ps {i}") for i in range(1, 5)]
     _review_all(run, deck, 1)  # Ps 1 has been studied

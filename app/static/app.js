@@ -47,6 +47,11 @@ document.addEventListener("change", (e) => {
   if (label && e.target.files[0]) label.textContent = e.target.files[0].name;
 });
 
+// Selects that filter a list (tag filter): apply on change.
+document.addEventListener("change", (e) => {
+  if (e.target.matches("select[data-autosubmit]")) e.target.form.requestSubmit();
+});
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/sw.js").catch(() => {});

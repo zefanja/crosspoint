@@ -1,0 +1,11 @@
+{# Tag filter select inside a GET form; needs `tags` and the selected `tag`. #}
+{% if tags or tag %}
+<div class="row tagfilter">
+  <select id="tag" name="tag" class="input" aria-label="{{ _('Filter by tag') }}" data-autosubmit>
+    <option value="">{{ _("All tags") }}</option>
+    {% for t in tags %}<option value="{{ t }}"{% if t | lower == tag | lower %} selected{% endif %}>{{ t }}</option>{% endfor %}
+    {% if tag and tag | lower not in tags | map("lower") | list %}<option value="{{ tag }}" selected>{{ tag }}</option>{% endif %}
+  </select>
+  <noscript><button class="btn">{{ _("Show") }}</button></noscript>
+</div>
+{% endif %}
