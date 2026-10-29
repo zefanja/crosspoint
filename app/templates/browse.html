@@ -2,6 +2,7 @@
 {% block title %}{{ _("Cards") }}{% endblock %}
 {% block content %}
 <h1 class="page-title">{{ _("Cards") }}</h1>
+{% include "partials/distribute_prompt.html" %}
 <div class="ui-stack">
   <nav class="segmented" aria-label="{{ _('Show') }}">
     {% for key, label in [("notes", _("Notes")), ("cards", _("Cards"))] %}

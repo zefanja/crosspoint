@@ -204,6 +204,34 @@ async def rename_deck(db: DbSession, access: DeckAccess, deck_id: int,
     return distribution.rename_in_members(groups, old, new) if groups else None
 
 
+@dataclass
+class DistributeTarget:
+    group_deck_id: int
+    deck_name: str
+    group_name: str
+
+
+async def distribute_targets(db: DbSession, user: User, collection_id: str,
+                             deck_id: int | None) -> list[DistributeTarget]:
+    """Group decks the user may distribute that contain deck `deck_id` of the admin
+    collection (the deck itself or a parent) – offered right after a change."""
+    if collection_id != anki_service.ADMIN_COLLECTION or deck_id is None:
+        return []
+    names = dict(await anki_service.deck_names(anki_service.ADMIN_COLLECTION))
+    if deck_id not in names:
+        return []
+    groups = visible_group_ids(db, user)
+    query = select(GroupDeck, Group.name).join(Group, Group.id == GroupDeck.group_id)
+    if groups is not None:
+        query = query.where(GroupDeck.group_id.in_(groups))
+    targets = []
+    for gd, group_name in db.execute(query.order_by(Group.name, GroupDeck.deck_name)):
+        name = names.get(gd.admin_deck_id)
+        if name is not None and deck_within(names[deck_id], name):
+            targets.append(DistributeTarget(gd.id, name, group_name))
+    return targets
+
+
 # --------------------------------------------------------------------------- edit log
 
 

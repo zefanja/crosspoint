@@ -11,6 +11,7 @@
   {% elif note.readonly %}<p class="alert">{{ _("This card belongs to a group deck and cannot be edited.") }}</p>
   {% elif note.generated %}<p class="alert">{{ _("Bible text cards are generated from the text and cannot be edited individually. To change them, delete and import the passage again.") }}</p>{% endif %}
   {% if saved %}<p class="alert alert-success" role="status">{{ _("Saved.") }}</p>{% endif %}
+  {% include "partials/distribute_prompt.html" %}
   {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
   {% if last_edit %}<p class="hint">{{ _("Last changed by %(name)s on %(date)s", name=last_edit.user_name or _("a deleted user"), date=last_edit.created_at | datetime) }}</p>{% endif %}
   <form method="post" class="ui-stack" enctype="multipart/form-data">

@@ -2,8 +2,9 @@
 
 from dataclasses import dataclass
 from datetime import datetime
+from urllib.parse import urlencode
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DbSession
@@ -62,12 +63,14 @@ async def group_decks(request: Request, user: User = Depends(require_staff),
 
 
 @router.post("/{group_deck_id}/distribute")
-async def distribute(group_deck_id: int, user: User = Depends(require_staff),
-                     _csrf: User = Depends(verify_csrf), db: DbSession = Depends(get_db)):
-    """Admins and the leaders of the deck's group."""
+async def distribute(group_deck_id: int, back: str = Form("/admin/group-decks"),
+                     user: User = Depends(require_staff), _csrf: User = Depends(verify_csrf),
+                     db: DbSession = Depends(get_db)):
+    """Admins and the leaders of the deck's group. `back`: the page the distribution was
+    started from (also offered right after editing a group deck)."""
     gd = db.get(GroupDeck, group_deck_id)
     groups = visible_group_ids(db, user)
     if gd is None or (groups is not None and gd.group_id not in groups):
         raise anki_service.NotFound(_("Deck not found."))
     job = await start_distribution(db, gd)
-    return RedirectResponse(f"/admin/jobs/{job.id}?back=/admin/group-decks", status_code=303)
+    return RedirectResponse(f"/admin/jobs/{job.id}?{urlencode({'back': back})}", status_code=303)

@@ -1099,3 +1099,8 @@ label.option-row { cursor: pointer; }
 .rename-row .input { flex: 1; min-width: 0; }
 .fsrs-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .fsrs-btn { width: auto; min-height: var(--touch); border-radius: 12px; font-size: 14px; }
+
+/* "Distribute the changes now?" after editing a group deck */
+.distribute-prompt p { margin: 0 0 10px; }
+.distribute-prompt form { margin: 8px 0 0; }
+.distribute-prompt .btn { min-height: var(--touch); max-width: 100%; white-space: normal; text-align: left; }

@@ -55,13 +55,18 @@ async def import_submit(request: Request, file: UploadFile,
     return render(request, "admin/import.html", ctx, status_code=400 if error else 200)
 
 
+def is_local_path(url: str) -> bool:
+    """A path on this site (no open redirect via "//host" or a scheme)."""
+    return url.startswith("/") and not url.startswith("//") and "\\" not in url
+
+
 @router.get("/jobs/{job_id}")
 def job_page(request: Request, job_id: str, back: str = "/admin",
              admin: User = Depends(require_staff)):
     job = distribution.get_job(job_id)
     if job is None:
         return render(request, "error.html", {"message": _("This task is no longer known.")}, 404)
-    back = back if back.startswith("/admin") else "/admin"
+    back = back if is_local_path(back) else "/admin"
     ctx = {"job": job, "back": back}
     if is_htmx(request):
         return render(request, "admin/partials/job.html", ctx)

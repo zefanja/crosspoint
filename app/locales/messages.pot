@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-28 20:24+0000\n"
+"POT-Creation-Date: 2026-10-29 17:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,9 +25,9 @@ msgstr ""
 msgid "All decks"
 msgstr ""
 
-#: app/anki_service.py:613 app/routes/admin_group_decks.py:71
+#: app/anki_service.py:613 app/routes/admin_group_decks.py:74
 #: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
-#: app/routes/decks.py:75 app/routes/decks.py:146 app/routes/decks.py:149
+#: app/routes/decks.py:75 app/routes/decks.py:151 app/routes/decks.py:154
 #: app/routes/export.py:59 app/workspace.py:193
 msgid "Deck not found."
 msgstr ""
@@ -60,7 +60,7 @@ msgstr ""
 msgid "The first field must not be empty."
 msgstr ""
 
-#: app/anki_service.py:867 app/routes/notes.py:79
+#: app/anki_service.py:867 app/routes/notes.py:80
 msgid "Note type not found."
 msgstr ""
 
@@ -92,20 +92,20 @@ msgstr ""
 msgid "Card not found."
 msgstr ""
 
-#: app/anki_service.py:1486
+#: app/anki_service.py:1500
 msgid "The image is too large (max. 5 MB)."
 msgstr ""
 
-#: app/anki_service.py:1489
+#: app/anki_service.py:1503
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr ""
 
-#: app/distribution.py:138
+#: app/distribution.py:173
 #, python-format
 msgid "Distribute “%(deck)s”"
 msgstr ""
 
-#: app/distribution.py:171
+#: app/distribution.py:206
 #, python-format
 msgid "Rename “%(old)s” to “%(new)s”"
 msgstr ""
@@ -143,7 +143,7 @@ msgstr ""
 msgid "“%(file)s” imported: %(count)s notes new or updated. The decks are now available in the admin collection."
 msgstr ""
 
-#: app/routes/admin.py:63
+#: app/routes/admin.py:68
 msgid "This task is no longer known."
 msgstr ""
 
@@ -209,48 +209,48 @@ msgstr ""
 msgid "Please try again."
 msgstr ""
 
-#: app/routes/bible.py:35 app/routes/notes.py:53
+#: app/routes/bible.py:36 app/routes/notes.py:53
 msgid "There is no deck you can add cards to yet. Create one on the start page."
 msgstr ""
 
-#: app/routes/bible.py:82
+#: app/routes/bible.py:84
 msgid "Please enter a title, e.g. “Psalm 23”."
 msgstr ""
 
-#: app/routes/bible.py:92
+#: app/routes/bible.py:95
 #, python-format
 msgid "“%(title)s”: %(notes)s steps with %(cards)s cards added."
 msgstr ""
 
-#: app/routes/browse.py:27
+#: app/routes/browse.py:29
 msgid "All"
 msgstr ""
 
-#: app/routes/browse.py:27 app/templates/admin/progress.html:26
+#: app/routes/browse.py:29 app/templates/admin/progress.html:26
 msgid "Due"
 msgstr ""
 
-#: app/routes/browse.py:27 app/templates/stats.html:58
+#: app/routes/browse.py:29 app/templates/stats.html:58
 msgid "New"
 msgstr ""
 
-#: app/routes/browse.py:28 app/templates/stats.html:62
+#: app/routes/browse.py:30 app/templates/stats.html:62
 msgid "Suspended"
 msgstr ""
 
-#: app/routes/browse.py:45
+#: app/routes/browse.py:48
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr ""
 
-#: app/routes/decks.py:116
+#: app/routes/decks.py:118
 msgid "New cards per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:118
+#: app/routes/decks.py:120
 msgid "Reviews per day: 0 to 9999."
 msgstr ""
 
-#: app/routes/decks.py:120
+#: app/routes/decks.py:122
 #, python-format
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr ""
@@ -272,7 +272,7 @@ msgstr ""
 msgid "“%(file)s” imported: %(count)s notes new or updated. The decks are now in your deck list."
 msgstr ""
 
-#: app/routes/notes.py:95
+#: app/routes/notes.py:96
 #, python-format
 msgid "Added: %(front)s"
 msgstr ""
@@ -329,32 +329,32 @@ msgid "Language"
 msgstr ""
 
 #: app/templates/browse.html:2 app/templates/browse.html:4
-#: app/templates/browse.html:7 app/templates/note_edit.html:3
+#: app/templates/browse.html:8 app/templates/note_edit.html:3
 #: app/templates/partials/tabbar.html:10 app/templates/stats.html:56
 msgid "Cards"
 msgstr ""
 
-#: app/templates/admin/progress.html:12 app/templates/browse.html:6
+#: app/templates/admin/progress.html:12 app/templates/browse.html:7
 msgid "Show"
 msgstr ""
 
-#: app/templates/browse.html:7
+#: app/templates/browse.html:8
 msgid "Notes"
 msgstr ""
 
-#: app/templates/browse.html:15
+#: app/templates/browse.html:16
 msgid "Search cards"
 msgstr ""
 
-#: app/templates/browse.html:15
+#: app/templates/browse.html:16
 msgid "Search (Anki search syntax)"
 msgstr ""
 
-#: app/templates/browse.html:16
+#: app/templates/browse.html:17
 msgid "Anki search syntax, e.g. John, is:due, is:new"
 msgstr ""
 
-#: app/templates/admin/users.html:13 app/templates/browse.html:18
+#: app/templates/admin/users.html:13 app/templates/browse.html:19
 msgid "Filter"
 msgstr ""
 
@@ -376,77 +376,77 @@ msgstr ""
 msgid "Saved."
 msgstr ""
 
-#: app/templates/deck_options.html:8
+#: app/templates/deck_options.html:9
 msgid "Deck renamed."
 msgstr ""
 
-#: app/templates/deck_options.html:15
+#: app/templates/deck_options.html:16
 msgid "New cards per day"
 msgstr ""
 
-#: app/templates/deck_options.html:16 app/templates/deck_options.html:23
-#: app/templates/note_bible.html:34
+#: app/templates/deck_options.html:17 app/templates/deck_options.html:24
+#: app/templates/note_bible.html:35
 msgid "Fewer"
 msgstr ""
 
-#: app/templates/deck_options.html:19 app/templates/deck_options.html:26
-#: app/templates/me.html:16 app/templates/note_bible.html:36
+#: app/templates/deck_options.html:20 app/templates/deck_options.html:27
+#: app/templates/me.html:16 app/templates/note_bible.html:37
 msgid "More"
 msgstr ""
 
-#: app/templates/deck_options.html:22
+#: app/templates/deck_options.html:23
 msgid "Max. reviews per day"
 msgstr ""
 
-#: app/templates/deck_options.html:30
+#: app/templates/deck_options.html:31
 msgid "Desired retention"
 msgstr ""
 
-#: app/templates/deck_options.html:36
+#: app/templates/deck_options.html:37
 msgid "Higher = you remember more, but review more often. 0.90 is a good default."
 msgstr ""
 
-#: app/templates/deck_options.html:39
+#: app/templates/deck_options.html:40
 msgid "New cards: introduce sibling cards on different days"
 msgstr ""
 
-#: app/templates/deck_options.html:43
+#: app/templates/deck_options.html:44
 msgid "Reviews: show sibling cards on different days"
 msgstr ""
 
-#: app/templates/deck_options.html:46
+#: app/templates/deck_options.html:47
 msgid "Sibling cards come from the same note, e.g. a verse and its reverse card. On different days, one card does not give away the answer to the other."
 msgstr ""
 
-#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:47
-#: app/templates/note_edit.html:28
+#: app/templates/admin/user_detail.html:32 app/templates/deck_options.html:48
+#: app/templates/note_edit.html:29
 msgid "Save"
 msgstr ""
 
-#: app/templates/deck_options.html:50
+#: app/templates/deck_options.html:51
 msgid "Parameters optimized. Future intervals use your personal parameters."
 msgstr ""
 
-#: app/templates/deck_options.html:51
+#: app/templates/deck_options.html:52
 msgid "Not enough reviews yet or no improvement found – the parameters stay unchanged."
 msgstr ""
 
-#: app/templates/deck_options.html:56
+#: app/templates/deck_options.html:57
 msgid "Optimize FSRS"
 msgstr ""
 
-#: app/templates/deck_options.html:57
+#: app/templates/deck_options.html:58
 #, python-format
 msgid "%(num)s review so far"
 msgid_plural "%(num)s reviews so far"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/deck_options.html:59
+#: app/templates/deck_options.html:60
 msgid "Optimize"
 msgstr ""
 
-#: app/templates/deck_options.html:61
+#: app/templates/deck_options.html:62
 #, python-format
 msgid "FSRS can adapt to your memory based on your review history. This makes sense from about %(n)s reviews."
 msgstr ""
@@ -677,8 +677,8 @@ msgstr ""
 msgid "add to existing Anki"
 msgstr ""
 
-#: app/templates/export.html:15 app/templates/note_add.html:14
-#: app/templates/note_bible.html:15 app/templates/note_edit.html:20
+#: app/templates/export.html:15 app/templates/note_add.html:15
+#: app/templates/note_bible.html:16 app/templates/note_edit.html:21
 #: app/templates/stats.html:6
 msgid "Deck"
 msgstr ""
@@ -803,7 +803,7 @@ msgstr ""
 msgid "STAFF"
 msgstr ""
 
-#: app/templates/note_add.html:22
+#: app/templates/note_add.html:23
 msgid "Add"
 msgstr ""
 
@@ -811,40 +811,40 @@ msgstr ""
 msgid "Memorize a whole passage: every line becomes a step with first-letter, gap and context cards (like the Anki add-on <a href=\"https://github.com/zefanja/bible-memorizer\">Bible Memorizer</a>)."
 msgstr ""
 
-#: app/templates/note_bible.html:21
+#: app/templates/note_bible.html:22
 msgid "Title"
 msgstr ""
 
-#: app/templates/note_bible.html:22
+#: app/templates/note_bible.html:23
 msgid "e.g. Psalm 23"
 msgstr ""
 
-#: app/templates/note_bible.html:26 app/templates/partials/add_tabs.html:2
+#: app/templates/note_bible.html:27 app/templates/partials/add_tabs.html:2
 msgid "Bible text"
 msgstr ""
 
-#: app/templates/note_bible.html:28
+#: app/templates/note_bible.html:29
 msgid "1 The LORD is my shepherd; I shall not want."
 msgstr ""
 
-#: app/templates/note_bible.html:28
+#: app/templates/note_bible.html:29
 msgid "2 He makes me lie down in green pastures …"
 msgstr ""
 
-#: app/templates/note_bible.html:30
+#: app/templates/note_bible.html:31
 msgid "Best pasted with verse numbers – they are detected automatically, also as superscripts (¹ ² ³). Every line becomes its own step; split long verses with line breaks."
 msgstr ""
 
-#: app/templates/note_bible.html:33
+#: app/templates/note_bible.html:34
 msgid "Lines of context"
 msgstr ""
 
-#: app/templates/note_bible.html:39
+#: app/templates/note_bible.html:40
 #, python-format
 msgid "Create overview table (from %(n)s verses)"
 msgstr ""
 
-#: app/templates/note_bible.html:43
+#: app/templates/note_bible.html:44
 msgid "Create cards"
 msgstr ""
 
@@ -868,31 +868,31 @@ msgstr ""
 msgid "Bible text cards are generated from the text and cannot be edited individually. To change them, delete and import the passage again."
 msgstr ""
 
-#: app/templates/note_edit.html:15
+#: app/templates/note_edit.html:16
 #, python-format
 msgid "Last changed by %(name)s on %(date)s"
 msgstr ""
 
 #: app/templates/admin/group_decks.html:30
-#: app/templates/admin/group_decks.html:49 app/templates/note_edit.html:15
+#: app/templates/admin/group_decks.html:49 app/templates/note_edit.html:16
 msgid "a deleted user"
 msgstr ""
 
-#: app/templates/note_edit.html:35
+#: app/templates/note_edit.html:36
 #: app/templates/partials/browse_card_row.html:15
 msgid "Unsuspend"
 msgstr ""
 
-#: app/templates/note_edit.html:35
+#: app/templates/note_edit.html:36
 #: app/templates/partials/browse_card_row.html:15
 msgid "Suspend"
 msgstr ""
 
-#: app/templates/note_edit.html:38
+#: app/templates/note_edit.html:39
 msgid "Really delete this card? Its learning progress will be lost."
 msgstr ""
 
-#: app/templates/note_edit.html:40
+#: app/templates/note_edit.html:41
 msgid "Delete"
 msgstr ""
 
@@ -1124,10 +1124,15 @@ msgstr ""
 
 #: app/templates/admin/group_decks.html:53
 #, python-format
+msgid "%(name)s changed the deck options"
+msgstr ""
+
+#: app/templates/admin/group_decks.html:54
+#, python-format
 msgid "%(name)s changed “%(front)s”"
 msgstr ""
 
-#: app/templates/admin/group_decks.html:56
+#: app/templates/admin/group_decks.html:57
 msgid "No changes yet."
 msgstr ""
 
@@ -1280,8 +1285,8 @@ msgstr ""
 msgid "File"
 msgstr ""
 
-#: app/templates/admin/job.html:4 app/templates/partials/review_card.html:42
-msgid "Back"
+#: app/templates/admin/job.html:4
+msgid "Go back"
 msgstr ""
 
 #: app/templates/admin/print_sheet.html:2
@@ -1576,6 +1581,23 @@ msgstr ""
 msgid "The deck is also renamed for all group members who already received it. Only the last part of the name can be changed."
 msgstr ""
 
+#: app/templates/partials/distribute_prompt.html:4
+msgid "Distribute the changes now?"
+msgstr ""
+
+#: app/templates/partials/distribute_prompt.html:5
+msgid "Members only get the new options when the deck is distributed. They replace the members' own options for this deck."
+msgstr ""
+
+#: app/templates/partials/distribute_prompt.html:5
+msgid "Members only get the changes when the deck is distributed. You can also do this later on the “Group decks” page."
+msgstr ""
+
+#: app/templates/partials/distribute_prompt.html:10
+#, python-format
+msgid "Distribute “%(deck)s” to %(group)s"
+msgstr ""
+
 #: app/templates/partials/image_upload.html:2
 msgid "+ Add image"
 msgstr ""
@@ -1690,6 +1712,10 @@ msgstr ""
 
 #: app/templates/partials/review_card.html:40
 msgid "Front"
+msgstr ""
+
+#: app/templates/partials/review_card.html:42
+msgid "Back"
 msgstr ""
 
 #: app/templates/partials/review_card.html:45

@@ -90,11 +90,12 @@ async def _options_page(request: Request, col: str, deck_id: int, opts=None, *,
 @router.get("/decks/{deck_id}/options", dependencies=[Depends(no_leader_workspace)])
 async def options_page(
     request: Request, deck_id: int, user: User = Depends(require_user),
-    col: str = Depends(current_collection), saved: int = 0, renamed: int = 0,
-    optimized: str | None = None
+    col: str = Depends(current_collection), db: DbSession = Depends(get_db), saved: int = 0,
+    renamed: int = 0, optimized: str | None = None
 ):
+    distribute = await workspace.distribute_targets(db, user, col, deck_id) if saved else []
     return await _options_page(request, col, deck_id, saved=bool(saved), renamed=bool(renamed),
-                               optimized=optimized)
+                               optimized=optimized, distribute=distribute, options_changed=True)
 
 
 @router.post("/decks/{deck_id}/options", dependencies=[Depends(no_leader_workspace)])
@@ -108,6 +109,7 @@ async def options_save(
     bury_reviews: str | None = Form(None),
     user: User = Depends(verify_csrf),
     col: str = Depends(current_collection),
+    db: DbSession = Depends(get_db),
 ):
     opts = anki_service.DeckOptions(new_per_day, reviews_per_day, round(desired_retention, 2),
                                     bury_new=bool(bury_new), bury_reviews=bool(bury_reviews))
@@ -121,6 +123,9 @@ async def options_save(
     if errors:
         return await _options_page(request, col, deck_id, opts, errors=errors, status_code=400)
     await anki_service.set_deck_options(col, deck_id, opts)
+    # group decks: the options are distributed with the deck when they changed (SPEC §7.3)
+    names = dict(await anki_service.deck_names(col))
+    workspace.log_edit(db, user, col, 0, deck_id, "options", names.get(deck_id, ""))
     return RedirectResponse(f"/decks/{deck_id}/options?saved=1", status_code=303)
 
 

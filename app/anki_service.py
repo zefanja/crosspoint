@@ -1158,6 +1158,20 @@ async def set_deck_options(user_id: str, deck_id: int, opts: DeckOptions) -> Non
     await _run(user_id, _set_deck_options, deck_id, opts)
 
 
+def _set_deck_options_by_name(col: Collection, name: str, opts: DeckOptions) -> bool:
+    deck = col.decks.by_name(name)
+    if deck is None or deck["dyn"]:
+        return False
+    _set_deck_options(col, deck["id"], opts)
+    return True
+
+
+async def set_deck_options_by_name(user_id: str, name: str, opts: DeckOptions) -> bool:
+    """Apply a group deck's options in a member collection (the .apkg import does not
+    update existing presets). False if the member has no such deck."""
+    return await _run(user_id, _set_deck_options_by_name, name, opts)
+
+
 @dataclass
 class OptimizeResult:
     reviews: int  # review items FSRS could learn from

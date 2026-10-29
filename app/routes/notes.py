@@ -41,7 +41,7 @@ async def _attach_image(col: str, form, names: list[str], fields: dict[str, str]
 
 async def _add_form(request, col: str, access: DeckAccess, notetype: str | None,
                     deck_id: int | None, *, values=None, message=None, error=None,
-                    status_code=200):
+                    distribute=(), status_code=200):
     notetypes = await anki_service.notetypes_for_adding(col)
     current = next((n for n in notetypes if n.name == notetype), notetypes[0])
     decks = access.filter(await anki_service.deck_names(col), edit=True)
@@ -54,7 +54,8 @@ async def _add_form(request, col: str, access: DeckAccess, notetype: str | None,
     return render(
         request, "note_add.html",
         {"notetypes": notetypes, "notetype": current, "decks": decks, "deck_id": deck_id,
-         "values": values or {}, "message": message, "error": error},
+         "values": values or {}, "message": message, "error": error,
+         "distribute": distribute},
         status_code=status_code,
     )
 
@@ -92,7 +93,8 @@ async def add_submit(request: Request, notetype: str = Form(...), deck_id: int =
     if notetype == anki_service.BIBLE_VERSE:  # keep translation and reverse for series entry
         keep = {i: str(form.get(f"field_{i}", "")) for i in range(2, len(nt.fields))}
     return await _add_form(request, col, access, notetype, deck_id, values=keep,
-                           message=_("Added: %(front)s", front=first))
+                           message=_("Added: %(front)s", front=first),
+                           distribute=await workspace.distribute_targets(db, user, col, deck_id))
 
 
 async def _get_visible_note(col: str, access: DeckAccess, note_id: int) -> anki_service.NoteData:
@@ -117,9 +119,11 @@ async def edit_page(request: Request, note_id: int, user: User = Depends(require
     col: str = Depends(current_collection), access: DeckAccess = Depends(deck_access),
     db: DbSession = Depends(get_db), saved: int = 0):
     note = await _get_visible_note(col, access, note_id)
+    distribute = await workspace.distribute_targets(db, user, col, note.deck_id) if saved else []
     return render(
         request, "note_edit.html",
         {**await _edit_context(col, access, db, note), "error": None, "saved": bool(saved),
+         "distribute": distribute,
          "values": {i: field_to_input(v) for i, (_name, v) in enumerate(note.fields)}},
     )
 
@@ -162,6 +166,8 @@ async def delete(request: Request, note_id: int, user: User = Depends(verify_csr
         return render(request, "error.html", {"message": _(str(exc))}, 403)
     workspace.log_edit(db, user, col, note_id, note.deck_id, "delete",
                        note.fields[0][1] if note.fields else "")
+    if col == anki_service.ADMIN_COLLECTION:
+        return RedirectResponse(f"/browse?distribute={note.deck_id}", status_code=303)
     return RedirectResponse("/browse", status_code=303)
 
 

@@ -5,6 +5,8 @@ admin UI polls. Each deck is exported once from the admin collection WITHOUT sch
 and imported into every member collection; notes carry the tag `gruppendeck`.
 Re-distributing updates existing notes by GUID (content changes, learning progress
 stays) and adds new ones. Notes deleted in the admin deck are not deleted for members.
+Deck options changed in the admin collection since the last distribution (edit log) are
+applied to the members' decks afterwards – the import never updates existing presets.
 """
 
 import asyncio
@@ -21,7 +23,7 @@ from app import anki_service, stats
 from app.config import get_settings
 from app.db import get_sessionmaker
 from app.i18n import _
-from app.models import GroupDeck, GroupMember, User
+from app.models import GroupDeck, GroupDeckEdit, GroupMember, User
 
 log = logging.getLogger(__name__)
 MAX_JOBS = 50
@@ -96,12 +98,37 @@ def _members(group_id: int) -> list[tuple[str, str]]:
     return [(r[0], r[1]) for r in rows]
 
 
-async def _run_distribution(job: Job, decks: list[GroupDeck], users: list[tuple[str, str]]):
+async def _changed_options(gd: GroupDeck, since: datetime | None
+                           ) -> list[tuple[str, anki_service.DeckOptions]]:
+    """(deck name, options) of the deck and its subdecks whose options were changed in the
+    admin collection since `since` (None: ever)."""
+    from app.workspace import deck_within  # workspace imports this module
+
+    query = select(GroupDeckEdit.deck_id).where(GroupDeckEdit.action == "options").distinct()
+    if since is not None:
+        query = query.where(GroupDeckEdit.created_at >= since)
+    with get_sessionmaker()() as db:
+        deck_ids = set(db.scalars(query))
+    if not deck_ids:
+        return []
+    names = dict(await anki_service.deck_names(anki_service.ADMIN_COLLECTION))
+    root = names.get(gd.admin_deck_id, gd.deck_name)
+    changed = sorted((names[did], did) for did in deck_ids
+                     if did in names and deck_within(names[did], root))
+    return [(name, await anki_service.get_deck_options(anki_service.ADMIN_COLLECTION, did))
+            for name, did in changed]
+
+
+async def _run_distribution(job: Job, decks: list[GroupDeck], users: list[tuple[str, str]],
+                            new_members: bool = False):
+    """`new_members`: the users have none of the decks yet, so they get every deck option
+    ever changed by the editors, not only the changes since the last distribution."""
     job.total = len(decks) * len(users)
     tmp_root = get_settings().data_dir / "exports"
     tmp_root.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=tmp_root) as tmp:
         packages: list[tuple[GroupDeck, Path]] = []
+        options: list[tuple[str, anki_service.DeckOptions]] = []
         for gd in decks:
             try:
                 await anki_service.tag_deck_notes(anki_service.ADMIN_COLLECTION, gd.admin_deck_id)
@@ -110,6 +137,8 @@ async def _run_distribution(job: Job, decks: list[GroupDeck], users: list[tuple[
                     anki_service.ADMIN_COLLECTION, gd.admin_deck_id, path, with_scheduling=False
                 )
                 packages.append((gd, path))
+                options += await _changed_options(gd, None if new_members
+                                                  else gd.last_distributed_at)
             except anki_service.AnkiServiceError as exc:
                 job.errors.append(f"{gd.deck_name}: {_(str(exc))}")
                 job.total -= len(users)
@@ -122,6 +151,12 @@ async def _run_distribution(job: Job, decks: list[GroupDeck], users: list[tuple[
                     log.exception("Import for %s failed", user_id)
                     job.errors.append(f"{name}: {exc}")
                 job.done += 1
+            for deck_name, opts in options:
+                try:
+                    await anki_service.set_deck_options_by_name(user_id, deck_name, opts)
+                except Exception as exc:  # noqa: BLE001 - continue with the others
+                    log.exception("Deck options for %s failed", user_id)
+                    job.errors.append(f"{name}: {exc}")
             await stats.update_after_review(user_id)
 
     now = datetime.now()
@@ -148,7 +183,7 @@ def distribute_group_to_users(group_id: int, users: list[tuple[str, str]], title
     if not decks or not users:
         return None
     job = _new_job(title)
-    return _start(job, _run_distribution(job, decks, users))
+    return _start(job, _run_distribution(job, decks, users, new_members=True))
 
 
 def refresh_stats(users: list[tuple[str, str]], title: str) -> Job:
