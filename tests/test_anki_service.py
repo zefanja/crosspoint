@@ -473,6 +473,32 @@ def test_release_collective_notes(run, deck):
         run(svc.set_group_locked(U, deck, "bm-1", True))
 
 
+def test_collective_notes_independent_of_note_type_name(run, deck):
+    """An .apkg import may rename the note type ("Bible Memorizer+"); the id prefix decides."""
+    def setup(col):
+        model = col.models.copy(col.models.by_name(svc.BIBLE_MEMORIZER), add=False)
+        model["name"] = "Bible Memorizer+"
+        col.models.add_dict(model)
+        model = col.models.by_name("Bible Memorizer+")
+        for prefix, title, count in (("gen_17A", "Römer 8", 3), ("gen_17B", "Psalm 1", 2)):
+            for idx in range(count):
+                note = col.new_note(model)
+                note["answer"], note["title"], note["id"] = f"{title} {idx}", title, f"{prefix}-{idx}"
+                col.add_note(note, deck)
+        note = col.new_note(model)  # no "-": not part of a block
+        note["answer"], note["id"] = "allein", "einzeln"
+        col.add_note(note, deck)
+
+    run(svc._run(U, setup))
+    notes = run(svc.release_notes(U, deck))
+    groups = [n.group for n in notes]
+    assert groups[:3] == [groups[0]] * 3 and groups[3:5] == [groups[3]] * 2
+    assert groups[0] and groups[3] and groups[0] != groups[3] and groups[5] is None
+    assert notes[0].title == "Römer 8" and notes[3].title == "Psalm 1"
+    run(svc.set_group_locked(U, deck, groups[0], True))
+    assert [n.locked for n in run(svc.release_notes(U, deck))] == [True] * 3 + [False] * 3
+
+
 def test_import_group_package_applies_release_state(run, deck, tmp_path):
     admin = svc.ADMIN_COLLECTION
     adeck = run(svc.create_deck(admin, "Gruppe"))

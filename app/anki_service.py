@@ -1110,12 +1110,17 @@ class ReleaseNote:
 
 
 def _note_group(note) -> tuple[str | None, str]:
-    """(group key, title) of a Bible Memorizer note: one import shares the "{ms}-" prefix
-    of its `id` field (in-app Bible text and the browser generator)."""
-    if note.note_type()["name"] != BIBLE_MEMORIZER:
+    """(group key, title) of a note that belongs to a Bible text: the notes of one import
+    share the part of their `id` field before the last "-" ("{ms}-{idx}" from the in-app
+    Bible text and the browser generator). Independent of the note type's name, which an
+    .apkg import may have changed (e.g. "Bible Memorizer+")."""
+    if "id" not in note.keys():
         return None, ""
-    batch = note["id"].partition("-")[0]
-    return (f"bm-{batch}" if batch.isdigit() else None), plain_text(note["title"])
+    batch, sep, _idx = plain_text(note["id"]).strip().rpartition("-")
+    if not sep or not batch:
+        return None, ""
+    title = plain_text(note["title"]) if "title" in note.keys() else ""
+    return "bm-" + re.sub(r"[^A-Za-z0-9_-]", "_", batch), title
 
 
 def _deck_note_ids(col: Collection, deck_id: int) -> list[int]:

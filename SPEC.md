@@ -298,8 +298,10 @@ Gruppenleiter – aus ihrer Deckliste)
   gesperrte Notiz der Liste) und „Neue Karten sperren“ (sperrt alle Notizen, deren Karten noch
   nie gelernt wurden – der Startpunkt).
 - **Sammelnotizen:** Bibeltexte (Notiztyp „Bible Memorizer“) bestehen aus mehreren Notizen,
-  eine je Zeile. Notizen mit demselben Präfix im Feld `id` (`{ms}-{idx}`, gesetzt von der
-  Bibeltext-Eingabe und vom Browser-Generator) gehören zu einem Import und erscheinen als eine
+  eine je Zeile. Notizen mit demselben Teil vor dem letzten `-` im Feld `id` (`{ms}-{idx}`,
+  gesetzt von der Bibeltext-Eingabe und vom Browser-Generator) gehören zu einem Import –
+  unabhängig vom Namen des Notiztyps, den ein `.apkg`-Import ändern kann (z. B.
+  „Bible Memorizer+“) – und erscheinen als eine
   Zeile mit dem Titel (Feld `title`), Kennzeichnung „Sammelnotiz“ und „X von Y freigegeben“.
   Ein Button sperrt bzw. gibt alle Notizen der Sammelnotiz frei; „Nächste freigeben“ gibt die
   nächste Zeile der Liste frei, bei einer Sammelnotiz also den ganzen Text. „Einzeln anzeigen“
