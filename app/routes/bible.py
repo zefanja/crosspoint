@@ -25,7 +25,8 @@ def _prepare(text: str) -> tuple[str, list[dict]]:
 
 
 async def _page(request, col: str, access: DeckAccess, *, deck_id=None, title="", recite=2,
-                table=False, text="", message=None, error=None, status_code=200):
+                table=False, text="", message=None, error=None, distribute=(),
+                status_code=200):
     decks = access.filter(await anki_service.deck_names(col), edit=True)
     if deck_id not in dict(decks):
         deck_id = await anki_service.current_deck_id(col)
@@ -38,7 +39,8 @@ async def _page(request, col: str, access: DeckAccess, *, deck_id=None, title=""
         request, "note_bible.html",
         {"decks": decks, "deck_id": deck_id, "title": title, "recite": recite, "table": table,
          "text": text, "rows": rows, "verses": len({r["verse"] for r in rows}),
-         "table_min": TABLE_MIN_VERSES, "message": message, "error": error},
+         "table_min": TABLE_MIN_VERSES, "message": message, "error": error,
+         "distribute": distribute},
         status_code=status_code,
     )
 
@@ -89,5 +91,6 @@ async def bible_submit(
                            status_code=400)
     workspace.log_edit(db, user, col, 0, deck_id, "add", title)
     return await _page(request, col, access, deck_id=deck_id, recite=recite, table=table,
+                       distribute=await workspace.distribute_targets(db, user, col, deck_id),
                        message=_("“%(title)s”: %(notes)s steps with %(cards)s cards added.",
                                  title=title, notes=notes, cards=cards))

@@ -1,0 +1,14 @@
+{# Offered after a change to a group deck in the admin collection (SPEC §7.3). #}
+{% if distribute %}
+<div class="alert distribute-prompt" role="status">
+  <p><strong>{{ _("Distribute the changes now?") }}</strong><br>
+    <span class="small">{% if options_changed %}{{ _("Members only get the new options when the deck is distributed. They replace the members' own options for this deck.") }}{% else %}{{ _("Members only get the changes when the deck is distributed. You can also do this later on the “Group decks” page.") }}{% endif %}</span></p>
+  {% for t in distribute %}
+  <form method="post" action="/admin/group-decks/{{ t.group_deck_id }}/distribute">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="back" value="{{ request.url.path }}">
+    <button class="btn btn-primary btn-small">{{ _("Distribute “%(deck)s” to %(group)s", deck=t.deck_name, group=t.group_name) }}</button>
+  </form>
+  {% endfor %}
+</div>
+{% endif %}

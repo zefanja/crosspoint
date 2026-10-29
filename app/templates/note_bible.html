@@ -7,6 +7,7 @@
   {% include "partials/add_tabs.html" %}
   <p class="hint">{{ _("Memorize a whole passage: every line becomes a step with first-letter, gap and context cards (like the Anki add-on <a href=\"https://github.com/zefanja/bible-memorizer\">Bible Memorizer</a>).") }}</p>
   {% if message %}<p class="alert alert-success" role="status">{{ message }}</p>{% endif %}
+  {% include "partials/distribute_prompt.html" %}
   {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
   <form method="post" action="/notes/bible" class="ui-stack">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

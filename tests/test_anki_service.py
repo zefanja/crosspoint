@@ -323,6 +323,15 @@ def test_deck_options_are_per_deck(run, deck):
     assert run(svc.get_deck_options(U, deck)).new_per_day == 7
 
 
+def test_set_deck_options_by_name(run, deck):
+    other = run(svc.create_deck(U, "Andere"))
+    opts = svc.DeckOptions(3, 50, 0.95, False, False)
+    assert run(svc.set_deck_options_by_name(U, DECK.upper(), opts))
+    assert run(svc.get_deck_options(U, deck)) == opts
+    assert run(svc.get_deck_options(U, other)) == svc.DeckOptions(5, 200, 0.9, True, True)
+    assert not run(svc.set_deck_options_by_name(U, "Gibt es nicht", opts))
+
+
 def test_bury_siblings_upgrade_runs_once(run, deck):
     def reset(col):  # an existing collection from before the upgrade
         for conf in col.decks.all_config():

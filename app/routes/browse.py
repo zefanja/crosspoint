@@ -5,9 +5,11 @@ from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
+from sqlalchemy.orm import Session as DbSession
 
-from app import anki_service
+from app import anki_service, workspace
 from app.auth import current_collection, require_user, verify_csrf
+from app.db import get_db
 from app.models import User
 from app.templating import is_htmx, render
 from app.i18n import _
@@ -31,8 +33,9 @@ async def _filters(col: str, access: DeckAccess) -> list[tuple[str, str]]:
 
 @router.get("/browse")
 async def browse(request: Request, q: str = "", view: str = "notes",
-    user: User = Depends(require_user), col: str = Depends(current_collection),
-    access: DeckAccess = Depends(deck_access)):
+    distribute: int | None = None, user: User = Depends(require_user),
+    col: str = Depends(current_collection), access: DeckAccess = Depends(deck_access),
+    db: DbSession = Depends(get_db)):
     view = view if view in VIEWS else "notes"
     search = anki_service.search_cards if view == "cards" else anki_service.search_notes
     error = None
@@ -48,6 +51,8 @@ async def browse(request: Request, q: str = "", view: str = "notes",
     if is_htmx(request) and request.headers.get("HX-Target") == "results":
         return render(request, "partials/browse_results.html", ctx)
     ctx["filters"] = await _filters(col, access)
+    # after deleting a note of a group deck: offer to distribute (SPEC §7.3)
+    ctx["distribute"] = await workspace.distribute_targets(db, user, col, distribute)
     return render(request, "browse.html", ctx)
 
 

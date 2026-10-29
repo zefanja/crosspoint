@@ -354,6 +354,19 @@ im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
     (Phase 2: optional aussetzen).
   - Neue Gruppenmitglieder erhalten alle Gruppendecks beim Hinzufügen automatisch.
 - Verteilung läuft als Hintergrundaufgabe mit Fortschrittsanzeige (100 Nutzer × Import).
+- **Deck-Optionen** (neue Karten/Tag, Wiederholungen/Tag, Ziel-Retention, Geschwister
+  verschieben) ändert der Admin über die Deck-Optionen in der Admin-Collection. Der Import
+  übernimmt Optionen bestehender Decks nicht; deshalb setzt die Verteilung danach per
+  `set_deck_options_by_name` die Optionen aller Decks (inkl. Unterdecks), deren Optionen seit
+  dem letzten Verteilen geändert wurden (Protokoll `group_deck_edits`, Aktion `options`) – neue
+  Mitglieder erhalten alle je geänderten Optionen. Sie ersetzen die eigenen Optionen der
+  Mitglieder für dieses Deck; ohne erneute Änderung bleiben eigene Anpassungen erhalten.
+- **Nachfrage nach dem Bearbeiten:** Nach dem Speichern einer Änderung in der Admin-Collection
+  (Notiz anlegen/bearbeiten/löschen, Bibeltext, Deck-Optionen) zeigt die Seite „Änderungen
+  gleich verteilen?“ mit je einem Button pro Gruppendeck, das das geänderte Deck (oder ein
+  Elterndeck) an eine Gruppe verteilt, die der Nutzer verteilen darf. Nach der Verteilung führt
+  „Zurück“ auf die Ausgangsseite. Ignorieren ist möglich; die Seite „Gruppendecks“ zeigt die
+  noch nicht verteilten Änderungen weiter an.
 
 #### Gemeinsames Bearbeiten (Admins und Gruppenleiter)
 
@@ -373,9 +386,9 @@ im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
 - Seite „Gruppendecks“ (`/admin/group-decks`, Admins und Gruppenleiter): Decks der (eigenen)
   Gruppen mit „zuletzt bearbeitet von …“, Zahl der Änderungen seit dem letzten Verteilen,
   Button „Verteilen“ und Liste der letzten Änderungen.
-- Jede Änderung an Notizen der Admin-Collection (anlegen, bearbeiten, löschen, Bibeltext) wird in
-  `group_deck_edits` protokolliert (Nutzer, Notiz, Deck, Kurztext der Vorderseite). Die
-  Bearbeiten-Seite zeigt „Zuletzt geändert von …“.
+- Jede Änderung an Notizen der Admin-Collection (anlegen, bearbeiten, löschen, Bibeltext) und an
+  Deck-Optionen wird in `group_deck_edits` protokolliert (Nutzer, Notiz, Deck, Kurztext der
+  Vorderseite). Die Bearbeiten-Seite zeigt „Zuletzt geändert von …“.
 - **Umbenennen** (Admins über die Deck-Optionen, Gruppenleiter über ✎ in ihrer Deckliste, nur
   bearbeitbare Decks): Der Import ordnet Decks per **Name** zu und lässt vorhandene Karten, wo
   sie sind – erneutes Verteilen nach einer Umbenennung nur in der Admin-Collection legte also

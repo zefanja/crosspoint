@@ -6,6 +6,7 @@
   {% set active_tab = "qa" if notetype.name == "Basic" else "verse" %}
   {% include "partials/add_tabs.html" %}
   {% if message %}<p class="alert alert-success" role="status">{{ message }}</p>{% endif %}
+  {% include "partials/distribute_prompt.html" %}
   {% if error %}<p class="alert alert-error" role="alert">{{ error }}</p>{% endif %}
   <form method="post" action="/notes/new" class="ui-stack" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

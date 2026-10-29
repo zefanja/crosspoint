@@ -173,6 +173,107 @@ def test_group_decks_page_distribute_and_log(client, setup, db):
     assert db.query(GroupDeckEdit).filter_by(user_id=setup["lea"].id, action="add").count() == 1
 
 
+def test_distribute_prompt_after_editing(client, setup, db):
+    csrf, decks, notes, member = setup["csrf"], setup["decks"], setup["notes"], setup["member"]
+    own = db.query(GroupDeck).filter_by(deck_name="Psalmen").one()
+    prompt = "Änderungen gleich verteilen?"
+    form = f'action="/admin/group-decks/{own.id}/distribute"'
+
+    assert prompt not in client.get(f"/notes/{notes['Psalmen']}").text  # only after saving
+    r = client.post(f"/notes/{notes['Psalmen']}", data={
+        "csrf_token": csrf, "deck_id": decks["Psalmen"], "field_0": "Ps 1", "field_1": "B"})
+    page = html.unescape(r.text)
+    assert prompt in page and form in page and "„Psalmen“ an Jugend verteilen" in page
+    assert f'name="back" value="/notes/{notes["Psalmen"]}"' in page
+
+    r = client.post("/notes/new", data={"csrf_token": csrf, "notetype": "Basic",
+                                        "deck_id": decks["Psalmen"], "field_0": "Ps 2", "field_1": "B"})
+    assert prompt in html.unescape(r.text)
+
+    # subdecks offer the parent's group deck; Sprüche: only Lea's group
+    sub = client.portal.call(anki_service.create_deck, A, "Psalmen::Teil 1")
+    r = client.post("/notes/new", data={"csrf_token": csrf, "notetype": "Basic",
+                                        "deck_id": sub, "field_0": "Ps 3", "field_1": "B"})
+    assert form in r.text
+    spr = client.get(f"/browse?distribute={decks['Sprüche']}").text
+    hauskreis = db.query(GroupDeck).filter_by(deck_name="Sprüche").join(Group).filter(
+        Group.name == "Hauskreis").one()
+    assert f"/admin/group-decks/{hauskreis.id}/distribute" not in spr
+
+    r = client.post(f"/notes/{notes['Psalmen']}/delete", data={"csrf_token": csrf},
+                    follow_redirects=False)
+    assert r.headers["location"] == f"/browse?distribute={decks['Psalmen']}"
+    assert prompt in html.unescape(client.get(r.headers["location"]).text)
+
+    # distributing from the prompt returns to the page it was started from
+    r = client.post(f"/admin/group-decks/{own.id}/distribute", data={
+        "csrf_token": csrf, "back": "/browse"}, follow_redirects=False)
+    job = wait_job(client, r)
+    assert job.errors == [] and "back=%2Fbrowse" in r.headers["location"]
+    assert 'href="/browse"' in client.get(r.headers["location"]).text
+    assert client.portal.call(anki_service.search_cards, member.id, '"deck:Psalmen"')[1] == 2
+    assert 'href="/admin"' in client.get(r.headers["location"].split("?")[0]
+                                          + "?back=//evil.example").text
+
+    # nothing to offer for the own collection or for decks without a group
+    client.post("/admin/workspace", data={"csrf_token": csrf, "ws": "own"})
+    mine = client.portal.call(anki_service.create_deck, setup["lea"].id, "Privat")
+    r = client.post("/notes/new", data={"csrf_token": csrf, "notetype": "Basic",
+                                        "deck_id": mine, "field_0": "X", "field_1": "Y"})
+    assert "Hinzugefügt" in r.text and prompt not in r.text
+
+
+def test_deck_options_are_distributed_when_changed(client, setup, db, login):
+    decks, member = setup["decks"], setup["member"]
+    call = client.portal.call
+    own = db.query(GroupDeck).filter_by(deck_name="Psalmen").one()
+    client.cookies.clear()
+    _admin, csrf = login("Admin", role="admin")
+    client.post("/admin/workspace", data={"csrf_token": csrf, "ws": "admin"})
+
+    def distribute():
+        return wait_job(client, client.post(f"/admin/group-decks/{own.id}/distribute",
+                                            data={"csrf_token": csrf}, follow_redirects=False))
+
+    def member_options():
+        did = dict((n, i) for i, n in call(anki_service.deck_names, member.id))["Psalmen"]
+        return call(anki_service.get_deck_options, member.id, did)
+
+    distribute()
+    default = member_options()
+    r = client.post(f"/decks/{decks['Psalmen']}/options", data={
+        "csrf_token": csrf, "new_per_day": 3, "reviews_per_day": 50,
+        "desired_retention": 0.85})
+    page = html.unescape(r.text)
+    assert "Änderungen gleich verteilen?" in page and "eigenen Optionen" in page
+    assert "Admin hat die Deck-Optionen geändert" in html.unescape(
+        client.get("/admin/group-decks").text)
+
+    assert distribute().errors == []
+    assert member_options() == anki_service.DeckOptions(3, 50, 0.85, False, False)
+
+    # the member's own options stay until the editors change the deck's options again
+    did = dict((n, i) for i, n in call(anki_service.deck_names, member.id))["Psalmen"]
+    call(anki_service.set_deck_options, member.id, did, default)
+    distribute()
+    assert member_options() == default
+
+    # new members get the changed options too
+    groups = setup["groups"]
+    late, _code = login("Tim")
+    client.cookies.clear()
+    db.add(GroupMember(group_id=groups["Jugend"], user_id=late.id))
+    db.commit()
+
+    async def add_member():  # like adding members on the group page
+        job = distribution.distribute_group_to_users(groups["Jugend"], [(late.id, "Tim")], "x")
+        return await distribution.wait(job.id)
+
+    assert call(add_member).errors == []
+    did = dict((n, i) for i, n in call(anki_service.deck_names, late.id))["Psalmen"]
+    assert call(anki_service.get_deck_options, late.id, did).new_per_day == 3
+
+
 def test_leader_renames_group_deck_for_members(client, setup, db):
     csrf, decks, member = setup["csrf"], setup["decks"], setup["member"]
     call = client.portal.call
