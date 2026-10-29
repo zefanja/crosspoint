@@ -226,6 +226,24 @@ class NoteRow:
     suspended_cards: int
     status: str  # "new" | "suspended" | "scheduled"
     due: date | None  # earliest due date of the active scheduled cards
+    group: str | None = None  # notes of one Bible text import share it (a "collective note")
+    title: str = ""  # the Bible text's title (group notes)
+
+
+def group_rows(rows: list) -> list[list]:
+    """Rows (with a `group` attribute) as lists: the notes of a collective note together,
+    in the order of each group's first note; every other row on its own."""
+    items: list[list] = []
+    groups: dict[str, list] = {}
+    for row in rows:
+        if row.group is None:
+            items.append([row])
+        elif row.group in groups:
+            groups[row.group].append(row)
+        else:
+            groups[row.group] = [row]
+            items.append(groups[row.group])
+    return items
 
 
 @dataclass
@@ -1058,6 +1076,7 @@ def _search_notes(col: Collection, query: str, limit: int) -> tuple[list[NoteRow
                   else "new" if all(st == "new" for st, _due_date in active) else "scheduled")
         decks = {c.did for c in cards}
         deck = col.decks.name(cards[0].did) if cards else ""
+        group, title = _note_group(note)
         rows.append(
             NoteRow(
                 note_id=int(nid),
@@ -1067,6 +1086,8 @@ def _search_notes(col: Collection, query: str, limit: int) -> tuple[list[NoteRow
                 suspended_cards=len(states) - len(active),
                 status=status,
                 due=min(dues) if dues else None,
+                group=group,
+                title=title,
             )
         )
     return rows, len(note_ids)

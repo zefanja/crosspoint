@@ -6,7 +6,32 @@
 <p class="hint">{% if view == "notes" %}{{ ngettext("%(num)s note", "%(num)s notes", total) }}{% else %}{{ ngettext("%(num)s card", "%(num)s cards", total) }}{% endif %}{% if total > limit %} – {{ _("showing the first %(limit)s", limit=limit) }}{% endif %}</p>
 <ul class="rowlist">
   {% for r in rows %}
-  {% if view == "notes" %}
+  {% if view == "notes" and r.parts %}
+  <li class="browse-group">
+    <details>
+      <summary class="rowlink{% if r.status == 'suspended' %} off{% endif %}">
+        <span class="row-main">
+          <span class="row-title"><span class="badge-collective">{{ _("Collective note") }}</span> {{ r.title or _("(empty)") }}</span>
+          <span class="row-meta">{{ r.deck }} · {{ ngettext("%(num)s note", "%(num)s notes", r.parts | length) }}{% if r.suspended_cards and r.status != "suspended" %} · {{ _("%(num)s suspended", num=r.suspended_cards) }}{% endif %}</span>
+        </span>
+        {% include "partials/browse_status.html" %}
+      </summary>
+      <ul class="rowlist">
+        {% for r in r.parts %}
+        <li>
+          <a href="/notes/{{ r.note_id }}" class="rowlink{% if r.status == 'suspended' %} off{% endif %}">
+            <span class="row-main">
+              <span class="row-title">{{ r.front or _("(empty)") }}</span>
+              <span class="row-meta">{{ r.deck }}{% if r.cards > 1 %} · {{ ngettext("%(num)s card", "%(num)s cards", r.cards) }}{% endif %}</span>
+            </span>
+            {% include "partials/browse_status.html" %}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </details>
+  </li>
+  {% elif view == "notes" %}
   <li>
     <a href="/notes/{{ r.note_id }}" class="rowlink{% if r.status == 'suspended' %} off{% endif %}">
       <span class="row-main">

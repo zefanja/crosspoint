@@ -178,18 +178,7 @@ class ReleaseItem:
 
 
 def release_items(notes: list[anki_service.ReleaseNote]) -> list[ReleaseItem]:
-    """Group the notes of collective notes, in the order of each group's first note."""
-    items: list[ReleaseItem] = []
-    groups: dict[str, ReleaseItem] = {}
-    for note in notes:
-        if note.group is None:
-            items.append(ReleaseItem([note]))
-        elif note.group in groups:
-            groups[note.group].notes.append(note)
-        else:
-            groups[note.group] = ReleaseItem([note])
-            items.append(groups[note.group])
-    return items
+    return [ReleaseItem(group) for group in anki_service.group_rows(notes)]
 
 
 async def _release_deck(col: str, access: DeckAccess, deck_id: int) -> str:

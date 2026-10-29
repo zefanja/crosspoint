@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 17:51+0000\n"
+"POT-Creation-Date: 2026-10-29 19:03+0000\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -26,80 +26,80 @@ msgstr "Meine Karten"
 msgid "All decks"
 msgstr "Alle Decks"
 
-#: app/anki_service.py:614 app/routes/admin_group_decks.py:74
+#: app/anki_service.py:632 app/routes/admin_group_decks.py:74
 #: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
-#: app/routes/decks.py:78 app/routes/decks.py:200 app/routes/decks.py:236
-#: app/routes/decks.py:282 app/routes/decks.py:285 app/routes/export.py:59
+#: app/routes/decks.py:78 app/routes/decks.py:189 app/routes/decks.py:225
+#: app/routes/decks.py:271 app/routes/decks.py:274 app/routes/export.py:59
 #: app/workspace.py:193
 msgid "Deck not found."
 msgstr "Deck nicht gefunden."
 
-#: app/anki_service.py:621 app/anki_service.py:649 app/workspace.py:161
+#: app/anki_service.py:639 app/anki_service.py:667 app/workspace.py:161
 msgid "Please enter a deck name."
 msgstr "Bitte einen Decknamen eingeben."
 
-#: app/anki_service.py:654
+#: app/anki_service.py:672
 msgid "Group decks can only be renamed, not moved to another parent deck."
 msgstr "Gruppendecks können nur umbenannt, aber nicht in ein anderes Elterndeck verschoben werden."
 
-#: app/anki_service.py:661
+#: app/anki_service.py:679
 msgid "A deck cannot be moved into its own subdeck."
 msgstr "Ein Deck kann nicht in sein eigenes Unterdeck verschoben werden."
 
-#: app/anki_service.py:664 app/anki_service.py:685 app/workspace.py:167
+#: app/anki_service.py:682 app/anki_service.py:703 app/workspace.py:167
 msgid "A deck with this name already exists."
 msgstr "Ein Deck mit diesem Namen gibt es schon."
 
-#: app/anki_service.py:667 app/templates/deck_rename.html:9
+#: app/anki_service.py:685 app/templates/deck_rename.html:9
 msgid "Group decks cannot be renamed."
 msgstr "Gruppendecks können nicht umbenannt werden."
 
-#: app/anki_service.py:854 app/anki_service.py:1158 app/anki_service.py:1172
-#: app/routes/decks.py:251 app/routes/decks.py:255 app/workspace.py:65
+#: app/anki_service.py:872 app/anki_service.py:1184 app/anki_service.py:1198
+#: app/routes/decks.py:240 app/routes/decks.py:244 app/workspace.py:65
 msgid "Note not found."
 msgstr "Notiz nicht gefunden."
 
-#: app/anki_service.py:862
+#: app/anki_service.py:880
 msgid "The first field must not be empty."
 msgstr "Das erste Feld darf nicht leer sein."
 
-#: app/anki_service.py:868 app/routes/notes.py:80
+#: app/anki_service.py:886 app/routes/notes.py:80
 msgid "Note type not found."
 msgstr "Notiztyp nicht gefunden."
 
-#: app/anki_service.py:895
+#: app/anki_service.py:913
 msgid "Please enter a Bible text."
 msgstr "Bitte einen Bibeltext eingeben."
 
-#: app/anki_service.py:905
+#: app/anki_service.py:923
 msgid "[Beginning]"
 msgstr "[Anfang]"
 
-#: app/anki_service.py:958
+#: app/anki_service.py:976
 msgid "Someone else changed this note in the meantime. Check the fields and save again to overwrite the other change."
 msgstr "Jemand anderes hat diese Notiz inzwischen geändert. Prüfe die Felder und speichere erneut, um die andere Änderung zu überschreiben."
 
-#: app/anki_service.py:961
+#: app/anki_service.py:979
 msgid "Cards from group decks cannot be edited."
 msgstr "Karten aus Gruppendecks können nicht bearbeitet werden."
 
-#: app/anki_service.py:963
+#: app/anki_service.py:981
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr "Bibeltext-Karten werden aus dem Text erzeugt. Zum Ändern bitte löschen und den Abschnitt neu importieren."
 
-#: app/anki_service.py:986
+#: app/anki_service.py:1004
 msgid "Cards from group decks cannot be deleted."
 msgstr "Karten aus Gruppendecks können nicht gelöscht werden."
 
-#: app/anki_service.py:1084 app/anki_service.py:1215
+#: app/anki_service.py:1105 app/anki_service.py:1241
 msgid "Card not found."
 msgstr "Karte nicht gefunden."
 
-#: app/anki_service.py:1634
+#: app/anki_service.py:1660
 msgid "The image is too large (max. 5 MB)."
 msgstr "Das Bild ist zu groß (max. 5 MB)."
 
-#: app/anki_service.py:1637
+#: app/anki_service.py:1663
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr "Nur PNG-, JPEG-, GIF- oder WebP-Bilder werden unterstützt."
 
@@ -225,23 +225,23 @@ msgstr "Bitte einen Titel eingeben, z. B. „Psalm 23“."
 msgid "“%(title)s”: %(notes)s steps with %(cards)s cards added."
 msgstr "„%(title)s“: %(notes)s Abschnitte mit %(cards)s Karten hinzugefügt."
 
-#: app/routes/browse.py:29
+#: app/routes/browse.py:79
 msgid "All"
 msgstr "Alle"
 
-#: app/routes/browse.py:29 app/templates/admin/progress.html:26
+#: app/routes/browse.py:79 app/templates/admin/progress.html:26
 msgid "Due"
 msgstr "Fällig"
 
-#: app/routes/browse.py:29 app/templates/stats.html:58
+#: app/routes/browse.py:79 app/templates/stats.html:58
 msgid "New"
 msgstr "Neu"
 
-#: app/routes/browse.py:30 app/templates/stats.html:62
+#: app/routes/browse.py:80 app/templates/stats.html:62
 msgid "Suspended"
 msgstr "Ausgesetzt"
 
-#: app/routes/browse.py:48
+#: app/routes/browse.py:98
 msgid "The search is not valid. Examples: John, is:due, is:new"
 msgstr "Die Suche ist ungültig. Beispiele: Joh, is:due, is:new"
 
@@ -258,7 +258,7 @@ msgstr "Wiederholungen pro Tag: 0 bis 9999."
 msgid "Desired retention: %(min)s to %(max)s."
 msgstr "Gewünschte Behaltensquote: %(min)s bis %(max)s."
 
-#: app/routes/decks.py:202
+#: app/routes/decks.py:191
 msgid "The group leaders release the cards of group decks."
 msgstr "Die Karten von Gruppendecks geben die Gruppenleiter frei."
 
@@ -492,7 +492,9 @@ msgstr "Gesperrt: %(front)s"
 #: app/templates/deck_release.html:11 app/templates/deck_release.html:35
 #: app/templates/deck_release.html:56
 #: app/templates/partials/browse_card_row.html:4
-#: app/templates/partials/browse_results.html:13
+#: app/templates/partials/browse_results.html:14
+#: app/templates/partials/browse_results.html:24
+#: app/templates/partials/browse_results.html:38
 msgid "(empty)"
 msgstr "(leer)"
 
@@ -547,11 +549,13 @@ msgid "Lock"
 msgstr "Sperren"
 
 #: app/templates/deck_release.html:56
+#: app/templates/partials/browse_results.html:14
 msgid "Collective note"
 msgstr "Sammelnotiz"
 
 #: app/templates/deck_release.html:57
 #: app/templates/partials/browse_results.html:6
+#: app/templates/partials/browse_results.html:15
 #, python-format
 msgid "%(num)s note"
 msgid_plural "%(num)s notes"
@@ -731,7 +735,8 @@ msgstr "NUR ANSEHEN"
 #: app/templates/admin/print_sheet.html:12
 #: app/templates/admin/user_detail.html:9 app/templates/decks_workspace.html:40
 #: app/templates/partials/browse_results.html:6
-#: app/templates/partials/browse_results.html:14
+#: app/templates/partials/browse_results.html:25
+#: app/templates/partials/browse_results.html:39
 #, python-format
 msgid "%(num)s card"
 msgid_plural "%(num)s cards"
@@ -1696,7 +1701,8 @@ msgstr "Keine Karten gefunden."
 msgid "showing the first %(limit)s"
 msgstr "die ersten %(limit)s werden angezeigt"
 
-#: app/templates/partials/browse_results.html:14
+#: app/templates/partials/browse_results.html:15
+#: app/templates/partials/browse_results.html:39
 #, python-format
 msgid "%(num)s suspended"
 msgstr "%(num)s ausgesetzt"
