@@ -6,19 +6,22 @@
 <div class="ui-stack">
   <nav class="segmented" aria-label="{{ _('Show') }}">
     {% for key, label in [("notes", _("Notes")), ("cards", _("Cards"))] %}
-    <a href="/browse?{{ {'view': key, 'q': q} | urlencode }}"{% if key == view %} class="active" aria-current="page"{% endif %}>{{ label }}</a>
+    <a href="/browse?{{ {'view': key, 'q': q, 'tag': tag} | urlencode }}"{% if key == view %} class="active" aria-current="page"{% endif %}>{{ label }}</a>
     {% endfor %}
   </nav>
-  <form method="get" action="/browse" class="searchbox" role="search"
+  <form method="get" action="/browse" class="stack" role="search"
         hx-get="/browse" hx-target="#results" hx-trigger="input changed delay:300ms from:#q, submit" hx-push-url="true">
     <input type="hidden" name="view" value="{{ view }}">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
-    <input type="search" id="q" name="q" value="{{ q }}" placeholder="{{ _('Search cards') }}" aria-label="{{ _('Search (Anki search syntax)') }}"
-           title="{{ _('Anki search syntax, e.g. John, is:due, is:new') }}" autocomplete="off">
+    <div class="searchbox">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+      <input type="search" id="q" name="q" value="{{ q }}" placeholder="{{ _('Search cards') }}" aria-label="{{ _('Search (Anki search syntax)') }}"
+             title="{{ _('Anki search syntax, e.g. John, is:due, is:new') }}" autocomplete="off">
+    </div>
+    {% include "partials/tag_filter.html" %}
   </form>
   <nav class="chips filters" aria-label="{{ _('Filter') }}">
     {% for label, query in filters %}
-    <a class="chip{% if query == q %} active{% endif %}" href="/browse?{{ {'view': view, 'q': query} | urlencode }}"{% if query == q %} aria-current="true"{% endif %}>{{ label }}</a>
+    <a class="chip{% if query == q %} active{% endif %}" href="/browse?{{ {'view': view, 'q': query, 'tag': tag} | urlencode }}"{% if query == q %} aria-current="true"{% endif %}>{{ label }}</a>
     {% endfor %}
   </nav>
   <div id="results">

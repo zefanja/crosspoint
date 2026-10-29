@@ -195,7 +195,7 @@ async def _release_deck(col: str, access: DeckAccess, deck_id: int) -> str:
 @router.get("/decks/{deck_id}/release")
 async def release_page(request: Request, deck_id: int, done: str | None = None,
                        note: int | None = None, group: str | None = None, count: int = 0,
-                       user: User = Depends(require_user),
+                       tag: str = "", user: User = Depends(require_user),
                        col: str = Depends(current_collection),
                        access: DeckAccess = Depends(deck_access),
                        db: DbSession = Depends(get_db)):
@@ -205,8 +205,13 @@ async def release_page(request: Request, deck_id: int, done: str | None = None,
         return render(request, "error.html", {"message": str(exc)}, 403)
     notes = await anki_service.release_notes(col, deck_id)
     items = release_items(notes)
+    tags = sorted({t.lower(): t for n in notes for t in n.tags}.values(), key=str.lower)
+    tag = tag.strip()
+    # a collective note stays whole when one of its notes has the tag
+    shown = [i for i in items if any(n.has_tag(tag) for n in i.notes)] if tag else items
     return render(request, "deck_release.html", {
-        "deck_id": deck_id, "deck_name": deck_name, "notes": notes, "items": items,
+        "deck_id": deck_id, "deck_name": deck_name, "notes": notes, "items": shown,
+        "all_items": len(items), "tags": tags, "tag": tag,
         "released": sum(1 for n in notes if not n.locked),
         "locked": sum(1 for n in notes if n.locked),
         "done": done, "count": count,
@@ -218,7 +223,7 @@ async def release_page(request: Request, deck_id: int, done: str | None = None,
 
 @router.post("/decks/{deck_id}/release")
 async def release(deck_id: int, action: str = Form(...), note_id: int | None = Form(None),
-                  group: str | None = Form(None),
+                  group: str | None = Form(None), tag: str = Form(""),
                   user: User = Depends(verify_csrf), col: str = Depends(current_collection),
                   access: DeckAccess = Depends(deck_access), db: DbSession = Depends(get_db)):
     if action not in RELEASE_ACTIONS:
@@ -228,6 +233,8 @@ async def release(deck_id: int, action: str = Form(...), note_id: int | None = F
     except anki_service.ReadOnlyNote:
         raise Forbidden()
     url = f"/decks/{deck_id}/release?done={action}"
+    if tag.strip():  # keep the tag filter
+        url += "&" + urlencode({"tag": tag.strip()})
     if action == "lock_new":
         count = await anki_service.lock_new(col, deck_id)
         if count:

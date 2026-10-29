@@ -351,6 +351,25 @@ def test_release_own_cards(client, login):
         "csrf_token": csrf, "action": "lock_new"}).status_code == 403
 
 
+def test_release_tag_filter(client, login):
+    user, csrf = login("Tom")
+    call = client.portal.call
+    deck = call(anki_service.create_deck, user.id, "Verse")
+    for i, tags in ((1, ("woche1",)), (2, ("woche2",)), (3, ("woche2",))):
+        call(anki_service.add_note, user.id, "Basic", deck, {"Front": f"Vers {i}", "Back": "B"}, tags)
+    call(anki_service.add_bible_text, user.id, deck, "Psalm 23", 2,
+         "Der Herr ist mein Hirte\nmir wird nichts mangeln", False, ("woche1",))
+    page = html.unescape(client.get(f"/decks/{deck}/release").text)
+    assert '<option value="woche2">' in page and "Vers 1" in page
+    page = html.unescape(client.get(f"/decks/{deck}/release?tag=woche1").text)
+    assert "Vers 1" in page and "Psalm 23" in page and "Vers 2" not in page
+    assert "2 von 4 Einträgen mit Tag „woche1“" in page
+    note_id = re.search(r'name="note_id" value="(\d+)"', page).group(1)
+    r = client.post(f"/decks/{deck}/release", follow_redirects=False, data={
+        "csrf_token": csrf, "action": "lock", "note_id": note_id, "tag": "woche1"})
+    assert r.headers["location"].startswith(f"/decks/{deck}/release?done=lock&tag=woche1&note=")
+
+
 def test_release_collective_notes_page(client, login):
     user, csrf = login("Tom")
     call = client.portal.call

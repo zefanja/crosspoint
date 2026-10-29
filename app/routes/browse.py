@@ -82,7 +82,7 @@ async def _filters(col: str, access: DeckAccess) -> list[tuple[str, str]]:
 
 
 @router.get("/browse")
-async def browse(request: Request, q: str = "", view: str = "notes",
+async def browse(request: Request, q: str = "", view: str = "notes", tag: str = "",
     distribute: int | None = None, user: User = Depends(require_user),
     col: str = Depends(current_collection), access: DeckAccess = Depends(deck_access),
     db: DbSession = Depends(get_db)):
@@ -90,7 +90,10 @@ async def browse(request: Request, q: str = "", view: str = "notes",
     search = anki_service.search_cards if view == "cards" else anki_service.search_notes
     error = None
     rows, total = [], 0
-    query = access.search(q)  # group leaders: only their groups' decks
+    tag = tag.strip()
+    combined = f"({q}) {anki_service.tag_search(tag)}" if tag and q.strip() else (
+        anki_service.tag_search(tag) if tag else q)
+    query = access.search(combined)  # group leaders: only their groups' decks
     try:
         if query is not None:
             rows, total = await search(col, query, limit=LIMIT)
@@ -98,11 +101,13 @@ async def browse(request: Request, q: str = "", view: str = "notes",
         error = _("The search is not valid. Examples: John, is:due, is:new")
     if view == "notes":
         rows = note_items(rows)
-    ctx = {"q": q, "view": view, "rows": rows, "total": total, "limit": LIMIT, "error": error,
-           "today": date.today(), "editable_names": access.editable_names}
+    ctx = {"q": q, "view": view, "tag": tag, "rows": rows, "total": total, "limit": LIMIT,
+           "error": error, "today": date.today(), "editable_names": access.editable_names}
     if is_htmx(request) and request.headers.get("HX-Target") == "results":
         return render(request, "partials/browse_results.html", ctx)
     ctx["filters"] = await _filters(col, access)
+    visible = access.search("")
+    ctx["tags"] = await anki_service.note_tags(col, visible) if visible is not None else []
     # after deleting a note of a group deck: offer to distribute (SPEC §7.3)
     ctx["distribute"] = await workspace.distribute_targets(db, user, col, distribute)
     return render(request, "browse.html", ctx)
@@ -110,13 +115,15 @@ async def browse(request: Request, q: str = "", view: str = "notes",
 
 @router.post("/cards/{card_id}/suspend")
 async def suspend_card(request: Request, card_id: int, suspended: int = Form(...),
-                       q: str = Form(""), user: User = Depends(verify_csrf),
+                       q: str = Form(""), tag: str = Form(""), user: User = Depends(verify_csrf),
                        col: str = Depends(current_collection),
                        access: DeckAccess = Depends(deck_access)):
     if access.restricted:
         access.require_edit([await anki_service.card_deck_id(col, card_id)])
     row = await anki_service.set_card_suspended(col, card_id, bool(suspended))
     if not is_htmx(request):
-        return RedirectResponse("/browse?" + urlencode({"view": "cards", "q": q}), status_code=303)
+        params = {"view": "cards", "q": q} | ({"tag": tag} if tag else {})
+        return RedirectResponse("/browse?" + urlencode(params), status_code=303)
     return render(request, "partials/browse_card_row.html",
-                  {"r": row, "q": q, "today": date.today(), "editable_names": access.editable_names})
+                  {"r": row, "q": q, "tag": tag, "today": date.today(),
+                   "editable_names": access.editable_names})

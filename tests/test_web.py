@@ -232,6 +232,27 @@ def test_browse_notes_and_cards_suspend_single_card(client, learner):
     assert client.post("/cards/999/suspend", data={"csrf_token": csrf, "suspended": 1}).status_code == 404
 
 
+def test_browse_tag_filter(client, learner):
+    user, csrf = learner
+    deck = default_deck(client)
+    for front, tags in (("Joh 3,16", ("woche1",)), ("Ps 23,1", ("woche2",)), ("Ps 1,1", ())):
+        client.portal.call(anki_service.add_note, user.id, "Basic", deck,
+                           {"Front": front, "Back": "B"}, tags)
+    page = client.get("/browse")
+    assert '<option value="woche1">' in page.text and "Alle Tags" in page.text
+    page = client.get("/browse?tag=woche2")
+    assert "1 Notiz" in page.text and "Ps 23,1" in page.text and "Joh 3,16" not in page.text
+    assert '<option value="woche2" selected>' in page.text
+    assert "tag=woche2" in page.text  # chips keep the tag
+    r = client.get("/browse?tag=woche1&q=Ps", headers={**HX, "HX-Target": "results"})
+    assert "Keine Notizen gefunden" in r.text
+    cards = client.get("/browse?view=cards&tag=woche1")
+    card_id = re.findall(r'action="/cards/(\d+)/suspend"', cards.text)[0]
+    r = client.post(f"/cards/{card_id}/suspend", follow_redirects=False,
+                    data={"csrf_token": csrf, "suspended": 1, "q": "", "tag": "woche1"})
+    assert r.headers["location"] == "/browse?view=cards&q=&tag=woche1"
+
+
 def test_group_note_readonly_in_ui(client, learner):
     user, csrf = learner
     deck = default_deck(client)

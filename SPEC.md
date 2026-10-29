@@ -267,6 +267,9 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
   Notizen, `?view=cards`). Die Suche bleibt beim Umschalten erhalten.
 - Schnellfilter (Entwurf 4b): Alle · Fällig (`is:due`) · Neu · Ausgesetzt · je Hauptdeck
   (`anki_service.deck_search`). Status als Pille: neu, heute (fällig), Datum, ausgesetzt.
+- Tag-Filter (`?tag=`): Auswahlliste mit allen Tags der sichtbaren Notizen (ohne die internen
+  Tags `gruppendeck`/`gesperrt`), wirkt zusätzlich zu Suche und Schnellfilter (Anki `tag:`,
+  inkl. Untertags `a::b`); bleibt beim Umschalten und bei den Schnellfiltern erhalten.
 - Notizen: eine Zeile pro Notiz – erstes Feld (gekürzt), Deck, Anzahl Karten (davon
   ausgesetzt), nächste Fälligkeit bzw. „neu“/„ausgesetzt“. Sammelnotizen (Bibeltexte, siehe
   „Schrittweise freigeben“) als eine Zeile mit Kennzeichnung, Titel, Zahl der Notizen und
@@ -309,6 +312,10 @@ Gruppenleiter – aus ihrer Deckliste)
   Ein Button sperrt bzw. gibt alle Notizen der Sammelnotiz frei; „Nächste freigeben“ gibt die
   nächste Zeile der Liste frei, bei einer Sammelnotiz also den ganzen Text. „Einzeln anzeigen“
   klappt die einzelnen Notizen auf (je Notiz bearbeiten, sperren, freigeben).
+- Tag-Filter (`?tag=`, Tags der Notizen des Decks ohne interne Tags) wie in der Kartenliste:
+  zeigt nur Zeilen mit dem Tag (eine Sammelnotiz ganz, wenn eine ihrer Notizen ihn trägt),
+  „X von Y Einträgen mit Tag …“; Sperren/Freigeben behält den Filter. Fortschritt,
+  „Nächste freigeben“ und „Neue Karten sperren“ beziehen sich weiter auf das ganze Deck.
 - Funktioniert in der eigenen Sammlung und in der Admin-Collection (Gruppenleiter nur in
   bearbeitbaren Decks). Empfangene Gruppendecks in der eigenen Sammlung sind ausgenommen
   (die Freigabe steuert der Admin).

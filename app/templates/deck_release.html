@@ -15,13 +15,13 @@
     <h2 class="panel-title">{{ _("%(released)s of %(total)s notes released", released=released, total=notes | length) }}</h2>
     <progress class="progress" max="{{ notes | length or 1 }}" value="{{ released }}"></progress>
     <form method="post" action="/decks/{{ deck_id }}/release">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">{% if tag %}<input type="hidden" name="tag" value="{{ tag }}">{% endif %}
       <input type="hidden" name="action" value="next">
       <button class="btn-go"{% if not locked %} disabled{% endif %}>{{ _("Release next") }}</button>
     </form>
     <p class="hint">{{ _("Locked notes are suspended and do not appear when studying. Release them one after another, e.g. one verse per week.") }}{% if admin_workspace %} {{ _("Members get the release when the deck is distributed.") }}{% endif %}</p>
     <form method="post" action="/decks/{{ deck_id }}/release">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">{% if tag %}<input type="hidden" name="tag" value="{{ tag }}">{% endif %}
       <input type="hidden" name="action" value="lock_new">
       <button class="btn-line">{{ _("Lock new cards") }}</button>
     </form>
@@ -37,13 +37,19 @@
         </span>
       </a>
       <form method="post" action="/decks/{{ deck_id }}/release">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">{% if tag %}<input type="hidden" name="tag" value="{{ tag }}">{% endif %}
         <input type="hidden" name="action" value="{{ 'release' if n.locked else 'lock' }}">
         <input type="hidden" name="note_id" value="{{ n.note_id }}">
         <button class="row-action">{{ _("Release") if n.locked else _("Lock") }}</button>
       </form>
     </li>
   {% endmacro %}
+  {% if tags or tag %}
+  <form method="get" action="/decks/{{ deck_id }}/release" role="search">
+    {% include "partials/tag_filter.html" %}
+  </form>
+  {% if tag %}<p class="hint">{{ _("%(shown)s of %(total)s entries with tag “%(tag)s”", shown=items | length, total=all_items, tag=tag) }}</p>{% endif %}
+  {% endif %}
   {% if items %}
   <ul class="rowlist">
     {% for item in items %}
@@ -58,7 +64,7 @@
           </span>
         </div>
         <form method="post" action="/decks/{{ deck_id }}/release">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">{% if tag %}<input type="hidden" name="tag" value="{{ tag }}">{% endif %}
           <input type="hidden" name="action" value="{{ 'release_group' if item.locked else 'lock_group' }}">
           <input type="hidden" name="group" value="{{ item.group }}">
           <button class="row-action">{{ _("Release all") if item.locked else _("Lock all") }}</button>
@@ -74,6 +80,6 @@
     {% endif %}
     {% endfor %}
   </ul>
-  {% else %}<p class="hint">{{ _("This deck has no cards yet.") }}</p>{% endif %}
+  {% elif not tag %}<p class="hint">{{ _("This deck has no cards yet.") }}</p>{% endif %}
 </div>
 {% endblock %}
