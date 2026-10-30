@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse, RedirectResponse, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DbSession
 
-from app import anki_service, i18n
+from app import anki_service, i18n, reminders
 from app.auth import cookie_secure, current_collection, media_token, require_user
 from app.db import get_db
 from app.models import Group, GroupMember, User
@@ -26,13 +26,18 @@ def privacy(request: Request):
 @router.get("/me")
 async def me(request: Request, user: User = Depends(require_user),
              col: str = Depends(current_collection), db: DbSession = Depends(get_db)):
-    """Account page (tab "Me"): groups, export, language, log out."""
+    """Account page (tab "Me"): groups, export, reminder, language, log out."""
     groups = db.scalars(
         select(Group.name).join(GroupMember, GroupMember.group_id == Group.id)
         .where(GroupMember.user_id == user.id).order_by(Group.name)
     ).all()
     stats = await anki_service.collection_stats(col, days=1)
-    return render(request, "me.html", {"groups": groups, "streak": stats.streak_days})
+    reminder = reminders.get_reminder(db, user.id)
+    return render(request, "me.html", {
+        "groups": groups, "streak": stats.streak_days,
+        "reminder_time": reminder.time if reminder else reminders.DEFAULT_TIME,
+        "vapid_key": reminders.public_key(),
+    })
 
 
 @router.get("/media/{collection_id}/{token}/{filename}")

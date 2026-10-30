@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CrossPoint VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 19:33+0000\n"
+"POT-Creation-Date: 2026-10-30 06:14+0000\n"
 "PO-Revision-Date: 2026-10-27 18:08+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -18,15 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/anki_service.py:55
+#: app/anki_service.py:56
 msgid "My cards"
 msgstr "Meine Karten"
 
-#: app/anki_service.py:63 app/templates/stats.html:7
+#: app/anki_service.py:64 app/templates/stats.html:7
 msgid "All decks"
 msgstr "Alle Decks"
 
-#: app/anki_service.py:633 app/routes/admin_group_decks.py:75
+#: app/anki_service.py:634 app/routes/admin_group_decks.py:75
 #: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
 #: app/routes/decks.py:78 app/routes/decks.py:189 app/routes/decks.py:230
 #: app/routes/decks.py:278 app/routes/decks.py:281 app/routes/export.py:59
@@ -34,72 +34,72 @@ msgstr "Alle Decks"
 msgid "Deck not found."
 msgstr "Deck nicht gefunden."
 
-#: app/anki_service.py:640 app/anki_service.py:668 app/workspace.py:161
+#: app/anki_service.py:641 app/anki_service.py:669 app/workspace.py:161
 msgid "Please enter a deck name."
 msgstr "Bitte einen Decknamen eingeben."
 
-#: app/anki_service.py:673
+#: app/anki_service.py:674
 msgid "Group decks can only be renamed, not moved to another parent deck."
 msgstr "Gruppendecks können nur umbenannt, aber nicht in ein anderes Elterndeck verschoben werden."
 
-#: app/anki_service.py:680
+#: app/anki_service.py:681
 msgid "A deck cannot be moved into its own subdeck."
 msgstr "Ein Deck kann nicht in sein eigenes Unterdeck verschoben werden."
 
-#: app/anki_service.py:683 app/anki_service.py:704 app/workspace.py:167
+#: app/anki_service.py:684 app/anki_service.py:705 app/workspace.py:167
 msgid "A deck with this name already exists."
 msgstr "Ein Deck mit diesem Namen gibt es schon."
 
-#: app/anki_service.py:686 app/templates/deck_rename.html:9
+#: app/anki_service.py:687 app/templates/deck_rename.html:9
 msgid "Group decks cannot be renamed."
 msgstr "Gruppendecks können nicht umbenannt werden."
 
-#: app/anki_service.py:873 app/anki_service.py:1210 app/anki_service.py:1224
+#: app/anki_service.py:889 app/anki_service.py:1226 app/anki_service.py:1240
 #: app/routes/decks.py:247 app/routes/decks.py:251 app/workspace.py:65
 msgid "Note not found."
 msgstr "Notiz nicht gefunden."
 
-#: app/anki_service.py:881
+#: app/anki_service.py:897
 msgid "The first field must not be empty."
 msgstr "Das erste Feld darf nicht leer sein."
 
-#: app/anki_service.py:887 app/routes/notes.py:80
+#: app/anki_service.py:903 app/routes/notes.py:80
 msgid "Note type not found."
 msgstr "Notiztyp nicht gefunden."
 
-#: app/anki_service.py:914
+#: app/anki_service.py:930
 msgid "Please enter a Bible text."
 msgstr "Bitte einen Bibeltext eingeben."
 
-#: app/anki_service.py:924
+#: app/anki_service.py:940
 msgid "[Beginning]"
 msgstr "[Anfang]"
 
-#: app/anki_service.py:977
+#: app/anki_service.py:993
 msgid "Someone else changed this note in the meantime. Check the fields and save again to overwrite the other change."
 msgstr "Jemand anderes hat diese Notiz inzwischen geändert. Prüfe die Felder und speichere erneut, um die andere Änderung zu überschreiben."
 
-#: app/anki_service.py:980
+#: app/anki_service.py:996
 msgid "Cards from group decks cannot be edited."
 msgstr "Karten aus Gruppendecks können nicht bearbeitet werden."
 
-#: app/anki_service.py:982
+#: app/anki_service.py:998
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr "Bibeltext-Karten werden aus dem Text erzeugt. Zum Ändern bitte löschen und den Abschnitt neu importieren."
 
-#: app/anki_service.py:1005
+#: app/anki_service.py:1021
 msgid "Cards from group decks cannot be deleted."
 msgstr "Karten aus Gruppendecks können nicht gelöscht werden."
 
-#: app/anki_service.py:1124 app/anki_service.py:1267
+#: app/anki_service.py:1140 app/anki_service.py:1283
 msgid "Card not found."
 msgstr "Karte nicht gefunden."
 
-#: app/anki_service.py:1691
+#: app/anki_service.py:1707
 msgid "The image is too large (max. 5 MB)."
 msgstr "Das Bild ist zu groß (max. 5 MB)."
 
-#: app/anki_service.py:1694
+#: app/anki_service.py:1710
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr "Nur PNG-, JPEG-, GIF- oder WebP-Bilder werden unterstützt."
 
@@ -113,25 +113,38 @@ msgstr "„%(deck)s“ verteilen"
 msgid "Rename “%(old)s” to “%(new)s”"
 msgstr "„%(old)s“ in „%(new)s“ umbenennen"
 
-#: app/main.py:135
+#: app/main.py:138
 msgid "You don't have permission to do that."
 msgstr "Dafür fehlen dir die Rechte."
 
-#: app/main.py:141
+#: app/main.py:144
 msgid "Not available while you are editing group decks. Switch back to your own cards first."
 msgstr "Nicht verfügbar, während du Gruppendecks bearbeitest. Wechsle zuerst zurück zu deinen eigenen Karten."
 
-#: app/main.py:148
+#: app/main.py:151
 msgid "Your session has expired. Please reload the page and try again."
 msgstr "Die Sitzung ist abgelaufen. Bitte lade die Seite neu und versuche es noch einmal."
 
-#: app/main.py:187
+#: app/main.py:190
 msgid "CrossPoint – memorize the Bible"
 msgstr "CrossPoint – Bibelverse lernen"
 
-#: app/main.py:189
+#: app/main.py:192
 msgid "Memorize Bible verses with spaced repetition – compatible with Anki."
 msgstr "Bibelverse lernen mit Spaced Repetition – kompatibel mit Anki."
+
+#: app/reminders.py:157
+#, python-format
+msgid "Cards waiting for you today: %(num)s"
+msgstr "Heute warten Karten auf dich: %(num)s"
+
+#: app/reminders.py:159
+msgid "Reminders are working."
+msgstr "Erinnerungen funktionieren."
+
+#: app/reminders.py:160
+msgid "Time to review"
+msgstr "Zeit zum Lernen"
 
 #: app/workspace.py:171
 msgid "This deck would also be distributed to groups you don't lead. Please choose another name."
@@ -162,11 +175,11 @@ msgstr "Bitte einen Gruppennamen eingeben."
 msgid "A group with this name already exists."
 msgstr "Eine Gruppe mit diesem Namen gibt es schon."
 
-#: app/routes/admin_groups.py:132 app/routes/admin_users.py:114
+#: app/routes/admin_groups.py:132 app/routes/admin_users.py:116
 msgid "Group decks for new members"
 msgstr "Gruppendecks für neue Mitglieder"
 
-#: app/routes/admin_progress.py:113 app/templates/admin/progress.html:48
+#: app/routes/admin_progress.py:115 app/templates/admin/progress.html:48
 msgid "Refresh figures"
 msgstr "Werte aktualisieren"
 
@@ -174,29 +187,29 @@ msgstr "Werte aktualisieren"
 msgid "User not found."
 msgstr "Nutzer nicht gefunden."
 
-#: app/routes/admin_users.py:103
+#: app/routes/admin_users.py:105
 #, python-format
 msgid "Please enter one name per line (at most %(max)s)."
 msgstr "Bitte einen Namen pro Zeile eingeben (höchstens %(max)s)."
 
-#: app/routes/admin_users.py:170
+#: app/routes/admin_users.py:172
 msgid "You cannot remove your own admin role."
 msgstr "Du kannst dir die Admin-Rolle nicht selbst entziehen."
 
-#: app/routes/admin_users.py:189
+#: app/routes/admin_users.py:191
 #, python-format
 msgid "Group decks for %(name)s"
 msgstr "Gruppendecks für %(name)s"
 
-#: app/routes/admin_users.py:214
+#: app/routes/admin_users.py:216
 msgid "You cannot deactivate yourself."
 msgstr "Du kannst dich nicht selbst deaktivieren."
 
-#: app/routes/admin_users.py:228
+#: app/routes/admin_users.py:230
 msgid "You cannot delete yourself."
 msgstr "Du kannst dich nicht selbst löschen."
 
-#: app/routes/admin_users.py:231
+#: app/routes/admin_users.py:233
 msgid "The name does not match. The user was not deleted."
 msgstr "Der Name stimmt nicht überein. Der Nutzer wurde nicht gelöscht."
 
@@ -289,7 +302,7 @@ msgstr "Hinzugefügt: %(front)s"
 #: app/templates/admin/import.html:4 app/templates/admin/progress.html:4
 #: app/templates/admin/user_detail.html:23 app/templates/admin/users.html:4
 #: app/templates/admin/users.html:26 app/templates/admin/users.html:55
-#: app/templates/base.html:26 app/templates/me.html:19
+#: app/templates/base.html:26 app/templates/me.html:20
 msgid "Admin"
 msgstr "Verwaltung"
 
@@ -297,7 +310,7 @@ msgstr "Verwaltung"
 msgid "Search"
 msgstr "Suchen"
 
-#: app/templates/base.html:31 app/templates/me.html:33
+#: app/templates/base.html:31 app/templates/me.html:53
 msgid "Log out"
 msgstr "Abmelden"
 
@@ -314,24 +327,24 @@ msgstr "Du bearbeitest die Admin-Sammlung (Gruppendecks)."
 msgid "Back to my cards"
 msgstr "Zurück zu meinen Karten"
 
-#: app/templates/base.html:53 app/templates/me.html:37
+#: app/templates/base.html:53 app/templates/me.html:57
 msgid "Compatible with Anki"
 msgstr "Kompatibel mit Anki"
 
-#: app/templates/base.html:55 app/templates/me.html:38
+#: app/templates/base.html:55 app/templates/me.html:58
 #: app/templates/privacy.html:2 app/templates/privacy.html:5
 msgid "Privacy"
 msgstr "Datenschutz"
 
-#: app/templates/base.html:57 app/templates/me.html:39
+#: app/templates/base.html:57 app/templates/me.html:59
 msgid "Source code"
 msgstr "Quellcode"
 
-#: app/templates/base.html:59 app/templates/me.html:40
+#: app/templates/base.html:59 app/templates/me.html:60
 msgid "Version"
 msgstr "Version"
 
-#: app/templates/base.html:60 app/templates/me.html:23 app/templates/me.html:24
+#: app/templates/base.html:60 app/templates/me.html:43 app/templates/me.html:44
 msgid "Language"
 msgstr "Sprache"
 
@@ -399,7 +412,7 @@ msgid "Fewer"
 msgstr "Weniger"
 
 #: app/templates/deck_options.html:20 app/templates/deck_options.html:27
-#: app/templates/me.html:16 app/templates/note_bible.html:37
+#: app/templates/me.html:17 app/templates/note_bible.html:37
 msgid "More"
 msgstr "Mehr"
 
@@ -936,17 +949,61 @@ msgstr "Gib deinen persönlichen Code ein – oder scanne den QR-Code auf deinem
 msgid "Code"
 msgstr "Code"
 
-#: app/templates/me.html:17 app/templates/note_bible.html:2
+#: app/templates/me.html:18 app/templates/note_bible.html:2
 msgid "Import Bible text"
 msgstr "Bibeltext importieren"
 
-#: app/templates/me.html:18
+#: app/templates/me.html:19
 msgid "Export to Anki"
 msgstr "Nach Anki exportieren"
 
-#: app/templates/me.html:19
+#: app/templates/me.html:20
 msgid "STAFF"
 msgstr "TEAM"
+
+#: app/templates/me.html:24
+msgid "Daily reminder"
+msgstr "Tägliche Erinnerung"
+
+#: app/templates/me.html:25
+msgid "A notification at the chosen time if cards are waiting for you."
+msgstr "Eine Benachrichtigung zur gewählten Uhrzeit, wenn Karten auf dich warten."
+
+#: app/templates/me.html:26
+msgid "This browser can't show notifications. On iPhone or iPad, first add CrossPoint to the home screen (Share → Add to Home Screen) and open it from there."
+msgstr "Dieser Browser kann keine Benachrichtigungen anzeigen. Auf iPhone oder iPad CrossPoint zuerst zum Home-Bildschirm hinzufügen (Teilen → Zum Home-Bildschirm) und von dort öffnen."
+
+#: app/templates/me.html:27
+msgid "Notifications are blocked for this site. Allow them in your browser or system settings."
+msgstr "Benachrichtigungen sind für diese Seite blockiert. Erlaube sie in den Browser- oder Systemeinstellungen."
+
+#: app/templates/me.html:29
+msgid "Time"
+msgstr "Uhrzeit"
+
+#: app/templates/me.html:32
+msgid "Turn on reminder"
+msgstr "Erinnerung einschalten"
+
+#: app/templates/me.html:34
+msgid "Send test"
+msgstr "Test senden"
+
+#: app/templates/me.html:35
+msgid "Turn off"
+msgstr "Ausschalten"
+
+#: app/templates/me.html:38
+msgid "Reminder saved."
+msgstr "Erinnerung gespeichert."
+
+#: app/templates/me.html:38
+msgid "Test sent."
+msgstr "Test gesendet."
+
+#: app/templates/me.html:39
+msgid "That didn't work. Please try again."
+msgstr "Das hat nicht geklappt. Bitte versuche es noch einmal."
 
 #: app/templates/note_add.html:23
 msgid "Add"
@@ -1077,19 +1134,23 @@ msgstr "Deine Karten und dein Lernverlauf."
 msgid "A session cookie to keep you logged in, and a cookie for your language. No tracking or advertising cookies."
 msgstr "Ein Sitzungs-Cookie, damit du angemeldet bleibst, und ein Cookie für deine Sprache. Keine Tracking- oder Werbe-Cookies."
 
-#: app/templates/privacy.html:13
+#: app/templates/privacy.html:12
+msgid "Only if you turn on the daily reminder: the time and your device's push subscription. The notification is sent encrypted via your browser vendor's push service."
+msgstr "Nur wenn du die tägliche Erinnerung einschaltest: die Uhrzeit und das Push-Abo deines Geräts. Die Benachrichtigung wird verschlüsselt über den Push-Dienst deines Browser-Herstellers verschickt."
+
+#: app/templates/privacy.html:14
 msgid "Your rights"
 msgstr "Deine Rechte"
 
-#: app/templates/privacy.html:14
+#: app/templates/privacy.html:15
 msgid "You can export your cards at any time. The administrator can delete your account including all data."
 msgstr "Du kannst deine Karten jederzeit exportieren. Der Administrator kann dein Konto samt aller Daten löschen."
 
-#: app/templates/privacy.html:15
+#: app/templates/privacy.html:16
 msgid "Responsible"
 msgstr "Verantwortlich"
 
-#: app/templates/privacy.html:16
+#: app/templates/privacy.html:17
 msgid "[Name and contact of the operator]"
 msgstr "[Name und Kontakt des Betreibers]"
 

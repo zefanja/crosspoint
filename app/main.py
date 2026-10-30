@@ -13,12 +13,13 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Resp
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
-from app import anki_service, auth, backup, i18n, workspace
+from app import anki_service, auth, backup, i18n, reminders, workspace
 from app.config import get_settings
 from app.db import get_engine, get_sessionmaker
 from app.routes import auth as auth_routes
 from app.routes import admin, admin_group_decks, admin_groups, admin_progress, admin_users
 from app.routes import bible, browse, decks, export, imports, notes, pages, review, statistics
+from app.routes import reminders as reminder_routes
 from app.templating import BASE_DIR, is_htmx, render, templates
 from app.i18n import _
 
@@ -67,6 +68,7 @@ async def housekeeping() -> None:
         try:
             await anki_service.close_idle()
             cleanup_exports()
+            await reminders.send_due()
             if time.monotonic() - last_prune > 3600:
                 with get_sessionmaker()() as db:
                     auth.prune(db)
@@ -96,7 +98,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 for module in (auth_routes, decks, review, bible, notes, browse, export, imports, pages,
-               statistics, admin, admin_users, admin_groups, admin_group_decks, admin_progress):
+               reminder_routes, statistics, admin, admin_users, admin_groups, admin_group_decks,
+               admin_progress):
     app.include_router(module.router)
 
 

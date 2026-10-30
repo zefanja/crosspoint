@@ -147,3 +147,29 @@ class GroupDeckEdit(Base):
     action: Mapped[str] = mapped_column(String(10))  # add|edit|delete
     summary: Mapped[str] = mapped_column(String(100), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, index=True)
+
+
+class Reminder(Base):
+    """Daily study reminder per user (Web Push); sent at `time` (HH:MM, server TZ)."""
+
+    __tablename__ = "reminders"
+
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    time: Mapped[str] = mapped_column(String(5))
+    lang: Mapped[str] = mapped_column(String(10), default="en")
+    last_sent_on: Mapped[date | None] = mapped_column(Date)
+
+
+class PushSubscription(Base):
+    """A browser/device that receives the user's reminders."""
+
+    __tablename__ = "push_subscriptions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    endpoint: Mapped[str] = mapped_column(String(1000), unique=True)
+    p256dh: Mapped[str] = mapped_column(String(200))
+    auth: Mapped[str] = mapped_column(String(100))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)

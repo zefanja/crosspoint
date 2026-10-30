@@ -84,6 +84,7 @@ Abnahmen (Portainer, Import in Anki Desktop/AnkiDroid, eine Woche Lernen am Hand
 - `app/bible_memorizer/` – vendored aus zefanja/bible-memorizer (`gen_notes.py` unverändert
   lassen), `model.py` (Notiztyp 1:1), `formatter.py` (Port des Web-Formatters)
 - `app/routes/statistics.py`, `admin.py` (Hub, Workspace, Import, Jobs)
+- `app/reminders.py` – tägliche Erinnerung per Web Push (VAPID-Schlüssel in `DATA_DIR`, Versand im Housekeeping-Loop), Routen in `app/routes/reminders.py`, Client `static/reminder.js` + `sw.js`
 - `app/distribution.py` – Hintergrundjobs (Verteilen, Werte aktualisieren) mit Fortschritt
 - `app/workspace.py` – gemeinsames Bearbeiten der Gruppendecks: `DeckAccess` (sichtbar/bearbeitbar pro Deck für Gruppenleiter), Deck-Anlage, Änderungsprotokoll; Routen nutzen `Depends(deck_access)` bzw. `no_leader_workspace`
 - `app/routes/admin_group_decks.py` – Seite „Gruppendecks“ (Verteilen, letzte Änderungen) für Admins und Gruppenleiter
