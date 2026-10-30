@@ -193,8 +193,11 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
   Gruppendeck-Karten), Balken „X von Y gelernt“ (gelernt = *mature*, Intervall ≥ 21 Tage;
   ausgesetzte Karten zählen nicht, Unterdecks zählen mit), Chip mit der Zahl fälliger Karten
   (✓ wenn nichts fällig) und ⚙ zu den Deck-Optionen. „+ Neues Deck“ klappt das Formular auf.
-- *Alle Decks lernen*: Die v3-Queue gilt nur fürs aktuelle Deck, daher werden die
-  Hauptdecks nacheinander abgearbeitet (das aktuelle zuerst); Zähler = ganzer Deckbaum.
+- *Alle Decks lernen*: Die v3-Queue gilt nur fürs aktuelle Deck. Die Karten der Hauptdecks
+  werden gemischt: Nach jeder Bewertung wird zufällig ein Hauptdeck mit fälligen Karten
+  gewählt, gewichtet nach seiner Restzahl (`_mix_decks`). Bis zur Bewertung bleibt das
+  gewählte Deck aktuell, damit die angezeigte Karte stabil ist (Doppeltipp-Schutz, Neuladen);
+  Zähler = ganzer Deckbaum.
   Der Deckwechsel ist in Anki ein eigener Undo-Schritt und wird in den Undo-Schritt der
   Bewertung gemergt (`merge_undo_entries`), damit „Rückgängig“ verfügbar bleibt.
 
