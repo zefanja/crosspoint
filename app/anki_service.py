@@ -10,6 +10,7 @@ Verified against anki==26.9.3 (see SPEC §6, spike results).
 import asyncio
 import hashlib
 import logging
+import random
 import re
 import shutil
 import tempfile
@@ -722,10 +723,11 @@ def _can_undo_review(col: Collection) -> bool:
 def _queue(col: Collection, deck_id: int):
     """Select the deck and fetch its next queued card.
 
-    The v3 queue is scoped to the current deck, so ALL_DECKS serves the top-level decks one
-    after another (the current one first, so a session stays in its deck) with the counts of
-    the whole tree. Selecting another deck is an undo step of its own, so only the deck that
-    serves the card is selected. Returns (deck name, queued card or None, (new, learn, review)).
+    The v3 queue is scoped to the current deck, so ALL_DECKS serves the current top-level deck
+    first (keeps the shown card stable until it is answered; `_mix_decks` switches decks after
+    each answer) and falls back to the other decks, with the counts of the whole tree.
+    Selecting another deck is an undo step of its own, so only the deck that serves the card is
+    selected. Returns (deck name, queued card or None, (new, learn, review)).
     """
     if deck_id != ALL_DECKS:
         deck = _require_deck(col, deck_id)
@@ -743,6 +745,18 @@ def _queue(col: Collection, deck_id: int):
         if queued.cards:
             return ALL_DECKS_NAME, queued.cards[0], counts  # name translated by the route
     return ALL_DECKS_NAME, None, counts
+
+
+def _mix_decks(col: Collection) -> None:
+    """ALL_DECKS: select a random top-level deck with due cards, weighted by its remaining
+    count, so the cards of all decks are mixed instead of served deck by deck."""
+    counts = {n.deck_id: n.new_count + n.learn_count + n.review_count
+              for n in col.sched.deck_due_tree().children}
+    pending = {did: count for did, count in counts.items() if count}
+    if len(pending) > 1:
+        deck_id = random.choices(list(pending), list(pending.values()))[0]
+        if deck_id != col.decks.get_current_id():
+            col.decks.select(deck_id)
 
 
 def _answers_today(col: Collection, deck_id: int) -> int:
@@ -821,6 +835,8 @@ def _answer(col: Collection, deck_id: int, card_id: int, rating: int, taken_secs
         )
         answered = True
         step = col.undo_status().last_step
+        if deck_id == ALL_DECKS:
+            _mix_decks(col)
     state = _review_state(col, deck_id)
     if answered:
         col.merge_undo_entries(step)  # a deck switch (ALL_DECKS) belongs to the answer

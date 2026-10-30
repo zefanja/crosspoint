@@ -163,6 +163,26 @@ def test_review_all_decks(run, deck):
     assert undone and state.card is not None and state.new == 1
 
 
+def test_review_all_decks_mixes_decks(run, deck, monkeypatch):
+    other = run(svc.create_deck(U, "Psalmen"))
+    for i in range(1, 3):
+        add_verse(run, deck, ref=f"Joh 3,{i}")
+        add_verse(run, other, ref=f"Ps 23,{i}")
+    calls = []
+    monkeypatch.setattr(svc.random, "choices",  # always the last deck ("Psalmen")
+                        lambda population, weights: calls.append(weights) or [population[-1]])
+    state = run(svc.review_state(U, svc.ALL_DECKS))
+    books = []
+    while state.card is not None:
+        books.append("Ps" if "Ps 23" in state.card.question else "Joh")
+        state, answered = run(svc.answer_card(U, svc.ALL_DECKS, state.card.card_id, 4, 3.0))
+        assert answered and state.can_undo
+    assert books == ["Joh", "Ps", "Ps", "Joh"]  # not deck by deck
+    assert calls == [[1, 2], [1, 1]]  # weighted by remaining cards; none with one deck left
+    state, undone = run(svc.undo_review(U, svc.ALL_DECKS))
+    assert undone and state.card is not None and state.new == 1
+
+
 def test_notetypes_for_adding(run):
     nts = run(svc.notetypes_for_adding(U))
     assert [n.name for n in nts] == ["Bible Verse", "Basic"]
