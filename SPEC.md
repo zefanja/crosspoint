@@ -71,6 +71,7 @@ DATA_DIR/
     _admin/collection.anki2           # Admin-Collection: Quelle der Gruppendecks
     <user_id>/collection.anki2        # eine Collection pro Nutzer
   exports/                            # temporäre Exportdateien (nach 1 h löschen)
+  vapid_private.pem                   # Web-Push-Schlüssel (beim ersten Gebrauch erzeugt)
 ```
 
 `<user_id>` ist eine interne ID (z. B. ULID), niemals der Anzeigename.
@@ -90,6 +91,8 @@ user_stats(user_id, total_cards, due_today, new_today, reviews_today,
 daily_reviews(user_id, day, reviews, again_count, new_count)   # für Diagramme
 group_leaders(group_id, user_id)
 group_deck_edits(id, user_id, note_id, deck_id, action, summary, created_at)  # wer hat was geändert
+reminders(user_id, time, lang, last_sent_on)          # tägliche Erinnerung (HH:MM, Server-TZ)
+push_subscriptions(id, user_id, endpoint, p256dh, auth, created_at)  # ein Eintrag pro Gerät
 ```
 
 `user_stats`/`daily_reviews` sind ein **Cache**: nach jeder Review und jedem Login aktualisiert,
@@ -205,8 +208,19 @@ Benötigte Operationen (Signaturen grob, gegen installierte `anki`-Version verif
 - Untere Leiste: Start · Karten (Suche) · großer „+“-Button (Karte hinzufügen) ·
   Fortschritt (Statistik) · Ich. Nicht in der Lernansicht und im Admin-Bereich.
 - „Ich“ (`/me`, Entwurf 3d): Kopfkarte mit Initiale, Name und Gruppen; Bibeltext importieren,
-  Export, Verwaltung (Staff); Sprache als Umschalter; Abmelden; Datenschutz/Quellcode/Version
-  (ersetzt auf diesen Seiten den Footer). Serie oben rechts.
+  Export, Verwaltung (Staff); tägliche Erinnerung; Sprache als Umschalter; Abmelden;
+  Datenschutz/Quellcode/Version (ersetzt auf diesen Seiten den Footer). Serie oben rechts.
+- **Tägliche Erinnerung** (Web Push, `app/reminders.py`): Auf „Ich“ Uhrzeit wählen und
+  „Erinnerung einschalten“ → Browser fragt nach Erlaubnis, das Gerät abonniert per
+  `PushManager` (VAPID; Schlüsselpaar wird beim ersten Gebrauch in `DATA_DIR` erzeugt, keine
+  neue Variable). Eine Uhrzeit pro Nutzer (Server-Zeitzone `TZ`), beliebig viele Geräte;
+  „Test senden“, „Ausschalten“ (nur dieses Gerät). Der Housekeeping-Loop prüft minütlich und
+  schickt höchstens eine Benachrichtigung pro Tag, nur wenn fällige oder neue Karten warten
+  („Zeit zum Lernen – Heute warten Karten auf dich: N“, Tippen öffnet die Startseite).
+  Eine bereits verstrichene Uhrzeit gilt ab morgen. Abgelaufene Abos (404/410) werden
+  gelöscht; ohne Geräte entfällt die Erinnerung. Endpunkte nur von bekannten Push-Diensten
+  (Google, Mozilla, Apple, Microsoft), sonst 400. iPhone/iPad: nur als zum Home-Bildschirm
+  hinzugefügte App (iOS ≥ 16.4) – die Seite zeigt dann einen Hinweis.
 - Gemeinsamer Stil der Lerner-Seiten (Entwürfe 2a, 3a–d, 4a–j): navy Kopfzeile mit gelber Linie
   (Logo oder „‹ Zurück“), weiße Feldkarten mit Großbuchstaben-Label, Schalter statt Checkboxen,
   −/+-Stepper für Zahlen, gelber Hauptbutton. Login, „Keine Verbindung“, Fehler und
@@ -455,8 +469,9 @@ im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
   Touch-Ziele ≥ 48 px, funktioniert ab 360 px Breite.
 - **Karten-Rendering:** Karten-HTML in einem `<iframe sandbox srcdoc=…>` ohne `allow-scripts`
   darstellen – schützt vor Skripten aus importierten Decks und isoliert das Template-CSS.
-- **PWA:** `manifest.webmanifest`, Icons, minimaler Service Worker (nur App-Shell-Cache,
-  Offline-Seite „Keine Verbindung“). Kein Offline-Lernen.
+- **PWA:** `manifest.webmanifest`, Icons, minimaler Service Worker (App-Shell-Cache,
+  Offline-Seite „Keine Verbindung“, Push-Benachrichtigung der täglichen Erinnerung).
+  Kein Offline-Lernen.
 - **Sprache:** UI mehrsprachig. Quellsprache Englisch (`_("…")` in Code und Templates),
   Übersetzungen per gettext/Babel in `app/locales/<lang>/LC_MESSAGES/messages.po`
   (zur Laufzeit im Speicher kompiliert, kein Build-Schritt). Erste Übersetzung: Deutsch.
@@ -491,6 +506,8 @@ im Prozess und zeigen eine Fortschrittsseite (htmx-Polling).
 - Datenschutzhinweis-Seite `/privacy` (Platzhaltertext) im Footer.
 - Nutzer kann jederzeit exportieren; Admin kann Nutzer samt Daten löschen.
 - Logs ohne Login-Codes (Query-Parameter `c` aus Access-Logs filtern).
+- Tägliche Erinnerung nur auf Wunsch: gespeichert werden Uhrzeit und Push-Abo des Geräts; die
+  Benachrichtigung läuft verschlüsselt über den Push-Dienst des Browser-Herstellers.
 
 ## 10. Hosting: Docker auf eigenem Server (Portainer)
 
@@ -617,6 +634,8 @@ Polling das vorherige Image. Daten bleiben unberührt; Migrationen müssen desha
 - Die App erstellt selbst nächtlich um 3:00 Uhr (In-Process-Scheduler) ein Backup nach
   `/data/backups/<datum>/`: `app.db` per SQLite-Backup-API, Collections per
   `col.export_collection_package` bzw. Dateikopie unter Nutzer-Lock, gepackt als `.tar.gz`.
+- Der Web-Push-Schlüssel `vapid_private.pem` wird mitgesichert (geht er verloren, müssen
+  Nutzer die Erinnerung neu einschalten).
 - Rotation nach `BACKUP_KEEP_DAYS`.
 - Weil `/data` auf einem Host-Pfad liegt, wird es zusätzlich von der bestehenden
   Server-Sicherung erfasst. Restore-Anleitung in `docs/deploy.md`.

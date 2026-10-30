@@ -94,18 +94,28 @@ Migrationen sind deshalb nur additiv – eine ältere Version läuft mit einer n
 Zum Wiederfreigeben einfach einen neuen Commit auf `main` pushen (oder den Workflow unter
 *Actions → Build & Deploy → Run workflow* manuell starten).
 
+## Tägliche Erinnerung (Web Push)
+
+Lerner können auf „Ich“ eine tägliche Erinnerung einschalten. Dafür ist nichts einzurichten:
+Das VAPID-Schlüsselpaar wird beim ersten Gebrauch als `/data/vapid_private.pem` erzeugt.
+Voraussetzungen: HTTPS (`BASE_URL`), `TZ` passend zu den Nutzern (Uhrzeiten gelten in der
+Server-Zeitzone) und ausgehende HTTPS-Verbindungen zu den Push-Diensten
+(`*.googleapis.com`, `*.mozilla.com`, `*.push.apple.com`, `*.notify.windows.com`).
+Auf iPhone/iPad funktioniert es nur, wenn CrossPoint zum Home-Bildschirm hinzugefügt wurde.
+
 ## Backups und Restore
 
 Die App erstellt nächtlich ab 3:00 Uhr ein Backup unter `/data/backups/<datum>/`
-(`app.db` per SQLite-Backup-API, Collections als `.tar.gz`), Rotation nach
+(`app.db` per SQLite-Backup-API, Collections als `.tar.gz`, Web-Push-Schlüssel
+`vapid_private.pem`), Rotation nach
 `BACKUP_KEEP_DAYS`. Da `/data` auf einem Host-Pfad liegt, erfasst es zusätzlich die
 bestehende Server-Sicherung.
 
 Restore:
 1. Stack in Portainer stoppen.
 2. Inhalt von `DATA_PATH` sichern (`tar czf /root/crosspoint-vorher.tgz /srv/crosspoint`).
-3. Gewünschtes Backup entpacken und `app.db` sowie `collections/` nach `DATA_PATH`
-   zurückkopieren; Besitzer `1000:1000`.
+3. Gewünschtes Backup entpacken und `app.db`, `collections/` sowie `vapid_private.pem`
+   nach `DATA_PATH` zurückkopieren; Besitzer `1000:1000`.
 4. Stack starten und `GET /healthz` prüfen.
 
 ## Lokal testen

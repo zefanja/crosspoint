@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 19:33+0000\n"
+"POT-Creation-Date: 2026-10-30 06:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/anki_service.py:55
+#: app/anki_service.py:56
 msgid "My cards"
 msgstr ""
 
-#: app/anki_service.py:63 app/templates/stats.html:7
+#: app/anki_service.py:64 app/templates/stats.html:7
 msgid "All decks"
 msgstr ""
 
-#: app/anki_service.py:633 app/routes/admin_group_decks.py:75
+#: app/anki_service.py:634 app/routes/admin_group_decks.py:75
 #: app/routes/admin_groups.py:143 app/routes/admin_groups.py:164
 #: app/routes/decks.py:78 app/routes/decks.py:189 app/routes/decks.py:230
 #: app/routes/decks.py:278 app/routes/decks.py:281 app/routes/export.py:59
@@ -33,72 +33,72 @@ msgstr ""
 msgid "Deck not found."
 msgstr ""
 
-#: app/anki_service.py:640 app/anki_service.py:668 app/workspace.py:161
+#: app/anki_service.py:641 app/anki_service.py:669 app/workspace.py:161
 msgid "Please enter a deck name."
 msgstr ""
 
-#: app/anki_service.py:673
+#: app/anki_service.py:674
 msgid "Group decks can only be renamed, not moved to another parent deck."
 msgstr ""
 
-#: app/anki_service.py:680
+#: app/anki_service.py:681
 msgid "A deck cannot be moved into its own subdeck."
 msgstr ""
 
-#: app/anki_service.py:683 app/anki_service.py:704 app/workspace.py:167
+#: app/anki_service.py:684 app/anki_service.py:705 app/workspace.py:167
 msgid "A deck with this name already exists."
 msgstr ""
 
-#: app/anki_service.py:686 app/templates/deck_rename.html:9
+#: app/anki_service.py:687 app/templates/deck_rename.html:9
 msgid "Group decks cannot be renamed."
 msgstr ""
 
-#: app/anki_service.py:873 app/anki_service.py:1210 app/anki_service.py:1224
+#: app/anki_service.py:889 app/anki_service.py:1226 app/anki_service.py:1240
 #: app/routes/decks.py:247 app/routes/decks.py:251 app/workspace.py:65
 msgid "Note not found."
 msgstr ""
 
-#: app/anki_service.py:881
+#: app/anki_service.py:897
 msgid "The first field must not be empty."
 msgstr ""
 
-#: app/anki_service.py:887 app/routes/notes.py:80
+#: app/anki_service.py:903 app/routes/notes.py:80
 msgid "Note type not found."
 msgstr ""
 
-#: app/anki_service.py:914
+#: app/anki_service.py:930
 msgid "Please enter a Bible text."
 msgstr ""
 
-#: app/anki_service.py:924
+#: app/anki_service.py:940
 msgid "[Beginning]"
 msgstr ""
 
-#: app/anki_service.py:977
+#: app/anki_service.py:993
 msgid "Someone else changed this note in the meantime. Check the fields and save again to overwrite the other change."
 msgstr ""
 
-#: app/anki_service.py:980
+#: app/anki_service.py:996
 msgid "Cards from group decks cannot be edited."
 msgstr ""
 
-#: app/anki_service.py:982
+#: app/anki_service.py:998
 msgid "Bible text cards are generated from the text. To change them, delete and import the passage again."
 msgstr ""
 
-#: app/anki_service.py:1005
+#: app/anki_service.py:1021
 msgid "Cards from group decks cannot be deleted."
 msgstr ""
 
-#: app/anki_service.py:1124 app/anki_service.py:1267
+#: app/anki_service.py:1140 app/anki_service.py:1283
 msgid "Card not found."
 msgstr ""
 
-#: app/anki_service.py:1691
+#: app/anki_service.py:1707
 msgid "The image is too large (max. 5 MB)."
 msgstr ""
 
-#: app/anki_service.py:1694
+#: app/anki_service.py:1710
 msgid "Only PNG, JPEG, GIF or WebP images are supported."
 msgstr ""
 
@@ -112,24 +112,37 @@ msgstr ""
 msgid "Rename “%(old)s” to “%(new)s”"
 msgstr ""
 
-#: app/main.py:135
+#: app/main.py:138
 msgid "You don't have permission to do that."
 msgstr ""
 
-#: app/main.py:141
+#: app/main.py:144
 msgid "Not available while you are editing group decks. Switch back to your own cards first."
 msgstr ""
 
-#: app/main.py:148
+#: app/main.py:151
 msgid "Your session has expired. Please reload the page and try again."
 msgstr ""
 
-#: app/main.py:187
+#: app/main.py:190
 msgid "CrossPoint – memorize the Bible"
 msgstr ""
 
-#: app/main.py:189
+#: app/main.py:192
 msgid "Memorize Bible verses with spaced repetition – compatible with Anki."
+msgstr ""
+
+#: app/reminders.py:157
+#, python-format
+msgid "Cards waiting for you today: %(num)s"
+msgstr ""
+
+#: app/reminders.py:159
+msgid "Reminders are working."
+msgstr ""
+
+#: app/reminders.py:160
+msgid "Time to review"
 msgstr ""
 
 #: app/workspace.py:171
@@ -161,11 +174,11 @@ msgstr ""
 msgid "A group with this name already exists."
 msgstr ""
 
-#: app/routes/admin_groups.py:132 app/routes/admin_users.py:114
+#: app/routes/admin_groups.py:132 app/routes/admin_users.py:116
 msgid "Group decks for new members"
 msgstr ""
 
-#: app/routes/admin_progress.py:113 app/templates/admin/progress.html:48
+#: app/routes/admin_progress.py:115 app/templates/admin/progress.html:48
 msgid "Refresh figures"
 msgstr ""
 
@@ -173,29 +186,29 @@ msgstr ""
 msgid "User not found."
 msgstr ""
 
-#: app/routes/admin_users.py:103
+#: app/routes/admin_users.py:105
 #, python-format
 msgid "Please enter one name per line (at most %(max)s)."
 msgstr ""
 
-#: app/routes/admin_users.py:170
+#: app/routes/admin_users.py:172
 msgid "You cannot remove your own admin role."
 msgstr ""
 
-#: app/routes/admin_users.py:189
+#: app/routes/admin_users.py:191
 #, python-format
 msgid "Group decks for %(name)s"
 msgstr ""
 
-#: app/routes/admin_users.py:214
+#: app/routes/admin_users.py:216
 msgid "You cannot deactivate yourself."
 msgstr ""
 
-#: app/routes/admin_users.py:228
+#: app/routes/admin_users.py:230
 msgid "You cannot delete yourself."
 msgstr ""
 
-#: app/routes/admin_users.py:231
+#: app/routes/admin_users.py:233
 msgid "The name does not match. The user was not deleted."
 msgstr ""
 
@@ -288,7 +301,7 @@ msgstr ""
 #: app/templates/admin/import.html:4 app/templates/admin/progress.html:4
 #: app/templates/admin/user_detail.html:23 app/templates/admin/users.html:4
 #: app/templates/admin/users.html:26 app/templates/admin/users.html:55
-#: app/templates/base.html:26 app/templates/me.html:19
+#: app/templates/base.html:26 app/templates/me.html:20
 msgid "Admin"
 msgstr ""
 
@@ -296,7 +309,7 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: app/templates/base.html:31 app/templates/me.html:33
+#: app/templates/base.html:31 app/templates/me.html:53
 msgid "Log out"
 msgstr ""
 
@@ -313,24 +326,24 @@ msgstr ""
 msgid "Back to my cards"
 msgstr ""
 
-#: app/templates/base.html:53 app/templates/me.html:37
+#: app/templates/base.html:53 app/templates/me.html:57
 msgid "Compatible with Anki"
 msgstr ""
 
-#: app/templates/base.html:55 app/templates/me.html:38
+#: app/templates/base.html:55 app/templates/me.html:58
 #: app/templates/privacy.html:2 app/templates/privacy.html:5
 msgid "Privacy"
 msgstr ""
 
-#: app/templates/base.html:57 app/templates/me.html:39
+#: app/templates/base.html:57 app/templates/me.html:59
 msgid "Source code"
 msgstr ""
 
-#: app/templates/base.html:59 app/templates/me.html:40
+#: app/templates/base.html:59 app/templates/me.html:60
 msgid "Version"
 msgstr ""
 
-#: app/templates/base.html:60 app/templates/me.html:23 app/templates/me.html:24
+#: app/templates/base.html:60 app/templates/me.html:43 app/templates/me.html:44
 msgid "Language"
 msgstr ""
 
@@ -398,7 +411,7 @@ msgid "Fewer"
 msgstr ""
 
 #: app/templates/deck_options.html:20 app/templates/deck_options.html:27
-#: app/templates/me.html:16 app/templates/note_bible.html:37
+#: app/templates/me.html:17 app/templates/note_bible.html:37
 msgid "More"
 msgstr ""
 
@@ -935,16 +948,60 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-#: app/templates/me.html:17 app/templates/note_bible.html:2
+#: app/templates/me.html:18 app/templates/note_bible.html:2
 msgid "Import Bible text"
 msgstr ""
 
-#: app/templates/me.html:18
+#: app/templates/me.html:19
 msgid "Export to Anki"
 msgstr ""
 
-#: app/templates/me.html:19
+#: app/templates/me.html:20
 msgid "STAFF"
+msgstr ""
+
+#: app/templates/me.html:24
+msgid "Daily reminder"
+msgstr ""
+
+#: app/templates/me.html:25
+msgid "A notification at the chosen time if cards are waiting for you."
+msgstr ""
+
+#: app/templates/me.html:26
+msgid "This browser can't show notifications. On iPhone or iPad, first add CrossPoint to the home screen (Share → Add to Home Screen) and open it from there."
+msgstr ""
+
+#: app/templates/me.html:27
+msgid "Notifications are blocked for this site. Allow them in your browser or system settings."
+msgstr ""
+
+#: app/templates/me.html:29
+msgid "Time"
+msgstr ""
+
+#: app/templates/me.html:32
+msgid "Turn on reminder"
+msgstr ""
+
+#: app/templates/me.html:34
+msgid "Send test"
+msgstr ""
+
+#: app/templates/me.html:35
+msgid "Turn off"
+msgstr ""
+
+#: app/templates/me.html:38
+msgid "Reminder saved."
+msgstr ""
+
+#: app/templates/me.html:38
+msgid "Test sent."
+msgstr ""
+
+#: app/templates/me.html:39
+msgid "That didn't work. Please try again."
 msgstr ""
 
 #: app/templates/note_add.html:23
@@ -1076,19 +1133,23 @@ msgstr ""
 msgid "A session cookie to keep you logged in, and a cookie for your language. No tracking or advertising cookies."
 msgstr ""
 
-#: app/templates/privacy.html:13
-msgid "Your rights"
+#: app/templates/privacy.html:12
+msgid "Only if you turn on the daily reminder: the time and your device's push subscription. The notification is sent encrypted via your browser vendor's push service."
 msgstr ""
 
 #: app/templates/privacy.html:14
-msgid "You can export your cards at any time. The administrator can delete your account including all data."
+msgid "Your rights"
 msgstr ""
 
 #: app/templates/privacy.html:15
-msgid "Responsible"
+msgid "You can export your cards at any time. The administrator can delete your account including all data."
 msgstr ""
 
 #: app/templates/privacy.html:16
+msgid "Responsible"
+msgstr ""
+
+#: app/templates/privacy.html:17
 msgid "[Name and contact of the operator]"
 msgstr ""
 

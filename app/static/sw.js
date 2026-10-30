@@ -1,5 +1,6 @@
-// Minimal service worker: app shell cache + offline page. No offline learning.
-const CACHE = "crosspoint-shell-v2";
+// Minimal service worker: app shell cache + offline page + daily reminder (push).
+// No offline learning.
+const CACHE = "crosspoint-shell-v3";
 const SHELL = [
   "/offline",
   "/static/app.css",
@@ -41,4 +42,27 @@ self.addEventListener("fetch", (event) => {
         .catch(() => caches.match(req, { ignoreSearch: true }))  // versioned URLs (?v=)
     );
   }
+});
+
+// Daily reminder: payload {title, body, url} from app/reminders.py.
+self.addEventListener("push", (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (e) { /* plain text */ }
+  event.waitUntil(self.registration.showNotification(data.title || "CrossPoint", {
+    body: data.body || "",
+    icon: "/static/icons/icon-192.png",
+    tag: "daily-reminder",
+    data: { url: data.url || "/" },
+  }));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = new URL(event.notification.data.url || "/", self.location.origin).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((wins) => {
+      const win = wins.find((w) => w.url.startsWith(self.location.origin));
+      return win ? win.focus().then((w) => w.navigate(url)).catch(() => {}) : self.clients.openWindow(url);
+    })
+  );
 });

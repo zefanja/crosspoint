@@ -3,6 +3,7 @@
 {% block topbar_extra %}{% if not leader_workspace %}
 <a class="streak-pill" href="/stats" title="{{ _('Days in a row with reviews') }}"><span class="streak-dot" aria-hidden="true"></span>{{ ngettext("%(num)s day", "%(num)s days", streak) }}</a>
 {% endif %}{% endblock %}
+{% block head %}<script src="/static/reminder.js?v={{ app_version }}" defer></script>{% endblock %}
 {% block content %}
 <div class="ui-stack me-page">
   <section class="hero me-hero">
@@ -18,6 +19,25 @@
     <a href="/export" class="me-link"><span>{{ _("Export to Anki") }}</span><span aria-hidden="true">›</span></a>
     {% if user.is_staff %}<a href="/admin" class="me-link"><span>{{ _("Admin") }}</span><span class="deck-badge">{{ _("STAFF") }}</span></a>{% endif %}
   </nav>
+
+  <section class="field reminder" id="reminder" data-key="{{ vapid_key }}" data-csrf="{{ csrf_token }}" hidden>
+    <h2 class="field-label me-section">{{ _("Daily reminder") }}</h2>
+    <p class="hint">{{ _("A notification at the chosen time if cards are waiting for you.") }}</p>
+    <p class="hint" data-show="unsupported" hidden>{{ _("This browser can't show notifications. On iPhone or iPad, first add CrossPoint to the home screen (Share → Add to Home Screen) and open it from there.") }}</p>
+    <p class="hint" data-show="denied" hidden>{{ _("Notifications are blocked for this site. Allow them in your browser or system settings.") }}</p>
+    <div class="reminder-row" data-show="off on" hidden>
+      <label for="reminder_time" class="reminder-label">{{ _("Time") }}</label>
+      <input type="time" id="reminder_time" class="input reminder-time" value="{{ reminder_time }}" required>
+    </div>
+    <button type="button" class="btn-go sm" data-action="on" data-show="off" hidden>{{ _("Turn on reminder") }}</button>
+    <div class="reminder-actions" data-show="on" hidden>
+      <button type="button" class="btn-line" data-action="test">{{ _("Send test") }}</button>
+      <button type="button" class="btn-line" data-action="off">{{ _("Turn off") }}</button>
+    </div>
+    <p class="hint" role="status" data-msg
+       data-saved="{{ _('Reminder saved.') }}" data-sent="{{ _('Test sent.') }}"
+       data-failed="{{ _("That didn't work. Please try again.") }}"></p>
+  </section>
 
   <section class="field">
     <h2 class="field-label me-section">{{ _("Language") }}</h2>

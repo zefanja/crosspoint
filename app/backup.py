@@ -38,6 +38,9 @@ async def run_backup(day: date | None = None) -> Path:
     target = backups_dir() / day.isoformat()
     target.mkdir(parents=True, exist_ok=True)
     await run_in_threadpool(_backup_app_db, target / "app.db")
+    vapid_key = get_settings().data_dir / "vapid_private.pem"
+    if vapid_key.exists():
+        shutil.copy2(vapid_key, target / vapid_key.name)
 
     with tempfile.TemporaryDirectory(dir=backups_dir()) as tmp:
         staging = Path(tmp) / "collections"
