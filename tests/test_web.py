@@ -97,6 +97,17 @@ def test_static_fonts_allow_card_frames(client):
     assert "access-control-allow-origin" not in client.get("/static/app.css").headers
 
 
+def test_card_frame_dark_mode_beats_light_background():
+    """The light card style uses body.card; the dark override must be at least as specific,
+    otherwise dark mode shows light text (yellow verse) on a white card."""
+    from app.templating import card_document
+
+    doc = card_document("x")
+    dark = doc[doc.index("@media (prefers-color-scheme: dark)") :]
+    assert "body.card{background-color:#0a2143" in dark.replace("html,", "")
+    assert "body.card .back{" in dark
+
+
 def test_create_deck(client, learner):
     _, csrf = learner
     r = client.post("/decks", data={"csrf_token": csrf, "name": "Psalmen"})
