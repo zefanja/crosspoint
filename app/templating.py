@@ -33,8 +33,10 @@ _CARD_TAIL = (
     "body.card{display:flex;flex-direction:column;"
     "font-family:Archivo,system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;line-height:1.4;"
     "color:#001a3f;background-color:#fff}.cp-card{width:100%;margin:auto 0}"
-    "@media (prefers-color-scheme: dark){html,body,.card{background-color:#0a2143;"
-    "color:#eaf4fb}.back{color:#f5d742}td:last-child,.highlight{color:#1d1d1f}}</style></body></html>"
+    # Dark mode needs the same specificity as body.card above, otherwise the white wins.
+    "@media (prefers-color-scheme: dark){html,body.card{background-color:#0a2143;"
+    "color:#eaf4fb}body.card .back{color:#f5d742}"
+    "body.card td:last-child,body.card .highlight{color:#1d1d1f}}</style></body></html>"
 )
 
 
