@@ -55,7 +55,7 @@ async def run_backup(day: date | None = None) -> Path:
             partial.rename(target / "collections.tar.gz")
 
         await run_in_threadpool(pack)
-    rotate()
+    rotate(today=day)
     log.info("Backup written to %s", target)
     return target
 
